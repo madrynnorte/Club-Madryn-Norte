@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inscripción — Madryn Norte</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--vd:#1a6636;--vc:#e8f2ec;--vb:#c8d9ce;--bl:#ffffff;--cr:#f8faf9;--rg:#c0392b;--ng:#0f2318;--gt:#4d6557;--gb:#dde8e1;--g2:#b0c4b8;--font-d:'Playfair Display',Georgia,serif;--font-s:'DM Sans',system-ui,sans-serif;--r:10px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-s);background:var(--cr);color:var(--ng);min-height:100vh}
+.hdr{background:var(--vd);position:relative;overflow:hidden}
+.hdr-inner{max-width:560px;margin:0 auto;padding:28px 24px 24px;display:flex;align-items:center;gap:18px;position:relative;z-index:1}
+.hdr-esc{width:52px;height:52px;border-radius:10px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.hdr-txt .t1{font-family:var(--font-d);font-size:19px;color:#fff;line-height:1.2}
+.hdr-txt .t2{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
+.hdr-txt .t3{font-size:13px;color:rgba(255,255,255,.7);margin-top:5px}
+.hdr-line{height:3px;background:var(--rg)}
+.hdr-pattern{position:absolute;inset:0;opacity:.04;background-image:repeating-linear-gradient(45deg,#fff 0,#fff 1px,transparent 0,transparent 50%);background-size:20px 20px}
+.wrap{max-width:560px;margin:0 auto;padding:24px 16px 60px}
+/* STEPS */
+.steps{display:flex;margin-bottom:24px;background:var(--bl);border:1px solid var(--gb);border-radius:var(--r);overflow:hidden}
+.step{flex:1;padding:10px 4px;text-align:center;font-size:11px;color:var(--g2);border-right:1px solid var(--gb);transition:all .2s}
+.step:last-child{border-right:none}
+.step .snum{width:20px;height:20px;border-radius:50%;background:var(--gb);color:var(--g2);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;margin:0 auto 3px}
+.step.active{background:var(--vc);color:var(--vd)}.step.active .snum{background:var(--vd);color:#fff}
+.step.done{color:var(--vd)}.step.done .snum{background:var(--vc);color:var(--vd)}
+/* CARD */
+.card{background:var(--bl);border:1px solid var(--gb);border-radius:var(--r);margin-bottom:14px}
+.ch{padding:14px 18px;border-bottom:1px solid var(--gb)}
+.ct{font-family:var(--font-d);font-size:15px;color:var(--ng)}
+.csub{font-size:12px;color:var(--gt);margin-top:2px}
+.cb{padding:16px 18px}
+/* FORM */
+.fg{margin-bottom:13px}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--gt);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.fc{width:100%;padding:10px 13px;border:1px solid var(--gb);border-radius:var(--r);font-size:14px;font-family:var(--font-s);color:var(--ng);background:var(--bl);transition:border-color .15s;-webkit-appearance:none}
+.fc:focus{outline:none;border-color:var(--vd);box-shadow:0 0 0 3px rgba(26,102,54,.1)}
+.fc.invalid{border-color:var(--rg)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.req{color:var(--rg);margin-left:2px}
+.error-msg{font-size:11px;color:var(--rg);margin-top:3px;display:none}
+/* MENOR TOGGLE */
+.toggle-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid var(--gb);border-radius:var(--r);cursor:pointer;transition:all .15s;margin-bottom:13px}
+.toggle-row.active{border-color:var(--rg);background:#fff8f7}
+.toggle-lbl{font-size:14px;font-weight:500;flex:1}
+.toggle-sw{width:42px;height:24px;border-radius:12px;background:var(--gb);position:relative;flex-shrink:0;transition:background .2s;cursor:pointer}
+.toggle-sw::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle-sw.on{background:var(--rg)}.toggle-sw.on::after{transform:translateX(18px)}
+/* TUTOR SECTION */
+.tutor-section{border:1.5px solid #f5c6c3;border-radius:var(--r);padding:14px;margin-bottom:13px;background:#fff8f7;display:none}
+.tutor-section.visible{display:block}
+.tutor-title{font-size:12px;font-weight:600;color:var(--rg);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+.vinculo-opts{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.vopt{display:flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid var(--gb);border-radius:8px;cursor:pointer;font-size:13px;transition:all .12s}
+.vopt:hover{background:var(--vc)}.vopt.sel{border-color:var(--vd);background:var(--vc)}
+.vopt input[type=radio]{accent-color:var(--vd);width:15px;height:15px;flex-shrink:0}
+/* FOTO */
+.photo-area{display:flex;align-items:center;gap:16px}
+.photo-preview{width:90px;height:110px;border-radius:10px;border:2px dashed var(--gb);background:var(--vc);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;transition:border-color .15s;flex-shrink:0}
+.photo-preview:hover{border-color:var(--vd)}
+.photo-preview img{width:100%;height:100%;object-fit:cover;display:none}
+.ph-ico{font-size:28px;opacity:.4;color:var(--vd)}
+.ph-txt{font-size:10px;color:var(--g2);margin-top:4px;text-align:center}
+.photo-btns{display:flex;flex-direction:column;gap:7px}
+.btn-foto{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--font-s);transition:all .15s}
+.btn-cam{background:var(--vd);color:#fff}.btn-cam:hover{background:#155d30}
+.btn-gal{background:var(--bl);color:var(--vd);border:1px solid var(--vb)}.btn-gal:hover{background:var(--vc)}
+/* ACTIVIDADES */
+.act-grid{display:flex;flex-direction:column;gap:8px}
+.act-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--gb);border-radius:var(--r);cursor:pointer;transition:all .15s;background:var(--bl)}
+.act-opt:hover{border-color:var(--vb);background:var(--vc)}
+.act-opt.sel{border-color:var(--vd);background:var(--vc)}
+.act-opt.dis{opacity:.5;cursor:not-allowed}
+.act-opt input[type=radio]{accent-color:var(--vd);width:17px;height:17px;flex-shrink:0}
+.act-nom{font-weight:500;font-size:14px}
+.act-det{font-size:12px;color:var(--gt);margin-top:2px}
+.act-precio{font-size:13px;font-weight:500;color:var(--vd);margin-left:auto;flex-shrink:0;white-space:nowrap}
+/* TÉRMINOS */
+.terms-box{background:var(--cr);border:1px solid var(--gb);border-radius:var(--r);padding:14px;font-size:12px;color:var(--gt);line-height:1.6;max-height:160px;overflow-y:auto;margin-bottom:12px}
+.check-row{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1.5px solid var(--gb);border-radius:var(--r);cursor:pointer;transition:border-color .15s}
+.check-row.checked{border-color:var(--vd);background:var(--vc)}
+.check-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--vd);flex-shrink:0;margin-top:1px}
+.check-lbl{font-size:13px;line-height:1.5}
+/* RESUMEN */
+.ri{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--cr);gap:12px}
+.ri:last-child{border-bottom:none}
+.ri-l{font-size:12px;color:var(--gt);flex-shrink:0}
+.ri-v{font-size:13px;font-weight:500;text-align:right}
+/* NAV */
+.nav-btns{display:flex;gap:10px;margin-top:18px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:var(--r);font-size:14px;font-weight:500;cursor:pointer;border:none;font-family:var(--font-s);transition:all .15s}
+.btn-p{background:var(--vd);color:#fff;flex:1;justify-content:center}.btn-p:hover{background:#155d30}.btn-p:disabled{opacity:.6;cursor:wait}
+.btn-o{background:var(--bl);color:var(--gt);border:1px solid var(--gb)}.btn-o:hover{background:var(--vc)}
+/* CÁMARA */
+#cam-modal{position:fixed;inset:0;background:rgba(15,35,24,.88);z-index:999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#cam-modal.open{display:flex}
+#cam-video{border-radius:12px;max-width:100%;max-height:58vh;background:#000}
+.cam-controls{display:flex;gap:12px;margin-top:14px}
+.btn-snap{background:var(--rg);color:#fff;padding:13px 26px;border:none;border-radius:var(--r);font-size:15px;cursor:pointer;font-family:var(--font-s);font-weight:500}
+.btn-canc{background:rgba(255,255,255,.1);color:#fff;padding:13px 18px;border:1px solid rgba(255,255,255,.2);border-radius:var(--r);font-size:13px;cursor:pointer;font-family:var(--font-s)}
+#cam-canvas{display:none}
+/* ÉXITO */
+#pantalla-exito{display:none;text-align:center;padding:48px 20px}
+.exito-ico{font-size:52px;margin-bottom:14px}
+.exito-title{font-family:var(--font-d);font-size:22px;color:var(--ng);margin-bottom:8px}
+.exito-txt{font-size:14px;color:var(--gt);line-height:1.65;max-width:360px;margin:0 auto}
+.exito-card{background:var(--bl);border:1px solid var(--gb);border-radius:var(--r);padding:18px;margin:20px auto;max-width:300px;text-align:left}
+/* TOAST */
+#toast{position:fixed;bottom:18px;right:18px;background:var(--ng);color:#fff;padding:10px 15px;border-radius:var(--r);font-size:13px;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:260px;border-left:3px solid var(--vd)}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.err{border-left-color:var(--rg)}
+.sect-title{font-size:11px;font-weight:600;color:var(--vd);text-transform:uppercase;letter-spacing:.07em;margin:16px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--vc)}
+@media(max-width:480px){.frow{grid-template-columns:1fr}.vinculo-opts{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-pattern"></div>
+  <div class="hdr-inner">
+    <div class="hdr-esc">🐉</div>
+    <div class="hdr-txt">
+      <div class="t1">Madryn Norte</div>
+      <div class="t2">Complejo Deportivo</div>
+      <div class="t3">Formulario de inscripción</div>
+    </div>
+  </div>
+  <div class="hdr-line"></div>
+</div>
+
+<div id="cam-modal">
+  <video id="cam-video" autoplay playsinline></video>
+  <canvas id="cam-canvas"></canvas>
+  <div class="cam-controls">
+    <button class="btn-canc" onclick="cerrarCam()">Cancelar</button>
+    <button class="btn-snap" onclick="sacarFoto()">📷 Foto</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="steps" id="steps-bar">
+    <div class="step active" id="step-1"><div class="snum">1</div>Datos</div>
+    <div class="step" id="step-2"><div class="snum">2</div>Foto</div>
+    <div class="step" id="step-3"><div class="snum">3</div>Salud</div>
+    <div class="step" id="step-4"><div class="snum">4</div>Actividad</div>
+    <div class="step" id="step-5"><div class="snum">5</div>Confirmar</div>
+  </div>
+
+  <!-- ── PASO 1: DATOS PERSONALES + TUTOR ── -->
+  <div id="pantalla-1">
+    <div class="card">
+      <div class="ch"><div class="ct">Datos del participante</div></div>
+      <div class="cb">
+        <div class="frow">
+          <div class="fg">
+            <label class="fl">Nombre<span class="req">*</span></label>
+            <input class="fc" id="f-nom" placeholder="Juan" oninput="limpErr('f-nom')">
+            <div class="error-msg" id="err-nom">Requerido</div>
+          </div>
+          <div class="fg">
+            <label class="fl">Apellido<span class="req">*</span></label>
+            <input class="fc" id="f-ape" placeholder="Pérez" oninput="limpErr('f-ape')">
+            <div class="error-msg" id="err-ape">Requerido</div>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="fg">
+            <label class="fl">DNI<span class="req">*</span></label>
+            <input class="fc" id="f-dni" placeholder="30123456" type="tel" oninput="limpErr('f-dni')">
+            <div class="error-msg" id="err-dni">Requerido</div>
+          </div>
+          <div class="fg">
+            <label class="fl">Fecha de nacimiento</label>
+            <input class="fc" id="f-fnac" type="date">
+          </div>
+        </div>
+        <div class="fg">
+          <label class="fl">Teléfono / WhatsApp <span style="font-size:10px;color:var(--g2)">(no necesario en menores)</span></label>
+          <input class="fc" id="f-tel" placeholder="2804 000000" type="tel">
+        </div>
+
+        <!-- Toggle menor de edad -->
+        <div class="sect-title">¿El participante es menor de edad?</div>
+        <div class="toggle-row" id="toggle-menor" onclick="toggleMenor()">
+          <span class="toggle-lbl">Es menor de edad</span>
+          <div class="toggle-sw" id="sw-menor"></div>
+        </div>
+
+        <!-- Sección tutor (visible solo si es menor) -->
+        <div class="tutor-section" id="tutor-sec">
+          <div class="tutor-title">👨‍👩‍👦 Datos del adulto responsable</div>
+          <div class="frow">
+            <div class="fg">
+              <label class="fl">Nombre del responsable<span class="req">*</span></label>
+              <input class="fc" id="f-resp-nom" placeholder="María García">
+              <div class="error-msg" id="err-resp-nom">Requerido si es menor</div>
+            </div>
+            <div class="fg">
+              <label class="fl">DNI del responsable</label>
+              <input class="fc" id="f-resp-dni" placeholder="Ej: 32100200" type="tel">
+            </div>
+          </div>
+          <div class="fg">
+            <label class="fl">Vínculo con el participante</label>
+            <div class="vinculo-opts" id="vinculo-opts">
+              <label class="vopt"><input type="radio" name="vinculo" value="Madre" onchange="selVinculo(this)"> Madre</label>
+              <label class="vopt"><input type="radio" name="vinculo" value="Padre" onchange="selVinculo(this)"> Padre</label>
+              <label class="vopt"><input type="radio" name="vinculo" value="Tutor" onchange="selVinculo(this)"> Tutor/a</label>
+              <label class="vopt"><input type="radio" name="vinculo" value="Otro" onchange="selVinculo(this)"> Otro</label>
+            </div>
+          </div>
+          <div class="fg">
+            <label class="fl">WhatsApp del responsable<span class="req">*</span></label>
+            <input class="fc" id="f-resp-tel" placeholder="2804 999001" type="tel">
+            <div class="error-msg" id="err-resp-tel">Requerido si es menor</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-btns"><button class="btn btn-p" onclick="irA(2)">Siguiente →</button></div>
+  </div>
+
+  <!-- ── PASO 2: FOTO ── -->
+  <div id="pantalla-2" style="display:none">
+    <div class="card">
+      <div class="ch"><div class="ct">Tu foto</div><div class="csub">Opcional — para el carnet de socio</div></div>
+      <div class="cb">
+        <div class="photo-area">
+          <div class="photo-preview" onclick="document.getElementById('input-gal').click()">
+            <img id="photo-img" alt="foto">
+            <span class="ph-ico" id="ph-ico">👤</span>
+            <span class="ph-txt" id="ph-txt">Tocar para subir</span>
+          </div>
+          <div class="photo-btns">
+            <button class="btn-foto btn-cam" onclick="abrirCam()">📷 Cámara</button>
+            <button class="btn-foto btn-gal" onclick="document.getElementById('input-gal').click()">🖼 Galería</button>
+            <input type="file" id="input-gal" accept="image/*" style="display:none" onchange="cargarFoto(this)">
+            <button id="btn-borrar-foto" onclick="borrarFoto()" style="display:none;background:none;border:none;color:var(--rg);font-size:12px;cursor:pointer;margin-top:4px">✕ Quitar foto</button>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--g2);text-align:center;margin-top:14px">Buena iluminación y fondo claro</p>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-o" onclick="irA(1)">← Atrás</button>
+      <button class="btn btn-p" onclick="irA(3)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- ── PASO 3: SALUD ── -->
+  <div id="pantalla-3" style="display:none">
+    <div class="card">
+      <div class="ch"><div class="ct">Salud</div></div>
+      <div class="cb">
+        <div class="fg">
+          <label class="fl">¿Tiene alguna lesión, enfermedad o condición médica que debamos conocer?<span class="req">*</span></label>
+          <p style="font-size:12px;color:var(--g2);margin-bottom:6px">Escribí SI o NO, y si es SI detallá</p>
+          <textarea class="fc" id="f-salud" rows="3" placeholder="NO — o: SI, asma leve controlada…"></textarea>
+          <div class="error-msg" id="err-salud">Campo requerido</div>
+        </div>
+        <div class="fg" style="margin-top:4px">
+          <label class="fl">Contacto de emergencia<span class="req">*</span></label>
+          <p style="font-size:12px;color:var(--g2);margin-bottom:6px">Nombre y número de teléfono</p>
+          <input class="fc" id="f-emerg" placeholder="Ana Pérez — 2804 111222">
+          <div class="error-msg" id="err-emerg">Campo requerido</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-o" onclick="irA(2)">← Atrás</button>
+      <button class="btn btn-p" onclick="irA(4)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- ── PASO 4: ACTIVIDAD + TÉRMINOS ── -->
+  <div id="pantalla-4" style="display:none">
+    <div class="card">
+      <div class="ch"><div class="ct">Actividad</div></div>
+      <div class="cb">
+        <div class="act-grid" id="act-grid"></div>
+        <div class="error-msg" id="err-act" style="margin-top:8px">Seleccioná una actividad</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Condiciones de inscripción</div></div>
+      <div class="cb">
+        <div class="terms-box">
+          <p>Declaro que los datos informados son correctos y que el participante se encuentra en condiciones de realizar actividad física/deportiva.</p>
+          <br>
+          <p>Entiendo que toda práctica deportiva implica riesgos propios de la actividad, incluyendo golpes, caídas, lesiones o accidentes, por lo que deslindo de responsabilidad a <strong>Madryn Norte Complejo Deportivo</strong>, sus organizadores, profesores y colaboradores por situaciones derivadas de la práctica normal de la actividad.</p>
+          <br>
+          <p>Me comprometo a informar cualquier condición médica, lesión previa o situación de salud relevante. En caso de emergencia, autorizo a la organización a comunicarse con el contacto indicado y/o solicitar asistencia médica si fuera necesario.</p>
+          <br>
+          <p>En caso de tratarse de un menor de edad, declaro ser su adulto responsable y autorizo su participación en la actividad seleccionada.</p>
+          <br>
+          <p>La inscripción queda sujeta a confirmación por parte de la organización, disponibilidad de cupos y regularización del pago correspondiente.</p>
+        </div>
+        <label class="check-row" id="check-terms" onclick="toggleTerms()">
+          <input type="checkbox" id="f-terms" onclick="event.stopPropagation()">
+          <span class="check-lbl">Declaro haber leído y acepto las condiciones de inscripción, participación y deslinde de responsabilidad.</span>
+        </label>
+        <div class="error-msg" id="err-terms">Necesitás aceptar las condiciones para continuar</div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-o" onclick="irA(3)">← Atrás</button>
+      <button class="btn btn-p" onclick="irA(5)">Ver resumen →</button>
+    </div>
+  </div>
+
+  <!-- ── PASO 5: CONFIRMAR ── -->
+  <div id="pantalla-5" style="display:none">
+    <div class="card">
+      <div class="ch"><div class="ct">Revisá tus datos</div></div>
+      <div class="cb">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--cr)">
+          <div id="res-foto" style="width:58px;height:70px;border-radius:8px;border:1px solid var(--gb);background:var(--vc);display:flex;align-items:center;justify-content:center;color:var(--vd);font-size:24px;flex-shrink:0;overflow:hidden"></div>
+          <div>
+            <div id="res-nombre" style="font-family:var(--font-d);font-size:17px;color:var(--ng)"></div>
+            <div id="res-edad" style="font-size:12px;color:var(--gt);margin-top:3px"></div>
+          </div>
+        </div>
+        <div id="res-datos"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Actividad seleccionada</div></div>
+      <div class="cb" id="res-act"></div>
+    </div>
+    <p style="font-size:12px;color:var(--g2);text-align:center;margin-bottom:14px">Al confirmar, el club revisará tu solicitud y te contactará para confirmar el lugar.</p>
+    <div class="nav-btns">
+      <button class="btn btn-o" onclick="irA(4)">← Atrás</button>
+      <button class="btn btn-p" id="btn-confirmar" onclick="confirmar()">✓ Enviar inscripción</button>
+    </div>
+  </div>
+
+  <!-- ── ÉXITO ── -->
+  <div id="pantalla-exito">
+    <div class="exito-ico">🎉</div>
+    <h2 class="exito-title">¡Inscripción enviada!</h2>
+    <p class="exito-txt">Tus datos fueron recibidos. El equipo de Madryn Norte revisará tu solicitud y te va a contactar para confirmar tu lugar.</p>
+    <div class="exito-card" id="exito-resumen"></div>
+    <p style="font-size:13px;color:var(--g2);margin-top:10px">Podés cerrar esta página.</p>
+  </div>
+
+</div>
+<div id="toast"></div>
+
+<script>
+// ── Config API ─────────────────────────────────────────────────────
+const SCRIPT_URL_DEFAULT = 'https://script.google.com/macros/s/AKfycbzOIbATY-QiY5yKu4at475QwfBq9yqJ4dlk6HRQrlQIOSYL4Gc2_w2RrxrRDslwleds/exec';
+const params  = new URLSearchParams(window.location.search);
+const API_URL = params.get('api') || SCRIPT_URL_DEFAULT;
+
+// ── Actividades ───────────────────────────────────────────────────
+let ACTIVIDADES = [];
+async function cargarActividades() {
+  if (API_URL) {
+    try {
+      const r    = await fetch(API_URL + '?accion=todo', { redirect: 'follow' });
+      const data = JSON.parse(await r.text());
+      if (data.ok && data.data?.actividades) {
+        const insc = data.data.inscripciones || [];
+        ACTIVIDADES = data.data.actividades
+          .filter(a => a.estado === 'activa')
+          .map(a => ({
+            id:          a.id,
+            nombre:      a.nombre,
+            dias:        a.dias_horarios || '',
+            valor:       Number(a.valor_mensual) || 0,
+            cupo:        Number(a.cupo_maximo) || 99,
+            inscriptos:  insc.filter(i => i.actividad_id === a.id && i.estado === 'activa').length,
+          }));
+        return;
+      }
+    } catch (_) {}
+  }
+  ACTIVIDADES = [
+    {id:'a1',nombre:'Mini Hockey',dias:'Lun y Mié 16:00-17:30',valor:8000,cupo:20,inscriptos:8},
+    {id:'a2',nombre:'Maxi Hockey',dias:'Mar y Jue 17:30-19:00',valor:9000,cupo:15,inscriptos:6},
+    {id:'a3',nombre:'Futsal',dias:'Lun, Mié y Vie 18:00-19:30',valor:8500,cupo:16,inscriptos:10},
+    {id:'a4',nombre:'Handball',dias:'Mar y Jue 16:00-17:30',valor:8000,cupo:18,inscriptos:5},
+    {id:'a5',nombre:'Básquet',dias:'Lun y Mié 19:00-20:30',valor:8000,cupo:14,inscriptos:9},
+    {id:'a6',nombre:'Entrenamiento de Fútbol',dias:'Mar, Jue y Sáb 10:00-11:30',valor:9500,cupo:20,inscriptos:12},
+  ];
+}
+
+// ── Estado ────────────────────────────────────────────────────────
+let PASO = 1, PASOS = 5;
+let fotoData = null, actSelId = null, esMenor = false, vinculo = '', camStream = null;
+
+// ── Helpers ───────────────────────────────────────────────────────
+const ML = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+function edad(f){if(!f)return null;const h=new Date(),n=new Date(f+'T12:00');let e=h.getFullYear()-n.getFullYear();const m=h.getMonth()-n.getMonth();if(m<0||(m===0&&h.getDate()<n.getDate()))e--;return e}
+function edadStr(f){const e=edad(f);return e===null?'':e+' años'}
+function fpeso(n){return'$'+Number(n).toLocaleString('es-AR')}
+function toast(msg,t='ok'){const el=document.getElementById('toast');el.textContent=msg;el.className='show'+(t==='err'?' err':'');clearTimeout(el._t);el._t=setTimeout(()=>el.className='',3200)}
+function limpErr(fid){document.getElementById(fid)?.classList.remove('invalid');const eid='err-'+fid.replace('f-','');document.getElementById(eid)?.style&&(document.getElementById(eid).style.display='none')}
+function v(id){return(document.getElementById(id)?.value||'').trim()}
+function req(id,eid){if(!v(id)){document.getElementById(id)?.classList.add('invalid');document.getElementById(eid)&&(document.getElementById(eid).style.display='block');return false}return true}
+
+// ── Navegación ────────────────────────────────────────────────────
+function irA(paso){
+  if(paso > PASO && !validarPaso(PASO)) return;
+  PASO = paso;
+  for(let i=1;i<=PASOS;i++){
+    document.getElementById('pantalla-'+i).style.display = i===paso ? 'block' : 'none';
+    const s = document.getElementById('step-'+i);
+    s.className = 'step'+(i===paso?' active':i<paso?' done':'');
+    s.querySelector('.snum').textContent = i < paso ? '✓' : i;
+  }
+  if(paso===4) renderActGrid();
+  if(paso===5) renderResumen();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function validarPaso(paso){
+  if(paso===1){
+    let ok = req('f-nom','err-nom') & req('f-ape','err-ape') & req('f-dni','err-dni');
+    if(esMenor){
+      ok = req('f-resp-nom','err-resp-nom') & req('f-resp-tel','err-resp-tel') & ok;
+    }
+    if(!ok) toast('Completá los campos obligatorios','err');
+    return !!ok;
+  }
+  if(paso===3){
+    let ok = req('f-salud','err-salud') & req('f-emerg','err-emerg');
+    if(!ok) toast('Completá los campos de salud','err');
+    return !!ok;
+  }
+  if(paso===4){
+    if(!actSelId){document.getElementById('err-act').style.display='block';toast('Seleccioná una actividad','err');return false}
+    if(!document.getElementById('f-terms').checked){document.getElementById('err-terms').style.display='block';toast('Aceptá las condiciones para continuar','err');return false}
+    return true;
+  }
+  return true;
+}
+
+// ── Toggle menor ──────────────────────────────────────────────────
+function toggleMenor(){
+  esMenor = !esMenor;
+  document.getElementById('sw-menor').classList.toggle('on', esMenor);
+  document.getElementById('toggle-menor').classList.toggle('active', esMenor);
+  document.getElementById('tutor-sec').classList.toggle('visible', esMenor);
+}
+function selVinculo(el){
+  vinculo = el.value;
+  document.querySelectorAll('.vopt').forEach(o=>o.classList.remove('sel'));
+  el.closest('.vopt').classList.add('sel');
+}
+function toggleTerms(){
+  const cb = document.getElementById('f-terms');
+  cb.checked = !cb.checked;
+  document.getElementById('check-terms').classList.toggle('checked', cb.checked);
+  if(cb.checked) document.getElementById('err-terms').style.display='none';
+}
+
+// ── Actividades ───────────────────────────────────────────────────
+function renderActGrid(){
+  const pasivoOpt = `<label class="act-opt${actSelId==='__pasivo__'?' sel':''}">
+    <input type="radio" name="act" value="__pasivo__" ${actSelId==='__pasivo__'?'checked':''} onchange="selAct('__pasivo__')">
+    <div style="flex:1">
+      <div class="act-nom">Sin actividad — Solo quiero ser socio</div>
+      <div class="act-det">🏅 Socio pasivo · Sin cargo por actividad</div>
+    </div>
+    <div class="act-precio" style="color:var(--vd)">Sin cargo</div>
+  </label>`;
+  const actsHTML = ACTIVIDADES.map(a=>{
+    const libre = a.cupo - a.inscriptos, ago = libre <= 0;
+    return `<label class="act-opt${actSelId===a.id?' sel':''}${ago?' dis':''}">
+      <input type="radio" name="act" value="${a.id}" ${actSelId===a.id?'checked':''} ${ago?'disabled':''} onchange="selAct('${a.id}')">
+      <div style="flex:1">
+        <div class="act-nom">${a.nombre}</div>
+        <div class="act-det">🕐 ${a.dias} · ${ago?'<span style="color:var(--rg)">Sin cupo</span>':libre+' lugares'}</div>
+      </div>
+      <div class="act-precio">${fpeso(a.valor)}/mes</div>
+    </label>`;
+  }).join('');
+  document.getElementById('act-grid').innerHTML = pasivoOpt + actsHTML;
+}
+function selAct(id){
+  actSelId=id;
+  document.getElementById('err-act').style.display='none';
+  document.querySelectorAll('.act-opt').forEach(o=>o.classList.remove('sel'));
+  document.querySelector(`input[value="${CSS.escape(id)}"]`)?.closest('.act-opt')?.classList.add('sel');
+}
+
+// ── Resumen ───────────────────────────────────────────────────────
+function renderResumen(){
+  const fnac = v('f-fnac'), act = ACTIVIDADES.find(a=>a.id===actSelId);
+  document.getElementById('res-nombre').textContent = v('f-nom')+' '+v('f-ape');
+  document.getElementById('res-edad').textContent = edadStr(fnac)+(esMenor?' · Menor de edad':'');
+  const fotoEl = document.getElementById('res-foto');
+  fotoEl.innerHTML = fotoData ? `<img src="${fotoData}" style="width:100%;height:100%;object-fit:cover">` : '👤';
+  const filas = [
+    ['DNI', v('f-dni')],
+    ['Fecha nac.', fnac ? new Date(fnac+'T12:00').toLocaleDateString('es-AR') : '—'],
+    ['Teléfono', v('f-tel')||'—'],
+    ['Salud', v('f-salud')],
+    ['Emergencia', v('f-emerg')],
+  ];
+  if(esMenor) filas.push(
+    ['Responsable', v('f-resp-nom')],
+    ['Tel. responsable', v('f-resp-tel')],
+    ['Vínculo', vinculo||'—'],
+  );
+  document.getElementById('res-datos').innerHTML = filas
+    .map(([l,val])=>`<div class="ri"><span class="ri-l">${l}</span><span class="ri-v">${val||'—'}</span></div>`).join('');
+  const resActEl = document.getElementById('res-act');
+  if(actSelId==='__pasivo__'){
+    resActEl.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-weight:500;font-size:14px">Sin actividad — Solo quiero ser socio</div><div style="font-size:12px;color:var(--gt);margin-top:2px">🏅 Socio pasivo</div></div>
+      <div style="font-size:14px;color:var(--vd);font-weight:500">Sin cargo</div>
+    </div>`;
+  } else if(act){
+    resActEl.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-weight:500;font-size:14px">${act.nombre}</div><div style="font-size:12px;color:var(--gt);margin-top:2px">🕐 ${act.dias}</div></div>
+      <div style="font-family:var(--font-d);font-size:17px;color:var(--vd)">${fpeso(act.valor)}/mes</div>
+    </div>`;
+  }
+}
+
+// ── Confirmar ─────────────────────────────────────────────────────
+async function confirmar(){
+  const btn = document.getElementById('btn-confirmar');
+  btn.textContent='Enviando…'; btn.disabled=true;
+  const act = ACTIVIDADES.find(a=>a.id===actSelId);
+  const datos = {
+    id:                   'x'+Math.random().toString(36).slice(2,9),
+    nombre:               v('f-nom'),
+    apellido:             v('f-ape'),
+    dni:                  v('f-dni'),
+    fecha_nacimiento:     v('f-fnac'),
+    telefono:             v('f-tel'),
+    es_menor:             esMenor ? 'SI' : 'NO',
+    responsable_nombre:   v('f-resp-nom'),
+    responsable_dni:      v('f-resp-dni'),
+    responsable_vinculo:  vinculo,
+    responsable_telefono: v('f-resp-tel'),
+    actividad:            actSelId==='__pasivo__' ? '__pasivo__' : (act?.nombre || ''),
+    salud:                v('f-salud'),
+    contacto_emergencia:  v('f-emerg'),
+    acepta_condiciones:   'SI',
+    foto:                 fotoData || '',
+    estado:               'pendiente',
+    fecha_envio:          new Date().toISOString(),
+    fuente:               'formulario',
+  };
+  if(API_URL){
+    try{
+      const r = await fetch(API_URL,{method:'POST',body:JSON.stringify({accion:'inscripcion_nueva',datos}),redirect:'follow'});
+      const resp = JSON.parse(await r.text());
+      if(!resp.ok) throw new Error(resp.error||'Error del servidor');
+    }catch(e){
+      toast('Error al enviar: '+e.message,'err');
+      btn.textContent='✓ Enviar inscripción'; btn.disabled=false;
+      return;
+    }
+  } else {
+    await new Promise(r=>setTimeout(r,700));
+  }
+  // Éxito
+  for(let i=1;i<=PASOS;i++) document.getElementById('pantalla-'+i).style.display='none';
+  document.getElementById('steps-bar').style.display='none';
+  const esPasivo = actSelId==='__pasivo__';
+  document.getElementById('exito-resumen').innerHTML=`
+    <div style="font-weight:500;margin-bottom:6px">${datos.nombre} ${datos.apellido}</div>
+    ${esPasivo
+      ? `<div style="font-size:13px;color:var(--gt)">🏅 Socio pasivo · Sin actividad</div>`
+      : `<div style="font-size:13px;color:var(--gt)">📋 ${act?.nombre||''}</div><div style="font-size:13px;color:var(--gt)">🕐 ${act?.dias||''}</div>`}
+    ${esMenor?`<div style="font-size:13px;color:var(--gt)">👨‍👩‍👦 Responsable: ${datos.responsable_nombre}</div>`:''}
+    <div style="font-size:13px;color:var(--gt);margin-top:8px">Estado: <span style="color:var(--vd);font-weight:500">Pendiente de validación</span></div>`;
+  document.getElementById('pantalla-exito').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Cámara ────────────────────────────────────────────────────────
+async function abrirCam(){
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}});
+    document.getElementById('cam-video').srcObject=camStream;
+    document.getElementById('cam-modal').classList.add('open');
+  }catch(e){toast('No se pudo acceder a la cámara. Usá la galería.','err')}
+}
+function sacarFoto(){
+  const v=document.getElementById('cam-video'),c=document.getElementById('cam-canvas');
+  const {w,h}=limitarDimension(v.videoWidth,v.videoHeight);
+  c.width=w;c.height=h;
+  c.getContext('2d').drawImage(v,0,0,w,h);
+  fotoData=c.toDataURL('image/jpeg',0.78);
+  mostrarFoto(fotoData);cerrarCam();
+}
+function cerrarCam(){
+  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}
+  document.getElementById('cam-modal').classList.remove('open');
+}
+function limitarDimension(ancho,alto){
+  const MAX_W=480,MAX_H=640;
+  let w=ancho,h=alto;
+  if(w>MAX_W){h=Math.round(h*MAX_W/w);w=MAX_W}
+  if(h>MAX_H){w=Math.round(w*MAX_H/h);h=MAX_H}
+  return{w,h};
+}
+function cargarFoto(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const {w,h}=limitarDimension(img.width,img.height);
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      fotoData=canvas.toDataURL('image/jpeg',0.78);
+      mostrarFoto(fotoData);
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function mostrarFoto(src){
+  const img=document.getElementById('photo-img');
+  img.src=src;img.style.display='block';
+  document.getElementById('ph-ico').style.display='none';
+  document.getElementById('ph-txt').style.display='none';
+  document.getElementById('btn-borrar-foto').style.display='block';
+  toast('Foto cargada ✓');
+}
+function borrarFoto(){
+  fotoData=null;
+  const img=document.getElementById('photo-img');
+  img.src='';img.style.display='none';
+  document.getElementById('ph-ico').style.display='';
+  document.getElementById('ph-txt').style.display='';
+  document.getElementById('btn-borrar-foto').style.display='none';
+}
+
+cargarActividades();
+</script>
+</body>
+</html>

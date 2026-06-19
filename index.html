@@ -228,7 +228,7 @@ tbody tr:hover td{background:var(--cr)}
 <div class="layout" id="app" style="display:none">
   <div class="sbo" id="sbo" onclick="closeSB()"></div>
   <aside class="sidebar" id="sidebar">
-    <div id="vp-bar" class="vista-pro-bar" style="display:none" onclick="salirVistaPro()">👁️ Vista Profesor — <span id="vp-nombre"></span> · Salir</div>
+    <div id="vp-bar" class="vista-pro-bar" style="display:none" onclick="salirVistaPro()">👁️ Vista Instructor/a — <span id="vp-nombre"></span> · Salir</div>
     <div class="sb-brand">
       <div class="sb-esc"><img src="escudo.jpg" alt="" onerror="this.style.display='none';this.parentElement.textContent='🐉'"></div>
       <div class="sb-titles"><div class="n1">Madryn Norte</div><div class="n2">Complejo Deportivo</div></div>
@@ -270,12 +270,12 @@ tbody tr:hover td{background:var(--cr)}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
         <div class="card"><div class="ch"><span class="ct">🎂 Cumpleaños del mes</span></div><div class="cb" id="dash-bday"></div></div>
-        <div class="card admin-only"><div class="ch"><span class="ct">🎯 Objetivo de socios</span><button class="btn btn-o btn-sm" onclick="editSociosObj()">Editar</button></div><div class="cb" id="dash-obj"></div></div>
+        <div class="card admin-only"><div class="ch"><span class="ct">🎯 Meta de membresías</span><button class="btn btn-o btn-sm" onclick="editSociosObj()">Editar</button></div><div class="cb" id="dash-obj"></div></div>
       </div>
     </div>
 
     <div class="page" id="page-alumnos">
-      <div class="ph"><div><div class="pt">Alumnos</div><div class="ps" id="al-sub">0 registrados</div></div>
+      <div class="ph"><div><div class="pt">Alumnos y Colaboradores</div><div class="ps" id="al-sub">0 registrados</div></div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <div class="sbar"><span class="sico">🔍</span><input class="fc" id="srch" placeholder="Buscar..." oninput="renderAlumnos()"></div>
           <select class="fc" id="fil-act-al" style="width:auto" onchange="renderAlumnos()"><option value="">Todas las actividades</option></select>
@@ -288,7 +288,7 @@ tbody tr:hover td{background:var(--cr)}
             <option value="baja">Baja</option>
             <option value="con_deuda">Con deuda</option>
           </select>
-          <button class="btn btn-p admin-only" onclick="abrirMAl()">+ Nuevo alumno</button>
+          <button class="btn btn-p admin-only" onclick="abrirMAl()">+ Nueva persona</button>
         </div>
       </div>
       <div class="tw"><table><thead><tr><th>Alumno</th><th>DNI</th><th>Edad</th><th>Teléfono</th><th>Actividades <button class="cfbtn" title="Filtrar" onclick="cfOpen(event,'al-act',getAlActVals(),renderAlumnos)">⊤</button></th><th>Estado <button class="cfbtn" title="Filtrar" onclick="cfOpen(event,'al-est',getAlEstVals(),renderAlumnos)">⊤</button></th><th>Acc.</th></tr></thead><tbody id="tb-al"></tbody></table></div>
@@ -297,7 +297,7 @@ tbody tr:hover td{background:var(--cr)}
     <div class="page" id="page-actividades">
       <div class="ph"><div><div class="pt">Actividades</div><div class="ps">Disciplinas del club</div></div><button class="btn btn-p admin-only" onclick="abrirMAct()">+ Nueva actividad</button></div>
       <div class="admin-only" style="background:var(--cr);border:1px solid var(--gb);border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
-        <div><div style="font-weight:600;font-size:14px">🏅 Cuota de Socio</div><div style="font-size:12px;color:var(--gt);margin-top:2px">Valor mensual base · aplica a todos los socios</div></div>
+        <div><div style="font-weight:600;font-size:14px">🏅 Cuota de membresía</div><div style="font-size:12px;color:var(--gt);margin-top:2px">Valor mensual base · aplica a todas las personas</div></div>
         <div style="display:flex;align-items:center;gap:12px">
           <div id="val-socio-txt" style="font-family:var(--font-d);font-size:20px;font-weight:700;color:var(--vd)">$0</div>
           <button class="btn btn-o btn-sm" onclick="editarValSocio()">Editar</button>
@@ -351,8 +351,8 @@ tbody tr:hover td{background:var(--cr)}
     </div>
 
     <div class="page" id="page-usuarios">
-      <div class="ph"><div><div class="pt">Usuarios</div><div class="ps">Profesores y administradores</div></div><button class="btn btn-p" onclick="abrirMUs()">+ Nuevo usuario</button></div>
-      <div class="tw"><table><thead><tr><th>Nombre</th><th>Usuario de acceso</th><th>Rol <button class="cfbtn" title="Filtrar" onclick="cfOpen(event,'us-rol',[{k:'admin',l:'Admin'},{k:'profesor',l:'Profesor'}],renderUs)">⊤</button></th><th>Actividades</th><th>Acc.</th></tr></thead><tbody id="tb-us"></tbody></table></div>
+      <div class="ph"><div><div class="pt">Usuarios</div><div class="ps">Instructores/as y administradores</div></div><button class="btn btn-p" onclick="abrirMUs()">+ Nuevo usuario</button></div>
+      <div class="tw"><table><thead><tr><th>Nombre</th><th>Usuario de acceso</th><th>Rol <button class="cfbtn" title="Filtrar" onclick="cfOpen(event,'us-rol',[{k:'admin',l:'Admin'},{k:'profesor',l:'Instructor/a'}],renderUs)">⊤</button></th><th>Actividades</th><th>Acc.</th></tr></thead><tbody id="tb-us"></tbody></table></div>
     </div>
 
     <div class="page" id="page-inscripcion">
@@ -381,7 +381,7 @@ tbody tr:hover td{background:var(--cr)}
 
 <!-- MODALES -->
 <div class="mbg" id="m-al"><div class="modal" style="max-width:580px">
-  <div class="mh"><span class="mt" id="m-al-t">Nuevo alumno</span><button class="bx" onclick="cerrar('m-al')">×</button></div>
+  <div class="mh"><span class="mt" id="m-al-t">Nueva persona</span><button class="bx" onclick="cerrar('m-al')">×</button></div>
   <div class="mb">
     <input type="hidden" id="al-id">
     <div class="frow"><div class="fg"><label class="fl">Nombre *</label><input class="fc" id="al-nom" placeholder="Juan"></div><div class="fg"><label class="fl">Apellido *</label><input class="fc" id="al-ape" placeholder="Pérez"></div></div>
@@ -390,6 +390,10 @@ tbody tr:hover td{background:var(--cr)}
     <div class="fg" style="display:flex;align-items:center;gap:10px;padding:8px 0">
       <input type="checkbox" id="al-menor" onchange="toggleMenorAl(this.checked)" style="width:16px;height:16px;cursor:pointer">
       <label for="al-menor" style="font-size:14px;font-weight:500;color:var(--ng);cursor:pointer">Es menor de edad</label>
+    </div>
+    <div class="fg" style="display:flex;align-items:center;gap:10px;padding:8px 0">
+      <input type="checkbox" id="al-sponsor" style="width:16px;height:16px;cursor:pointer">
+      <label for="al-sponsor" style="font-size:14px;font-weight:500;color:var(--ng);cursor:pointer">Sponsor / comercio aliado</label>
     </div>
     <div id="al-tutor-sec" style="display:none;background:#fff8f7;border:1px solid #f5c6c3;border-radius:var(--r);padding:12px;margin-bottom:10px">
       <div style="font-size:11px;font-weight:600;color:var(--rg);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">👨‍👩‍👦 Adulto responsable</div>
@@ -408,7 +412,7 @@ tbody tr:hover td{background:var(--cr)}
         <div class="fg"><label class="fl">Tipo de descuento</label><select class="fc" id="al-tipo-desc" onchange="toggleDescPct()"><option value="ninguno">Sin descuento</option><option value="beca_total">Beca total (100%)</option><option value="beca_parcial">Beca parcial</option><option value="familiar">Familiar del club</option><option value="staff">Staff / Profe</option><option value="otro">Otro</option></select></div>
         <div class="fg" id="al-desc-pct-sec"><label class="fl">Descuento (%)</label><input class="fc" type="number" id="al-desc-pct" min="0" max="100" value="0" placeholder="0"></div>
       </div>
-      <div class="fg" style="margin-bottom:0"><label class="fl">Motivo / observación del descuento</label><input class="fc" id="al-motivo-desc" placeholder="Ej: beca por rendimiento, hermano de socio…"></div>
+      <div class="fg" style="margin-bottom:0"><label class="fl">Motivo / observación del descuento</label><input class="fc" id="al-motivo-desc" placeholder="Ej: beca por rendimiento, hermano/a de un alumno…"></div>
     </div>
     <div class="fg"><label class="fl">Observaciones generales</label><textarea class="fc" id="al-obs" rows="2"></textarea></div>
   </div>
@@ -420,7 +424,7 @@ tbody tr:hover td{background:var(--cr)}
   <div class="mb">
     <input type="hidden" id="act-id">
     <div class="fg"><label class="fl">Nombre *</label><input class="fc" id="act-nom"></div>
-    <div class="frow"><div class="fg"><label class="fl">Profesor</label><select class="fc" id="act-prof"><option value="">Sin asignar</option></select></div><div class="fg"><label class="fl">Estado</label><select class="fc" id="act-est"><option value="activa">Activa</option><option value="inactiva">Inactiva</option></select></div></div>
+    <div class="frow"><div class="fg"><label class="fl">Instructor/a</label><select class="fc" id="act-prof"><option value="">Sin asignar</option></select></div><div class="fg"><label class="fl">Estado</label><select class="fc" id="act-est"><option value="activa">Activa</option><option value="inactiva">Inactiva</option></select></div></div>
     <div class="fg"><label class="fl">Días y horarios</label><input class="fc" id="act-hor" placeholder="Lunes y Miércoles 16:00-17:30"></div>
     <div class="frow"><div class="fg"><label class="fl">Valor mensual ($)</label><input class="fc" type="number" id="act-val"></div><div class="fg"><label class="fl">Cupo máximo</label><input class="fc" type="number" id="act-cupo"></div></div>
   </div>
@@ -431,7 +435,7 @@ tbody tr:hover td{background:var(--cr)}
   <div class="mh"><span class="mt" id="m-cu-t">Registrar pago</span><button class="bx" onclick="cerrar('m-cu')">×</button></div>
   <div class="mb">
     <input type="hidden" id="cu-id">
-    <div class="frow"><div class="fg"><label class="fl">Alumno *</label><select class="fc" id="cu-al" onchange="fillActsAl()"></select></div><div class="fg"><label class="fl">Tipo de cuota *</label><select class="fc" id="cu-tipo" onchange="toggleCuTipo()"><option value="actividad">Cuota de actividad</option><option value="socio">Cuota de socio</option></select></div></div>
+    <div class="frow"><div class="fg"><label class="fl">Alumno *</label><select class="fc" id="cu-al" onchange="fillActsAl()"></select></div><div class="fg"><label class="fl">Tipo de cuota *</label><select class="fc" id="cu-tipo" onchange="toggleCuTipo()"><option value="actividad">Cuota de actividad</option><option value="socio">Cuota de membresía</option></select></div></div>
     <div class="fg" id="cu-act-sec"><label class="fl">Actividad *</label><select class="fc" id="cu-act" onchange="recalcMonto()"></select></div>
     <div class="frow"><div class="fg"><label class="fl">Mes/Año *</label><input class="fc" type="month" id="cu-mes"></div><div class="fg"><label class="fl">Descuento / Beca (%)</label><input class="fc" type="number" id="cu-desc" min="0" max="100" value="0" placeholder="0" onchange="recalcMonto()" oninput="recalcMonto()"></div></div>
     <div class="frow"><div class="fg"><label class="fl">Monto a cobrar ($) *</label><input class="fc" type="number" id="cu-monto"></div><div class="fg"><label class="fl">Estado *</label><select class="fc" id="cu-est"><option value="pendiente">Pendiente</option><option value="pagado">Pagado</option><option value="parcial">Parcial</option><option value="bonificado">Bonificado</option></select></div></div>
@@ -449,12 +453,12 @@ tbody tr:hover td{background:var(--cr)}
   <div class="mb">
     <input type="hidden" id="us-id">
     <div class="frow"><div class="fg"><label class="fl">Nombre *</label><input class="fc" id="us-nom"></div><div class="fg"><label class="fl">Usuario de acceso *</label><input class="fc" id="us-username" placeholder="ej: carlos (sin espacios)"></div></div>
-    <div class="frow"><div class="fg"><label class="fl">Email (opcional)</label><input class="fc" type="email" id="us-email" placeholder="usuario@gmail.com"></div><div class="fg"><label class="fl">Rol</label><select class="fc" id="us-rol" onchange="toggleActsUs()"><option value="profesor">Profesor</option><option value="admin">Administrador</option></select></div></div>
+    <div class="frow"><div class="fg"><label class="fl">Email (opcional)</label><input class="fc" type="email" id="us-email" placeholder="usuario@gmail.com"></div><div class="fg"><label class="fl">Rol</label><select class="fc" id="us-rol" onchange="toggleActsUs()"><option value="profesor">Instructor/a</option><option value="admin">Administrador</option></select></div></div>
     <div class="fg"><label class="fl">Contraseña *</label><div style="position:relative"><input class="fc" type="password" id="us-pwd" placeholder="Contraseña de acceso" style="padding-right:40px"><button type="button" onclick="toggleUsPwd()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gt);font-size:16px" id="us-eye">👁️</button></div><small style="color:var(--g2);font-size:12px">Dejá vacío para no cambiar la contraseña al editar</small></div>
     <div id="us-acts-sec" class="fg">
       <label class="fl">Actividades a cargo</label>
       <div id="us-acts-list" style="border:1px solid var(--gb);border-radius:var(--r);padding:8px;max-height:130px;overflow-y:auto;display:flex;flex-direction:column;gap:4px"></div>
-      <small style="color:var(--g2);font-size:12px;display:block;margin-top:3px">Marcá las actividades que dicta este profesor</small>
+      <small style="color:var(--g2);font-size:12px;display:block;margin-top:3px">Marcá las actividades que dicta este instructor/a</small>
     </div>
   </div>
   <div class="mf"><button class="btn btn-o" onclick="cerrar('m-us')">Cancelar</button><button class="btn btn-p" id="btn-us" onclick="guardarUs()">Crear usuario</button></div>
@@ -488,10 +492,10 @@ tbody tr:hover td{background:var(--cr)}
 
 <!-- Modal vista-profesor -->
 <div class="mbg" id="m-vp"><div class="modal" style="max-width:380px">
-  <div class="mh"><span class="mt">Ver como profesor</span><button class="bx" onclick="cerrar('m-vp')">×</button></div>
+  <div class="mh"><span class="mt">Ver como instructor/a</span><button class="bx" onclick="cerrar('m-vp')">×</button></div>
   <div class="mb">
-    <p style="font-size:13px;color:var(--gt);margin-bottom:12px">Elegí un profesor para ver la app desde su perspectiva.</p>
-    <div class="fg"><label class="fl">Profesor</label><select class="fc" id="vp-sel"></select></div>
+    <p style="font-size:13px;color:var(--gt);margin-bottom:12px">Elegí un instructor/a para ver la app desde su perspectiva.</p>
+    <div class="fg"><label class="fl">Instructor/a</label><select class="fc" id="vp-sel"></select></div>
   </div>
   <div class="mf"><button class="btn btn-o" onclick="cerrar('m-vp')">Cancelar</button><button class="btn btn-p" onclick="confirmarVistaPro()">👁️ Activar vista</button></div>
 </div></div>
@@ -512,7 +516,7 @@ const SCRIPT_URL_DEFAULT='https://script.google.com/macros/s/AKfycbzOIbATY-QiY5y
 let cfg={};try{cfg=JSON.parse(localStorage.getItem(CFG_KEY)||'{}')}catch(e){cfg={}}
 if(!cfg.scriptUrl&&SCRIPT_URL_DEFAULT){cfg.scriptUrl=SCRIPT_URL_DEFAULT;localStorage.setItem(CFG_KEY,JSON.stringify(cfg))}
 const HOY=new Date(),MES=HOY.toISOString().slice(0,7);
-let CU=null,CU_REAL=null,db={usuarios:[],actividades:[],alumnos:[],inscripciones:[],cuotas:[],asistencia:[],nuevos:[]},DEMO=false,PAG='dashboard',vt=null,asiT={},asiModificado=false;
+let CU=null,CU_REAL=null,db={usuarios:[],actividades:[],alumnos:[],inscripciones:[],cuotas:[],asistencia:[],nuevos:[],contadores:{personas:1000,usuarios:1}},DEMO=false,PAG='dashboard',vt=null,asiT={},asiModificado=false;
 
 window.addEventListener('load',()=>{
   setSpl('Iniciando…');
@@ -563,7 +567,7 @@ async function guardarSetup(){
     await apig({accion:'init'});
     setSpl('Creando usuario administrador…');
     const pwdHash=await sha256(pwd);
-    const nuevoAdmin={id:uid(),nombre:nom,username:eml,email:eml,password:pwdHash,rol:'admin',activo:true,foto:''};
+    const nuevoAdmin={id:nuevoIdUsuario(),nombre:nom,username:eml,email:eml,password:pwdHash,rol:'admin',activo:true,foto:''};
     await apip({accion:'registrar_usuario',datos:nuevoAdmin,email:eml});
     setSpl('¡Listo!');setTimeout(()=>{hideSpl();mostrarLogin()},800);
   }catch(e){setSpl('Error: '+e.message);setTimeout(()=>{hideSpl();document.getElementById('setup').style.display='flex'},2500)}
@@ -577,9 +581,10 @@ async function cargarTodo(){
   setSS('saving','Cargando…');
   try{
     const r=await apig({accion:'todo'});
-    if(r.ok&&r.data){db=r.data;['usuarios','actividades','alumnos','inscripciones','cuotas','asistencia','nuevos'].forEach(k=>{if(!db[k])db[k]=[]});if(!db.config)db.config={};localStorage.setItem('mn_db_cache',JSON.stringify(db));setSS('ok','Sincronizado ✓');setTimeout(()=>setSS('',''),3000)}
+    if(r.ok&&r.data){db=r.data;['usuarios','actividades','alumnos','inscripciones','cuotas','asistencia','nuevos'].forEach(k=>{if(!db[k])db[k]=[]});if(!db.config)db.config={};if(!db.contadores)db.contadores={personas:1000,usuarios:1};localStorage.setItem('mn_db_cache',JSON.stringify(db));setSS('ok','Sincronizado ✓');setTimeout(()=>setSS('',''),3000)}
     else throw new Error(r.error||'Sin datos')
   }catch(e){const c=localStorage.getItem('mn_db_cache');if(c){db=JSON.parse(c);setSS('err','Sin conexión — caché local')}else setSS('err','Sin datos')}
+  migrarIds();
 }
 
 async function guardar(accion,hoja,id,datos){
@@ -633,7 +638,7 @@ async function loginUser(){
       const check=await apig({accion:'todo'});
       const sinUsuarios=!check.data?.usuarios?.length;
       if(sinUsuarios){
-        const nuevoAdmin={id:uid(),nombre:cfg.adminNom||usr,username:usr,email:usr,password:pwdHash,rol:'admin',activo:true,foto:''};
+        const nuevoAdmin={id:nuevoIdUsuario(),nombre:cfg.adminNom||usr,username:usr,email:usr,password:pwdHash,rol:'admin',activo:true,foto:''};
         const reg=await apip({accion:'registrar_usuario',datos:nuevoAdmin,email:usr});
         if(!reg.ok){toast('No se pudo crear el usuario: '+(reg.error||''),'err');return}
         CU={id:nuevoAdmin.id,nombre:nuevoAdmin.nombre,username:nuevoAdmin.username,email:nuevoAdmin.email,rol:'admin',activo:true,foto:''};
@@ -654,7 +659,7 @@ async function actualizarDatos(){const b=document.getElementById('btn-refresh');
 function iniciarSesion(){
   document.getElementById('sb-av').textContent=CU.nombre[0].toUpperCase();
   document.getElementById('sb-uname').textContent=CU.nombre;
-  document.getElementById('sb-urol').textContent=CU.rol==='admin'?'Administrador':'Profesor';
+  document.getElementById('sb-urol').textContent=CU.rol==='admin'?'Administrador':'Instructor/a';
   const D=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],Mo=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],h=new Date();
   document.getElementById('tb-fecha').textContent=D[h.getDay()]+' '+h.getDate()+' de '+Mo[h.getMonth()];
   const _base=window.location.href.substring(0,window.location.href.lastIndexOf('/')+1);
@@ -669,15 +674,15 @@ function iniciarSesion(){
   if(!DEMO)setInterval(async()=>{try{await cargarTodo();renderPag()}catch(e){}},120000);
 }
 
-const NVA=[{id:'dashboard',l:'Dashboard',i:'📊'},{id:'alumnos',l:'Alumnos',i:'👥'},{id:'actividades',l:'Actividades',i:'🏃'},{id:'cuotas',l:'Cuotas',i:'💰'},{id:'asistencia',l:'Asistencia',i:'✅'},{id:'inscripcion',l:'Formulario público',i:'📬'},{id:'usuarios',l:'Usuarios',i:'👤'}];
+const NVA=[{id:'dashboard',l:'Dashboard',i:'📊'},{id:'alumnos',l:'Alumnos y Colaboradores',i:'👥'},{id:'actividades',l:'Actividades',i:'🏃'},{id:'cuotas',l:'Cuotas',i:'💰'},{id:'asistencia',l:'Asistencia',i:'✅'},{id:'inscripcion',l:'Formulario público',i:'📬'},{id:'usuarios',l:'Usuarios',i:'👤'}];
 const NVP=[{id:'mis-actividades',l:'Mis actividades',i:'🏃'},{id:'cuotas',l:'Cuotas',i:'💰'},{id:'asistencia',l:'Asistencia',i:'✅'}];
-const PT={dashboard:'Panel general',alumnos:'Alumnos',actividades:'Actividades',cuotas:'Cuotas',asistencia:'Asistencia',usuarios:'Usuarios',inscripcion:'Formulario público','mis-actividades':'Mis actividades'};
+const PT={dashboard:'Panel general',alumnos:'Alumnos y Colaboradores',actividades:'Actividades',cuotas:'Cuotas',asistencia:'Asistencia',usuarios:'Usuarios',inscripcion:'Formulario público','mis-actividades':'Mis actividades'};
 
 function buildNav(){
   const esAdmin=CU_REAL?CU_REAL.rol==='admin':CU.rol==='admin';
   const items=CU.rol==='admin'?NVA:NVP;
   let nav=items.map(it=>`<button class="nav-btn" id="nav-${it.id}" onclick="navA('${it.id}')"><span class="ni">${it.i}</span>${it.l}</button>`).join('');
-  if(esAdmin&&!CU_REAL)nav+=`<button class="nav-btn" onclick="abrirVistaPro()" style="margin-top:8px;border-top:1px solid rgba(255,255,255,.1);padding-top:12px"><span class="ni">👁️</span>Vista Profesor</button><button class="nav-btn" onclick="resetCfg()" style="margin-top:2px"><span class="ni">⚙️</span>Cambiar URL servidor</button>`;
+  if(esAdmin&&!CU_REAL)nav+=`<button class="nav-btn" onclick="abrirVistaPro()" style="margin-top:8px;border-top:1px solid rgba(255,255,255,.1);padding-top:12px"><span class="ni">👁️</span>Vista Instructor/a</button><button class="nav-btn" onclick="resetCfg()" style="margin-top:2px"><span class="ni">⚙️</span>Cambiar URL servidor</button>`;
   document.getElementById('sb-nav').innerHTML=nav;
   const vpBar=document.getElementById('vp-bar');
   if(CU_REAL){vpBar.style.display='block';document.getElementById('vp-nombre').textContent=CU.nombre}
@@ -687,7 +692,7 @@ function buildNav(){
 
 function abrirVistaPro(){
   const profs=db.usuarios.filter(u=>u.rol==='profesor'&&u.activo!==false);
-  if(!profs.length){toast('No hay profesores cargados','err');return}
+  if(!profs.length){toast('No hay instructores/as cargados','err');return}
   document.getElementById('vp-sel').innerHTML=profs.map(p=>`<option value="${p.id}">${p.nombre} (${p.email})</option>`).join('');
   abrir('m-vp');
 }
@@ -697,7 +702,7 @@ function confirmarVistaPro(){
   CU_REAL=CU;CU=p;
   document.getElementById('sb-av').textContent=CU.nombre[0].toUpperCase();
   document.getElementById('sb-uname').textContent=CU.nombre;
-  document.getElementById('sb-urol').textContent='Profesor (vista admin)';
+  document.getElementById('sb-urol').textContent='Instructor/a (vista admin)';
   cerrar('m-vp');buildNav();navA('mis-actividades');
   toast('Vista activada: '+CU.nombre);
 }
@@ -732,8 +737,52 @@ function fixFoto(url){
   if(m)return 'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w400';
   return url;
 }
-function nextAlumnoId(){const nums=db.alumnos.map(a=>{const m=String(a.id||'').match(/^A(\d+)$/);return m?parseInt(m[1]):0});const max=nums.length?Math.max(...nums):1000;return 'A'+String(max+1).padStart(4,'0')}
-function nextProfesorId(){const nums=db.usuarios.filter(u=>u.rol==='profesor').map(u=>{const m=String(u.id||'').match(/^I(\d+)$/);return m?parseInt(m[1]):0});const max=nums.length?Math.max(...nums):0;return 'I'+String(max+1).padStart(4,'0')}
+function nuevoIdPersona(){
+  const ids=db.alumnos.map(a=>parseInt(a.id)||0);
+  const max=ids.length?Math.max(...ids):999;
+  const next=Math.max(max+1, 1000);
+  if(db.contadores)db.contadores.personas=next;
+  return String(next).padStart(4,'0');
+}
+function nuevoIdUsuario(){
+  const ids=db.usuarios.map(u=>parseInt(u.id)||0);
+  const max=ids.length?Math.max(...ids):0;
+  const next=Math.max(max+1, 1);
+  if(db.contadores)db.contadores.usuarios=next;
+  return String(next).padStart(4,'0');
+}
+function migrarIds(){
+  if(db.version_migracion_ids) return;
+  const mapU={};
+  db.usuarios.forEach((u,i)=>{
+    const nuevo=String(i+1).padStart(4,'0');
+    mapU[String(u.id)]=nuevo;
+    u.id=nuevo;
+  });
+  const mapA={};
+  db.alumnos.forEach((a,i)=>{
+    const nuevo=String(1000+i).padStart(4,'0');
+    mapA[String(a.id)]=nuevo;
+    a.id=nuevo;
+  });
+  db.inscripciones.forEach(r=>{
+    if(mapA[String(r.alumno_id)])r.alumno_id=mapA[String(r.alumno_id)];
+  });
+  db.cuotas.forEach(r=>{
+    if(mapA[String(r.alumno_id)])r.alumno_id=mapA[String(r.alumno_id)];
+  });
+  db.asistencia.forEach(r=>{
+    if(mapA[String(r.alumno_id)])r.alumno_id=mapA[String(r.alumno_id)];
+  });
+  db.actividades.forEach(r=>{
+    if(mapU[String(r.profesor_id)])r.profesor_id=mapU[String(r.profesor_id)];
+  });
+  // Re-vincular la sesión activa al nuevo id (CU se guardó con el id viejo)
+  if(CU&&mapU[String(CU.id)]){CU.id=mapU[String(CU.id)];try{localStorage.setItem('mn_session',JSON.stringify(CU))}catch(e){}}
+  if(CU_REAL&&mapU[String(CU_REAL.id)])CU_REAL.id=mapU[String(CU_REAL.id)];
+  db.version_migracion_ids=true;
+  if(DEMO) localStorage.setItem('mn_demo_db', JSON.stringify(db));
+}
 function edad(f){if(!f)return null;const h=new Date(),n=new Date(f+'T12:00');let e=h.getFullYear()-n.getFullYear();const m=h.getMonth()-n.getMonth();if(m<0||(m===0&&h.getDate()<n.getDate()))e--;return e}
 function edadStr(f){const e=edad(f);return e===null?'-':e+' años'}
 const ML=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -743,11 +792,15 @@ function toast(msg,t='ok'){const el=document.getElementById('toast');el.textCont
 function abrir(id){document.getElementById(id).classList.add('open')}
 function cerrar(id){document.getElementById(id).classList.remove('open')}
 function getAlActs(id){return db.inscripciones.filter(i=>i.alumno_id===id&&i.estado==='activa').map(i=>db.actividades.find(a=>a.id===i.actividad_id)).filter(Boolean)}
+function categoriaPersona(alId){return db.inscripciones.some(i=>String(i.alumno_id)===String(alId)&&i.estado==='activa')?'Alumno/a':'Colaborador/a'}
+function esSponsor(al){return al&&(al.es_sponsor===true||al.es_sponsor==='SI'||al.es_sponsor==='true')}
+function badgeSponsor(al){return esSponsor(al)?`<span class="badge" style="background:#14532d;color:#fff;margin:1px;font-size:11px">Sponsor</span>`:''}
 function getActAls(id){return db.inscripciones.filter(i=>i.actividad_id===id&&i.estado==='activa').map(i=>db.alumnos.find(a=>a.id===i.alumno_id)).filter(Boolean)}
 const QC={pagado:{cls:'b-pag',l:'✓ Pagado'},pendiente:{cls:'b-pen',l:'⏳ Pendiente'},parcial:{cls:'b-par',l:'◑ Parcial'},bonificado:{cls:'b-bon',l:'○ Bonificado'},'sin cuota':{cls:'b-bon',l:'○ Sin cuota'}};
 function bquo(e){const c=QC[e]||QC.pendiente;return`<span class="badge ${c.cls}">${c.l}</span>`}
 const EC={activo:'b-act',con_deuda:'b-deu',pausado:'b-pau',inhabilitado:'b-baj',baja:'b-baj',provisional:'b-prov',admin:'b-adm',profesor:'b-pro'};
-function best(e){return`<span class="badge ${EC[e]||''}">${e}</span>`}
+const EL={admin:'Administrador',profesor:'Instructor/a'};
+function best(e){return`<span class="badge ${EC[e]||''}">${EL[e]||e}</span>`}
 let _cf={};
 function estadoVis(al){
   if(al.estado!=='activo')return al.estado;
@@ -818,7 +871,7 @@ function renderDash(){
   const pagN=qm.filter(c=>c.estado==='pagado').length,pendN=qm.filter(c=>['pendiente','parcial'].includes(c.estado)).length;
   const pctCob=pagN+pendN>0?Math.round(pagN/(pagN+pendN)*100):null;
 
-  // socio breakdown
+  // alumnos / colaboradores breakdown
   const conAct=db.alumnos.filter(a=>['activo','con_deuda'].includes(estadoVis(a))&&db.inscripciones.some(i=>String(i.alumno_id)===String(a.id)&&i.estado==='activa')).length;
   const sinAct=db.alumnos.filter(a=>['activo','con_deuda'].includes(estadoVis(a))&&!db.inscripciones.some(i=>String(i.alumno_id)===String(a.id)&&i.estado==='activa')).length;
   const conDeuCnt=db.alumnos.filter(a=>estadoVis(a)==='con_deuda').length;
@@ -832,9 +885,9 @@ function renderDash(){
     (pctCob!==null?`<div class="metric m-vd"><div class="ml">Cobranza del mes</div><div class="mv">${pctCob}%</div></div>`:'')+
     `<div class="metric m-rg"><div class="ml">Cuotas pendientes</div><div class="mv">${pend.length}</div></div>`+
     `<div class="metric m-rg"><div class="ml">Deuda total</div><div class="mv">${fpeso(deuda)}</div></div>`+
-    `<div class="metric m-rg"><div class="ml">Con deuda este mes</div><div class="mv">${conDeuCnt}</div></div>`+
-    `<div class="metric m-g2"><div class="ml">Con actividad</div><div class="mv">${conAct}</div></div>`+
-    `<div class="metric m-g2"><div class="ml">Sin actividad</div><div class="mv">${sinAct}</div></div>`+
+    `<div class="metric m-rg"><div class="ml">Con deuda</div><div class="mv">${conDeuCnt}</div></div>`+
+    `<div class="metric m-g2"><div class="ml">Alumnos</div><div class="mv">${conAct}</div></div>`+
+    `<div class="metric m-g2"><div class="ml">Colaboradores</div><div class="mv">${sinAct}</div></div>`+
     `<div class="metric m-g2"><div class="ml">Actividades activas</div><div class="mv">${db.actividades.filter(a=>a.estado==='activa').length}</div></div>`;
 
   document.getElementById('dash-acts').innerHTML=db.actividades.filter(a=>a.estado==='activa').map(a=>{const cnt=db.inscripciones.filter(i=>i.actividad_id===a.id&&i.estado==='activa').length;const pct=a.cupo_maximo?Math.round(cnt/Number(a.cupo_maximo)*100):0;return`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="font-weight:500">${a.nombre}</span><span style="color:var(--gt)">${cnt}/${a.cupo_maximo||'∞'}</span></div><div class="ab"><div class="abf" style="width:${pct}%"></div></div></div>`}).join('');
@@ -885,7 +938,7 @@ function renderDash(){
   const bdayEl=document.getElementById('dash-bday');
   if(bdayEl)bdayEl.innerHTML=bdays.length?bdays.map(a=>{const dia=parseInt(a.fecha_nacimiento.slice(8,10));const edad=HOY.getFullYear()-parseInt(a.fecha_nacimiento.slice(0,4));return`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--cr)"><div style="font-size:13px;font-weight:500">${a.nombre} ${a.apellido}</div><span style="font-size:12px;color:var(--gt)">${dia}/${mesActual} · ${edad} años</span></div>`}).join(''):'<div class="empty"><div class="eico">🎂</div><p>Sin cumpleaños este mes</p></div>';
 
-  // Card: Socios objetivo
+  // Card: Meta de membresías
   const objEl=document.getElementById('dash-obj');
   if(objEl){
     const obj=parseInt(db.config?.socios_objetivo||0);
@@ -900,7 +953,7 @@ function renderDash(){
 }
 function editSociosObj(){
   const actual=parseInt(db.config?.socios_objetivo||0);
-  const nuevo=prompt('Objetivo de socios activos:',actual||'');
+  const nuevo=prompt('Meta de membresías:',actual||'');
   if(nuevo===null)return;
   const val=parseInt(nuevo)||0;
   db.config=db.config||{};db.config.socios_objetivo=val;
@@ -929,7 +982,7 @@ function renderAlumnos(){
     const acts=getAlActs(al.id);
     const esProv=al.estado==='provisional';
     const foto=al.foto?`<img src="${fixFoto(al.foto)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid var(--gb);margin-right:8px;vertical-align:middle" onerror="this.style.display='none'">`:'';
-    return`<tr><td><div style="display:flex;align-items:center">${foto}<div><div style="font-weight:500">${al.nombre} ${al.apellido}${esProv?` <span class="badge b-prov" style="font-size:10px">prov</span>`:''}</div><div style="font-size:11px;color:var(--g2)">${al.id}${al.responsable_nombre?' · '+al.responsable_nombre:''}</div></div></div></td><td style="color:var(--gt)">${al.dni||'-'}</td><td style="color:var(--gt)">${edadStr(al.fecha_nacimiento)}</td><td style="color:var(--gt)">${al.telefono||'-'}</td><td>${acts.map(a=>`<span class="badge b-act" style="margin:1px;font-size:11px">${a.nombre}</span>`).join('')||'-'}</td><td>${best(estadoVis(al))}</td><td><div style="display:flex;gap:4px"><button class="btn btn-g btn-sm" onclick="verDetalleAl('${al.id}')" title="Balance">📊</button>${isA?`<button class="btn btn-g btn-sm" onclick="editAl('${al.id}')">✏️</button><button class="btn btn-g btn-sm" onclick="verCarnet('${al.id}')" title="Carnet">🪪</button><button class="btn btn-g btn-sm" onclick="delAl('${al.id}')">🗑️</button>`:`<button class="btn btn-g btn-sm" onclick="verCarnet('${al.id}')" title="Carnet">🪪</button>`}</div></td></tr>`}).join('')||`<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--g2)">Sin resultados</td></tr>`;
+    return`<tr><td><div style="display:flex;align-items:center">${foto}<div><div style="font-weight:500">${al.nombre} ${al.apellido}${esProv?` <span class="badge b-prov" style="font-size:10px">prov</span>`:''}</div><div style="font-size:11px;color:var(--g2)">${al.id}${al.responsable_nombre?' · '+al.responsable_nombre:''}</div></div></div></td><td style="color:var(--gt)">${al.dni||'-'}</td><td style="color:var(--gt)">${edadStr(al.fecha_nacimiento)}</td><td style="color:var(--gt)">${al.telefono||'-'}</td><td>${acts.map(a=>`<span class="badge b-act" style="margin:1px;font-size:11px">${a.nombre}</span>`).join('')||'-'}</td><td><div style="display:flex;flex-wrap:wrap;gap:3px;align-items:center">${best(estadoVis(al))}<span class="badge" style="background:#eef2ff;color:#3730a3;font-size:11px">${categoriaPersona(al.id)}</span>${badgeSponsor(al)}</div></td><td><div style="display:flex;gap:4px"><button class="btn btn-g btn-sm" onclick="verDetalleAl('${al.id}')" title="Balance">📊</button>${isA?`<button class="btn btn-g btn-sm" onclick="editAl('${al.id}')">✏️</button><button class="btn btn-g btn-sm" onclick="verCarnet('${al.id}')" title="Carnet">🪪</button><button class="btn btn-g btn-sm" onclick="delAl('${al.id}')">🗑️</button>`:`<button class="btn btn-g btn-sm" onclick="verCarnet('${al.id}')" title="Carnet">🪪</button>`}</div></td></tr>`}).join('')||`<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--g2)">Sin resultados</td></tr>`;
 }
 function toggleMenorAl(v){document.getElementById('al-tutor-sec').style.display=v?'block':'none'}
 function toggleDescPct(){
@@ -941,10 +994,10 @@ function toggleDescPct(){
   else{sec.style.display='block'}
 }
 function abrirMAl(){
-  document.getElementById('al-id').value='';document.getElementById('m-al-t').textContent='Nuevo alumno';
+  document.getElementById('al-id').value='';document.getElementById('m-al-t').textContent='Nueva persona';
   ['al-nom','al-ape','al-dni','al-obs','al-tel','al-rnom','al-rdni','al-rtel','al-sal','al-emg','al-motivo-desc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('al-fnac').value='';document.getElementById('al-est').value='activo';
-  document.getElementById('al-menor').checked=false;document.getElementById('al-rvin').value='madre';
+  document.getElementById('al-menor').checked=false;document.getElementById('al-sponsor').checked=false;document.getElementById('al-rvin').value='madre';
   document.getElementById('al-tipo-desc').value='ninguno';document.getElementById('al-desc-pct').value='0';
   toggleMenorAl(false);toggleDescPct();document.querySelectorAll('.al-act-cb').forEach(cb=>cb.checked=false);abrir('m-al');
 }
@@ -957,6 +1010,7 @@ function editAl(id){
   document.getElementById('al-obs').value=al.observaciones||'';
   const menor=al.es_menor==='SI'||al.es_menor===true||al.es_menor==='true';
   document.getElementById('al-menor').checked=menor;toggleMenorAl(menor);
+  document.getElementById('al-sponsor').checked=esSponsor(al);
   document.getElementById('al-rnom').value=al.responsable_nombre||'';
   document.getElementById('al-rdni').value=al.responsable_dni||'';
   document.getElementById('al-rvin').value=al.responsable_vinculo||'madre';
@@ -969,7 +1023,7 @@ function editAl(id){
   toggleDescPct();
   const ia=db.inscripciones.filter(i=>i.alumno_id===id&&i.estado==='activa').map(i=>i.actividad_id);
   document.querySelectorAll('.al-act-cb').forEach(cb=>cb.checked=ia.includes(cb.value));
-  document.getElementById('m-al-t').textContent='Editar alumno';abrir('m-al');
+  document.getElementById('m-al-t').textContent='Editar persona';abrir('m-al');
 }
 async function guardarAl(){
   const id=document.getElementById('al-id').value,nom=document.getElementById('al-nom').value.trim(),ape=document.getElementById('al-ape').value.trim();
@@ -979,10 +1033,10 @@ async function guardarAl(){
   btnOff('btn-al');const acts=Array.from(document.querySelectorAll('.al-act-cb:checked')).map(cb=>cb.value);
   const tipoDesc=document.getElementById('al-tipo-desc').value;
   const pctDesc=tipoDesc==='ninguno'?0:tipoDesc==='beca_total'?100:parseFloat(document.getElementById('al-desc-pct').value)||0;
-  const d={nombre:nom,apellido:ape,dni:document.getElementById('al-dni').value.trim(),fecha_nacimiento:document.getElementById('al-fnac').value,telefono:document.getElementById('al-tel').value.trim(),estado:document.getElementById('al-est').value,es_menor:menor?'SI':'NO',responsable_nombre:document.getElementById('al-rnom').value.trim(),responsable_dni:document.getElementById('al-rdni').value.trim(),responsable_vinculo:document.getElementById('al-rvin').value,responsable_telefono:document.getElementById('al-rtel').value.trim(),salud:document.getElementById('al-sal').value.trim(),contacto_emergencia:document.getElementById('al-emg').value.trim(),observaciones:document.getElementById('al-obs').value.trim(),tipo_descuento:tipoDesc,descuento_pct:pctDesc,motivo_descuento:document.getElementById('al-motivo-desc').value.trim()};
+  const d={nombre:nom,apellido:ape,dni:document.getElementById('al-dni').value.trim(),fecha_nacimiento:document.getElementById('al-fnac').value,telefono:document.getElementById('al-tel').value.trim(),estado:document.getElementById('al-est').value,es_menor:menor?'SI':'NO',es_sponsor:document.getElementById('al-sponsor').checked?'SI':'NO',responsable_nombre:document.getElementById('al-rnom').value.trim(),responsable_dni:document.getElementById('al-rdni').value.trim(),responsable_vinculo:document.getElementById('al-rvin').value,responsable_telefono:document.getElementById('al-rtel').value.trim(),salud:document.getElementById('al-sal').value.trim(),contacto_emergencia:document.getElementById('al-emg').value.trim(),observaciones:document.getElementById('al-obs').value.trim(),tipo_descuento:tipoDesc,descuento_pct:pctDesc,motivo_descuento:document.getElementById('al-motivo-desc').value.trim()};
   try{
-    if(id){const ix=db.alumnos.findIndex(a=>a.id===id);db.alumnos[ix]={...db.alumnos[ix],...d};await guardar('actualizar','alumnos',id,d);const viejas=db.inscripciones.filter(i=>i.alumno_id===id&&i.estado==='activa');for(const v of viejas){if(!acts.includes(v.actividad_id)){db.inscripciones=db.inscripciones.filter(i=>i.id!==v.id);await guardar('eliminar','inscripciones',v.id,null)}}for(const ai of acts){if(!viejas.find(v=>v.actividad_id===ai)){const ni={id:uid(),alumno_id:id,actividad_id:ai,estado:'activa',fecha_inscripcion:new Date().toISOString().slice(0,10)};db.inscripciones.push(ni);await guardar('insertar','inscripciones',null,ni)}}toast('Alumno actualizado')}
-    else{const nid=nextAlumnoId(),nuevo={id:nid,...d,fecha_alta:new Date().toISOString().slice(0,10)};db.alumnos.push(nuevo);await guardar('insertar','alumnos',null,nuevo);for(const ai of acts){const ni={id:uid(),alumno_id:nid,actividad_id:ai,estado:'activa',fecha_inscripcion:new Date().toISOString().slice(0,10)};db.inscripciones.push(ni);await guardar('insertar','inscripciones',null,ni)}toast('Alumno creado')}
+    if(id){const ix=db.alumnos.findIndex(a=>a.id===id);db.alumnos[ix]={...db.alumnos[ix],...d};await guardar('actualizar','alumnos',id,d);const viejas=db.inscripciones.filter(i=>i.alumno_id===id&&i.estado==='activa');for(const v of viejas){if(!acts.includes(v.actividad_id)){db.inscripciones=db.inscripciones.filter(i=>i.id!==v.id);await guardar('eliminar','inscripciones',v.id,null)}}for(const ai of acts){if(!viejas.find(v=>v.actividad_id===ai)){const ni={id:uid(),alumno_id:id,actividad_id:ai,estado:'activa',fecha_inscripcion:new Date().toISOString().slice(0,10)};db.inscripciones.push(ni);await guardar('insertar','inscripciones',null,ni)}}toast('Persona actualizada')}
+    else{const nid=nuevoIdPersona(),nuevo={id:nid,...d,fecha_alta:new Date().toISOString().slice(0,10)};db.alumnos.push(nuevo);await guardar('insertar','alumnos',null,nuevo);for(const ai of acts){const ni={id:uid(),alumno_id:nid,actividad_id:ai,estado:'activa',fecha_inscripcion:new Date().toISOString().slice(0,10)};db.inscripciones.push(ni);await guardar('insertar','inscripciones',null,ni)}toast('Persona creada')}
     cerrar('m-al');renderAlumnos();initSels();
   }catch(e){toast('Error: '+e.message,'err')}
   btnOn('btn-al');
@@ -1008,12 +1062,12 @@ function renderActs(){
 }
 function editarValSocio(){
   const actual=parseFloat(db.config?.valor_cuota_socio||0);
-  const nuevo=prompt('Valor mensual de la cuota de socio ($):', actual);
+  const nuevo=prompt('Valor mensual de la cuota de membresía ($):', actual);
   if(nuevo===null)return;
   const val=parseFloat(nuevo)||0;
   db.config=db.config||{};db.config.valor_cuota_socio=val;
   guardar('guardar_config',null,null,{valor_cuota_socio:val}).then(()=>{
-    renderActs();toast('Cuota de socio → '+fpeso(val));
+    renderActs();toast('Cuota de membresía → '+fpeso(val));
   }).catch(e=>toast('Error: '+e.message,'err'));
 }
 function abrirMAct(){document.getElementById('act-id').value='';document.getElementById('m-act-t').textContent='Nueva actividad';['act-nom','act-hor','act-val','act-cupo'].forEach(id=>document.getElementById(id).value='');document.getElementById('act-prof').value='';document.getElementById('act-est').value='activa';abrir('m-act')}
@@ -1022,7 +1076,7 @@ async function guardarAct(){const id=document.getElementById('act-id').value,nom
 async function delAct(id){if(!confirm('¿Eliminar?'))return;try{db.actividades=db.actividades.filter(a=>a.id!==id);await guardar('eliminar','actividades',id,null);renderActs();initSels();toast('Eliminada')}catch(e){toast('Error','err')}}
 
 function initFilMes(){const sel=document.getElementById('fil-mes'),m=[];for(let i=-3;i<=1;i++){const d=new Date(HOY.getFullYear(),HOY.getMonth()+i,1);m.push(d.toISOString().slice(0,7))}sel.innerHTML=m.map(x=>`<option value="${x}" ${x===MES?'selected':''}>${fmes(x)}</option>`).join('')}
-function initFilActCu(){const isA=CU?.rol==='admin';const cuId=String(CU?.id||'');const acts=isA?db.actividades:db.actividades.filter(a=>String(a.profesor_id)===cuId);document.getElementById('fil-act-cu').innerHTML='<option value="">— Todas las actividades —</option>'+(isA?'<option value="__socio__">🏅 Cuota de Socio</option>':'')+acts.map(a=>`<option value="${a.id}">${a.nombre}</option>`).join('')}
+function initFilActCu(){const isA=CU?.rol==='admin';const cuId=String(CU?.id||'');const acts=isA?db.actividades:db.actividades.filter(a=>String(a.profesor_id)===cuId);document.getElementById('fil-act-cu').innerHTML='<option value="">— Todas las actividades —</option>'+(isA?'<option value="__socio__">🏅 Cuota de membresía</option>':'')+acts.map(a=>`<option value="${a.id}">${a.nombre}</option>`).join('')}
 function renderCuotas(){
   const mes=document.getElementById('fil-mes').value;
   const af=document.getElementById('fil-act-cu').value;
@@ -1048,8 +1102,8 @@ function renderCuotas(){
   let filas='';
 
   if(af==='__socio__'){
-    // ── Modo cuota de socio: muestra TODOS los socios ──
-    if(thCat)thCat.textContent='Tipo de socio';
+    // ── Modo cuota de membresía: muestra TODAS las personas ──
+    if(thCat)thCat.textContent='Categoría';
     let als=db.alumnos.filter(a=>a.estado!=='baja'&&a.estado!=='provisional');
     if(q)als=als.filter(a=>(a.nombre+' '+a.apellido).toLowerCase().includes(q));
     let pag=0,pen=0,sin=0,bon=0;
@@ -1061,11 +1115,10 @@ function renderCuotas(){
       acumCuota(c);
       if(est==='pagado')pag++;else if(est==='bonificado')bon++;else if(est==='pendiente'||est==='parcial')pen++;else sin++;
       const qc=QC[est]||QC['sin cuota'];
-      const hasActs=db.inscripciones.some(i=>String(i.alumno_id)===String(al.id)&&i.estado==='activa');
-      const tipoSocio=hasActs?'Con actividad':'Sin actividad';
+      const cat=categoriaPersona(al.id);
       return`<tr>
         <td style="font-weight:500">${al.nombre} ${al.apellido}<div style="font-size:11px;color:var(--g2)">${al.id}</div></td>
-        <td><span class="badge" style="background:#f1f5f9;color:#475569;font-size:11px">${tipoSocio}</span></td>
+        <td><span class="badge" style="background:#eef2ff;color:#3730a3;font-size:11px">${cat}</span>${badgeSponsor(al)}</td>
         <td style="color:var(--gt)">${fmes(mes)}</td>
         <td style="font-weight:500">${fpeso(c?.monto||0)}</td>
         <td${est==='sin cuota'?` class="cclick" onclick="crearOCambEst('${al.id}','__socio__','${mes}')"`:''}><span class="badge ${qc.cls}">${qc.l}</span></td>
@@ -1080,7 +1133,7 @@ function renderCuotas(){
       ${pen?`<span style="background:#fee2e2;color:#b91c1c;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:500">⚠ ${pen} pendientes</span>`:''}
       ${sin?`<span style="background:var(--cr);color:var(--gt);border:1px solid var(--gb);padding:4px 12px;border-radius:99px;font-size:12px;font-weight:500">○ ${sin} sin cuota</span>`:''}
     `:'';
-    filas=rows.join('')||`<tr><td colspan="8" style="padding:40px;text-align:center;color:var(--g2)">Sin socios</td></tr>`;
+    filas=rows.join('')||`<tr><td colspan="8" style="padding:40px;text-align:center;color:var(--g2)">Sin personas</td></tr>`;
 
   }else if(af){
     // ── Modo actividad: muestra TODOS los alumnos inscriptos ──
@@ -1152,7 +1205,7 @@ async function crearOCambEst(alId,actId,mes){
       const valSocio=parseFloat(db.config?.valor_cuota_socio||0);
       const esBon=valSocio===0;
       nueva={id:uid(),alumno_id:alId,actividad_id:null,tipo:'socio',mes_anio:mes,monto:valSocio,descuento:esBon?100:0,estado:esBon?'bonificado':'pendiente',medio_pago:null,fecha_pago:null,observaciones:''};
-      toast('Cuota de socio creada → '+(esBon?'Bonificada':'Pendiente'));
+      toast('Cuota de membresía creada → '+(esBon?'Bonificada':'Pendiente'));
     }else{
       const act=db.actividades.find(a=>String(a.id)===String(actId));
       const desc=parseFloat(al?.descuento_pct||0);
@@ -1263,7 +1316,7 @@ function renderDetFin(alId){
   const thActs=acts.map(a=>`<th style="padding:8px 10px;font-size:11px;font-weight:600;color:var(--g2);text-align:center;border-bottom:1px solid var(--gb);white-space:nowrap">🏃 ${a.nombre}</th>`).join('');
   const thead=`<thead><tr>
     <th style="padding:8px 10px;font-size:11px;font-weight:600;color:var(--g2);text-align:left;border-bottom:1px solid var(--gb)">Mes</th>
-    <th style="padding:8px 10px;font-size:11px;font-weight:600;color:var(--g2);text-align:center;border-bottom:1px solid var(--gb)">🏅 Socio</th>
+    <th style="padding:8px 10px;font-size:11px;font-weight:600;color:var(--g2);text-align:center;border-bottom:1px solid var(--gb)">🏅 Membresía</th>
     ${thActs}
   </tr></thead>`;
 
@@ -1421,7 +1474,7 @@ async function guardarUs(){
       toast(nom+' actualizado');
     }else{
       if(!pwd){toast('Ingresá una contraseña','err');btnOn('btn-us');return}
-      const nid=rol==='profesor'?nextProfesorId():uid();
+      const nid=nuevoIdUsuario();
       const n={id:nid,nombre:nom,username,email,password:await sha256(pwd),rol,activo:true,foto:''};
       db.usuarios.push(n);await guardar('insertar','usuarios',null,n);
       for(const aid of selActs){const a=db.actividades.find(x=>x.id===aid);if(!a)continue;a.profesor_id=nid;await guardar('actualizar','actividades',aid,{profesor_id:nid})}
@@ -1483,7 +1536,7 @@ async function aprobar(){
   if(btnAp){btnAp.disabled=true;btnAp.textContent='Aprobando…'}
   const act=db.actividades.find(a=>a.nombre===ins.actividad)||db.actividades[0];
   const esPasivo=ins.actividad==='__pasivo__'||!ins.actividad||!act;
-  const nuevo={id:nextAlumnoId(),nombre:ins.nombre,apellido:ins.apellido,dni:ins.dni,fecha_nacimiento:ins.fecha_nacimiento,
+  const nuevo={id:nuevoIdPersona(),nombre:ins.nombre,apellido:ins.apellido,dni:ins.dni,fecha_nacimiento:ins.fecha_nacimiento,
     telefono:ins.telefono,es_menor:ins.es_menor||'NO',
     responsable_nombre:ins.responsable_nombre||'',responsable_dni:ins.responsable_dni||'',
     responsable_vinculo:ins.responsable_vinculo||'',responsable_telefono:ins.responsable_telefono||'',
@@ -1573,13 +1626,14 @@ function _carnetHTML(al,acts,cuotaColor,cuotaTxt,fotoUrl,edadNum,estVis){
       </div>
       <div style="background:#f8fafc;border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:12px">
         <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span style="color:#64748b">Nro. Socio</span><span style="font-weight:700;color:#166534">${al.id}</span>
+          <span style="color:#64748b">N° de Ficha</span><span style="font-weight:700;color:#166534">${al.id}</span>
         </div>
         <div style="display:flex;justify-content:space-between">
           <span style="color:#64748b">DNI</span><span style="font-weight:600;color:#1e293b">${al.dni||'—'}</span>
         </div>
       </div>
-      ${acts.length?`<div style="margin-bottom:10px">${acts.map(a=>`<span style="display:inline-block;background:#166534;color:#fff;font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;margin:2px 2px 0 0">${a.nombre}</span>`).join('')}</div>`:`<div style="margin-bottom:10px"><span style="display:inline-block;background:#f1f5f9;color:#475569;font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px">Socio Activo sin actividad</span></div>`}
+      <div style="margin-bottom:10px"><span style="display:inline-block;background:#eef2ff;color:#3730a3;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;margin:2px 2px 0 0">${categoriaPersona(al.id)}</span>${esSponsor(al)?`<span style="display:inline-block;background:#14532d;color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;margin:2px 2px 0 0">Sponsor</span>`:''}</div>
+      ${acts.length?`<div style="margin-bottom:10px">${acts.map(a=>`<span style="display:inline-block;background:#166534;color:#fff;font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;margin:2px 2px 0 0">${a.nombre}</span>`).join('')}</div>`:''}
       ${estVis==='con_deuda'?`<div style="background:#fff0f0;border:1px solid #f5c6c3;border-radius:6px;padding:4px 10px;font-size:11px;color:#c0392b;margin-bottom:8px">⚠ Tiene cuotas pendientes este mes</div>`:''}
       <div style="background:${cuotaColor}12;border:1.5px solid ${cuotaColor}50;border-radius:8px;padding:8px 12px">
         <div style="font-size:12px;font-weight:700;color:${cuotaColor}">${cuotaTxt}</div>
@@ -1590,7 +1644,7 @@ function _carnetHTML(al,acts,cuotaColor,cuotaTxt,fotoUrl,edadNum,estVis){
 }
 function verCarnetPropio(){
   const u=CU;if(!u)return;
-  const rolLabel=u.rol==='admin'?'Administrador':'Profesor';
+  const rolLabel=u.rol==='admin'?'Administrador':'Instructor/a';
   const fotoUrl=fixFoto(u.foto||'');
   const acts=u.rol==='profesor'?db.actividades.filter(a=>String(a.profesor_id)===String(u.id)&&a.estado==='activa'):[];
   const html=`<div style="width:320px;margin:0 auto;border-radius:14px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.18);font-family:system-ui,sans-serif">
@@ -1664,13 +1718,14 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 window.addEventListener('beforeunload',e=>{if(asiModificado){guardarAsi().catch(()=>{});e.preventDefault();e.returnValue='Hay cambios de asistencia sin guardar'}});
 
 function cargarDemo(){
-  const saved=localStorage.getItem('mn_demo_db');if(saved){try{db=JSON.parse(saved);return}catch(e){}}
+  const saved=localStorage.getItem('mn_demo_db');if(saved){try{db=JSON.parse(saved);if(!db.contadores)db.contadores={personas:1000,usuarios:1};migrarIds();return}catch(e){}}
   const u1={id:uid(),nombre:'Admin General',email:'admin@madryn.com',rol:'admin',activo:true,foto:''},u2={id:uid(),nombre:'Carlos Méndez',email:'carlos@madryn.com',rol:'profesor',activo:true,foto:''},u3={id:uid(),nombre:'Laura Sosa',email:'laura@madryn.com',rol:'profesor',activo:true,foto:''};
   const a1={id:uid(),nombre:'Mini Hockey',profesor_id:u2.id,dias_horarios:'Lun y Mié 16:00-17:30',valor_mensual:8000,cupo_maximo:20,estado:'activa'},a2={id:uid(),nombre:'Maxi Hockey',profesor_id:u2.id,dias_horarios:'Mar y Jue 17:30-19:00',valor_mensual:9000,cupo_maximo:15,estado:'activa'},a3={id:uid(),nombre:'Futsal',profesor_id:u3.id,dias_horarios:'Lun Mié Vie 18:00-19:30',valor_mensual:8500,cupo_maximo:16,estado:'activa'},a4={id:uid(),nombre:'Handball',profesor_id:u3.id,dias_horarios:'Mar y Jue 16:00-17:30',valor_mensual:8000,cupo_maximo:18,estado:'activa'},a5={id:uid(),nombre:'Básquet',profesor_id:null,dias_horarios:'Lun y Mié 19:00-20:30',valor_mensual:8000,cupo_maximo:14,estado:'activa'},a6={id:uid(),nombre:'Entren. Fútbol',profesor_id:u2.id,dias_horarios:'Mar Jue Sáb 10:00-11:30',valor_mensual:9500,cupo_maximo:20,estado:'activa'};
   const als=[{id:uid(),nombre:'Valentina',apellido:'García',dni:'44001234',fecha_nacimiento:'2015-03-10',telefono:'2804111222',contacto_responsable:'María García',estado:'activo',observaciones:''},{id:uid(),nombre:'Mateo',apellido:'López',dni:'43556789',fecha_nacimiento:'2014-07-22',telefono:'2804333444',contacto_responsable:'',estado:'activo',observaciones:''},{id:uid(),nombre:'Agustina',apellido:'Ríos',dni:'45012345',fecha_nacimiento:'2016-11-05',telefono:'2804555666',contacto_responsable:'Paula Ríos',estado:'activo',observaciones:'Alergia al polvo'},{id:uid(),nombre:'Tomás',apellido:'Ferreyra',dni:'42987654',fecha_nacimiento:'2013-04-18',telefono:'2804777888',contacto_responsable:'',estado:'activo',observaciones:''},{id:uid(),nombre:'Isabella',apellido:'Martínez',dni:'46123456',fecha_nacimiento:'2017-08-30',telefono:'2804222333',contacto_responsable:'Laura Martínez',estado:'pausado',observaciones:'Pausa por lesión'},{id:uid(),nombre:'Santiago',apellido:'Núñez',dni:'44567890',fecha_nacimiento:'2015-01-14',telefono:'2804444555',contacto_responsable:'',estado:'activo',observaciones:''},{id:uid(),nombre:'Sofía',apellido:'Vera',dni:'45678901',fecha_nacimiento:'2016-05-20',telefono:'2804666777',contacto_responsable:'Ana Vera',estado:'activo',observaciones:''}];
   const ins=[{id:uid(),alumno_id:als[0].id,actividad_id:a1.id,estado:'activa'},{id:uid(),alumno_id:als[1].id,actividad_id:a1.id,estado:'activa'},{id:uid(),alumno_id:als[2].id,actividad_id:a1.id,estado:'activa'},{id:uid(),alumno_id:als[3].id,actividad_id:a3.id,estado:'activa'},{id:uid(),alumno_id:als[4].id,actividad_id:a4.id,estado:'activa'},{id:uid(),alumno_id:als[5].id,actividad_id:a3.id,estado:'activa'},{id:uid(),alumno_id:als[6].id,actividad_id:a2.id,estado:'activa'},{id:uid(),alumno_id:als[0].id,actividad_id:a2.id,estado:'activa'}];
   const cuotas=[{id:uid(),alumno_id:als[0].id,actividad_id:a1.id,mes_anio:MES,monto:8000,estado:'pagado',fecha_pago:'2025-05-01',medio_pago:'transferencia',observaciones:''},{id:uid(),alumno_id:als[1].id,actividad_id:a1.id,mes_anio:MES,monto:8000,estado:'pendiente',fecha_pago:null,medio_pago:null,observaciones:''},{id:uid(),alumno_id:als[2].id,actividad_id:a1.id,mes_anio:MES,monto:8000,estado:'pagado',fecha_pago:'2025-05-02',medio_pago:'efectivo',observaciones:''},{id:uid(),alumno_id:als[3].id,actividad_id:a3.id,mes_anio:MES,monto:8500,estado:'parcial',fecha_pago:'2025-05-03',medio_pago:'efectivo',observaciones:'Pagó 5000'},{id:uid(),alumno_id:als[4].id,actividad_id:a4.id,mes_anio:MES,monto:8000,estado:'bonificado',fecha_pago:null,medio_pago:null,observaciones:'Lesión'},{id:uid(),alumno_id:als[5].id,actividad_id:a3.id,mes_anio:MES,monto:8500,estado:'pendiente',fecha_pago:null,medio_pago:null,observaciones:''},{id:uid(),alumno_id:als[6].id,actividad_id:a2.id,mes_anio:MES,monto:9000,estado:'pagado',fecha_pago:'2025-05-01',medio_pago:'mercado_pago',observaciones:''}];
-  db={usuarios:[u1,u2,u3],actividades:[a1,a2,a3,a4,a5,a6],alumnos:als,inscripciones:ins,cuotas,asistencia:[],nuevos:[]};
+  db={usuarios:[u1,u2,u3],actividades:[a1,a2,a3,a4,a5,a6],alumnos:als,inscripciones:ins,cuotas,asistencia:[],nuevos:[],contadores:{personas:1000,usuarios:1}};
+  migrarIds();
   localStorage.setItem('mn_demo_db',JSON.stringify(db));
 }
 </script>

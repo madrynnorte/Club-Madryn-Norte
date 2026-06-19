@@ -225,7 +225,7 @@ body{font-family:var(--font-s);background:var(--cr);color:var(--ng);min-height:1
   <!-- ── PASO 2: FOTO ── -->
   <div id="pantalla-2" style="display:none">
     <div class="card">
-      <div class="ch"><div class="ct">Tu foto</div><div class="csub">Opcional — para el carnet de socio</div></div>
+      <div class="ch"><div class="ct">Tu foto</div><div class="csub">Opcional — para el carnet de membresía</div></div>
       <div class="cb">
         <div class="photo-area">
           <div class="photo-preview" onclick="document.getElementById('input-gal').click()">
@@ -462,8 +462,8 @@ function renderActGrid(){
   const pasivoOpt = `<label class="act-opt${actSelId==='__pasivo__'?' sel':''}">
     <input type="radio" name="act" value="__pasivo__" ${actSelId==='__pasivo__'?'checked':''} onchange="selAct('__pasivo__')">
     <div style="flex:1">
-      <div class="act-nom">Sin actividad — Solo quiero ser socio</div>
-      <div class="act-det">🏅 Socio pasivo · Sin cargo por actividad</div>
+      <div class="act-nom">Sin actividad — Solo quiero ser Colaborador/a</div>
+      <div class="act-det">🏅 Colaborador/a · Sin cargo por actividad</div>
     </div>
     <div class="act-precio" style="color:var(--vd)">Sin cargo</div>
   </label>`;
@@ -511,7 +511,7 @@ function renderResumen(){
   const resActEl = document.getElementById('res-act');
   if(actSelId==='__pasivo__'){
     resActEl.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><div style="font-weight:500;font-size:14px">Sin actividad — Solo quiero ser socio</div><div style="font-size:12px;color:var(--gt);margin-top:2px">🏅 Socio pasivo</div></div>
+      <div><div style="font-weight:500;font-size:14px">Sin actividad — Solo quiero ser Colaborador/a</div><div style="font-size:12px;color:var(--gt);margin-top:2px">🏅 Colaborador/a</div></div>
       <div style="font-size:14px;color:var(--vd);font-weight:500">Sin cargo</div>
     </div>`;
   } else if(act){
@@ -568,7 +568,7 @@ async function confirmar(){
   document.getElementById('exito-resumen').innerHTML=`
     <div style="font-weight:500;margin-bottom:6px">${datos.nombre} ${datos.apellido}</div>
     ${esPasivo
-      ? `<div style="font-size:13px;color:var(--gt)">🏅 Socio pasivo · Sin actividad</div>`
+      ? `<div style="font-size:13px;color:var(--gt)">🏅 Colaborador/a · Sin actividad</div>`
       : `<div style="font-size:13px;color:var(--gt)">📋 ${act?.nombre||''}</div><div style="font-size:13px;color:var(--gt)">🕐 ${act?.dias||''}</div>`}
     ${esMenor?`<div style="font-size:13px;color:var(--gt)">👨‍👩‍👦 Responsable: ${datos.responsable_nombre}</div>`:''}
     <div style="font-size:13px;color:var(--gt);margin-top:8px">Estado: <span style="color:var(--vd);font-weight:500">Pendiente de validación</span></div>`;

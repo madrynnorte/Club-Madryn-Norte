@@ -14,7 +14,7 @@ const ESQUEMA = {
   usuarios:      ['id','nombre','username','email','password','rol','activo','foto'],
   actividades:   ['id','nombre','profesor_id','dias_horarios','valor_mensual','cupo_maximo','estado'],
   alumnos:       ['id','nombre','apellido','dni','fecha_nacimiento','telefono',
-                  'es_menor','responsable_nombre','responsable_dni','responsable_vinculo','responsable_telefono',
+                  'es_menor','es_sponsor','responsable_nombre','responsable_dni','responsable_vinculo','responsable_telefono',
                   'estado','tipo_socio',
                   'tipo_descuento','descuento_pct','motivo_descuento',
                   'observaciones','salud','contacto_emergencia',

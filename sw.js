@@ -1,4 +1,4 @@
-const CACHE = 'madryn-norte-v1';
+const CACHE = 'madryn-norte-v2';
 const FILES = ['./', './index.html', './escudo.jpg', './manifest.json'];
 
 self.addEventListener('install', e => {

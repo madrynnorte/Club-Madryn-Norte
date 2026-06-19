@@ -1,8 +1,8 @@
 const CACHE = 'madryn-norte-v2';
-const FILES = ['./', './index.html', './escudo.jpg', './manifest.json'];
+const STATIC = ['./escudo.jpg', './manifest.json'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC)));
   self.skipWaiting();
 });
 
@@ -16,7 +16,16 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('./index.html')))
-  );
+  const req = e.request;
+  // HTML: siempre red primero, caché solo si no hay conexión
+  if (req.mode === 'navigate' || req.headers.get('accept')?.includes('text/html')) {
+    e.respondWith(
+      fetch(req)
+        .then(r => { const c = r.clone(); caches.open(CACHE).then(ch => ch.put(req, c)); return r; })
+        .catch(() => caches.match(req).then(r => r || caches.match('./index.html')))
+    );
+  } else {
+    // Imágenes y otros estáticos: caché primero
+    e.respondWith(caches.match(req).then(r => r || fetch(req).catch(() => {})));
+  }
 });

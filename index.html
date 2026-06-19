@@ -586,7 +586,6 @@ async function cargarTodo(){
     if(r.ok&&r.data){db=r.data;['usuarios','actividades','alumnos','inscripciones','cuotas','asistencia','nuevos'].forEach(k=>{if(!db[k])db[k]=[]});if(!db.config)db.config={};if(!db.contadores)db.contadores={personas:1000,usuarios:1};localStorage.setItem('mn_db_cache',JSON.stringify(db));setSS('ok','Sincronizado ✓');setTimeout(()=>setSS('',''),3000)}
     else throw new Error(r.error||'Sin datos')
   }catch(e){const c=localStorage.getItem('mn_db_cache');if(c){db=JSON.parse(c);setSS('err','Sin conexión — caché local')}else setSS('err','Sin datos')}
-  migrarIds();
 }
 
 async function guardar(accion,hoja,id,datos){
@@ -740,16 +739,16 @@ function fixFoto(url){
   return url;
 }
 function nuevoIdPersona(){
-  const ids=db.alumnos.map(a=>parseInt(a.id)||0);
+  const ids=db.alumnos.map(a=>parseInt(String(a.id).replace(/[^0-9]/g,''))||0);
   const max=ids.length?Math.max(...ids):999;
-  const next=Math.max(max+1, 1000);
+  const next=Math.max(max+1,1000);
   if(db.contadores)db.contadores.personas=next;
-  return String(next).padStart(4,'0');
+  return String(next);
 }
 function nuevoIdUsuario(){
-  const ids=db.usuarios.map(u=>parseInt(u.id)||0);
+  const ids=db.usuarios.map(u=>parseInt(String(u.id).replace(/[^0-9]/g,''))||0);
   const max=ids.length?Math.max(...ids):0;
-  const next=Math.max(max+1, 1);
+  const next=Math.max(max+1,1);
   if(db.contadores)db.contadores.usuarios=next;
   return String(next).padStart(4,'0');
 }

@@ -235,6 +235,7 @@ tbody tr:hover td{background:var(--cr)}
     </div>
     <nav class="sb-nav" id="sb-nav"></nav>
     <div class="sb-foot">
+      <button onclick="verCarnetPropio()" style="width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:rgba(255,255,255,.85);font-size:12px;font-weight:500;padding:7px 10px;cursor:pointer;margin-bottom:8px;text-align:center">🪪 Mi Carnet</button>
       <div class="sb-user">
         <div class="sb-av" id="sb-av">A</div>
         <div style="min-width:0"><div class="sb-uname" id="sb-uname">—</div><div class="sb-urol" id="sb-urol">—</div></div>
@@ -515,10 +516,17 @@ let CU=null,CU_REAL=null,db={usuarios:[],actividades:[],alumnos:[],inscripciones
 
 window.addEventListener('load',()=>{
   setSpl('Iniciando…');
-  setTimeout(()=>{
-    if(cfg.demo){DEMO=true;hideSpl();cargarDemo();mostrarLogin()}
-    else if(cfg.scriptUrl){hideSpl();mostrarLogin()}
-    else{hideSpl();document.getElementById('setup').style.display='flex'}
+  setTimeout(async()=>{
+    if(cfg.demo){
+      DEMO=true;cargarDemo();
+      const sv=localStorage.getItem('mn_session');
+      if(sv){try{CU=JSON.parse(sv);hideSpl();iniciarSesion();return}catch(e){localStorage.removeItem('mn_session')}}
+      hideSpl();mostrarLogin();
+    }else if(cfg.scriptUrl){
+      const sv=localStorage.getItem('mn_session');
+      if(sv){try{CU=JSON.parse(sv);setSpl('Restaurando sesión…');await cargarTodo();hideSpl();iniciarSesion();return}catch(e){localStorage.removeItem('mn_session')}}
+      hideSpl();mostrarLogin();
+    }else{hideSpl();document.getElementById('setup').style.display='flex'}
   },900);
 });
 
@@ -603,7 +611,7 @@ function mostrarLogin(){
   document.getElementById('login-screen').style.display='flex';
 }
 
-function loginDemo(){const id=document.getElementById('demo-sel').value;CU=db.usuarios.find(u=>u.id===id);if(!CU)return;document.getElementById('login-screen').style.display='none';iniciarSesion()}
+function loginDemo(){const id=document.getElementById('demo-sel').value;CU=db.usuarios.find(u=>u.id===id);if(!CU)return;localStorage.setItem('mn_session',JSON.stringify(CU));document.getElementById('login-screen').style.display='none';iniciarSesion()}
 function togglePwd(){const i=document.getElementById('login-pwd'),b=document.getElementById('btn-eye');if(!i)return;i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁️':'🙈'}
 
 async function loginUser(){
@@ -617,7 +625,7 @@ async function loginUser(){
       const ul=usr.toLowerCase();
       const u=db.usuarios.find(x=>(x.username||'').toLowerCase()===ul||(x.email||'').toLowerCase()===ul);
       if(!u){toast('Usuario no encontrado en demo','err');return}
-      CU=u;document.getElementById('login-screen').style.display='none';iniciarSesion();return;
+      CU=u;localStorage.setItem('mn_session',JSON.stringify(CU));document.getElementById('login-screen').style.display='none';iniciarSesion();return;
     }
     const pwdHash=await sha256(pwd);
     let r=await apip({accion:'login',username:usr,email:usr,pwd:pwdHash});
@@ -629,10 +637,10 @@ async function loginUser(){
         const reg=await apip({accion:'registrar_usuario',datos:nuevoAdmin,email:usr});
         if(!reg.ok){toast('No se pudo crear el usuario: '+(reg.error||''),'err');return}
         CU={id:nuevoAdmin.id,nombre:nuevoAdmin.nombre,username:nuevoAdmin.username,email:nuevoAdmin.email,rol:'admin',activo:true,foto:''};
-        await cargarTodo();document.getElementById('login-screen').style.display='none';iniciarSesion();return;
+        localStorage.setItem('mn_session',JSON.stringify(CU));await cargarTodo();document.getElementById('login-screen').style.display='none';iniciarSesion();return;
       }else{toast(r.error||'Usuario o contraseña incorrectos','err');return}
     }
-    CU=r.data.usuario;
+    CU=r.data.usuario;localStorage.setItem('mn_session',JSON.stringify(CU));
     await cargarTodo();document.getElementById('login-screen').style.display='none';iniciarSesion();
   }catch(e){toast('Error: '+e.message,'err')}
   finally{btn.disabled=false;btn.textContent='Ingresar'}
@@ -640,7 +648,7 @@ async function loginUser(){
 
 function volverLogin(){document.getElementById('no-access').style.display='none';mostrarLogin()}
 function resetCfg(){localStorage.removeItem(CFG_KEY);location.reload()}
-function cerrarSesion(){CU=null;document.getElementById('app').style.display='none';mostrarLogin()}
+function cerrarSesion(){CU=null;localStorage.removeItem('mn_session');document.getElementById('app').style.display='none';mostrarLogin()}
 async function actualizarDatos(){const b=document.getElementById('btn-refresh');b.textContent='↻…';b.disabled=true;await cargarTodo();renderPag();b.textContent='↻';b.disabled=false;toast('Datos actualizados ✓')}
 
 function iniciarSesion(){
@@ -1579,6 +1587,38 @@ function _carnetHTML(al,acts,cuotaColor,cuotaTxt,fotoUrl,edadNum,estVis){
       <div style="margin-top:10px;border-top:1px dashed #e2e8f0;padding-top:8px;text-align:center;font-size:10px;color:#94a3b8;letter-spacing:.04em">VÁLIDO SOLO CON FOTO — madryn norte</div>
     </div>
   </div>`;
+}
+function verCarnetPropio(){
+  const u=CU;if(!u)return;
+  const rolLabel=u.rol==='admin'?'Administrador':'Profesor';
+  const fotoUrl=fixFoto(u.foto||'');
+  const acts=u.rol==='profesor'?db.actividades.filter(a=>String(a.profesor_id)===String(u.id)&&a.estado==='activa'):[];
+  const html=`<div style="width:320px;margin:0 auto;border-radius:14px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.18);font-family:system-ui,sans-serif">
+    <div style="background:linear-gradient(135deg,#7f1d1d 0%,#991b1b 55%,#166534 100%);padding:16px 16px 28px;text-align:center;position:relative">
+      <div style="font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.75);text-transform:uppercase;margin-bottom:2px">Complejo Deportivo</div>
+      <div style="font-size:17px;font-weight:700;color:#fff;letter-spacing:.06em">MADRYN NORTE</div>
+      <div style="position:absolute;top:10px;right:12px;background:rgba(255,255,255,.15);border-radius:6px;padding:2px 8px;font-size:10px;color:rgba(255,255,255,.9);font-weight:600">${rolLabel}</div>
+    </div>
+    <div style="background:#fff;padding:0 16px 16px;position:relative">
+      <div style="display:flex;gap:14px;margin-top:-24px;align-items:flex-end;margin-bottom:12px">
+        ${fotoUrl?`<img src="${fotoUrl}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.2);flex-shrink:0" onerror="this.style.display='none'">`:`<div style="width:72px;height:72px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:28px;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.2);flex-shrink:0">👤</div>`}
+        <div style="padding-bottom:4px;min-width:0">
+          <div style="font-size:16px;font-weight:700;color:#1e293b;line-height:1.2">${u.nombre}</div>
+          ${u.apellido?`<div style="font-size:16px;font-weight:700;color:#1e293b;line-height:1.2">${u.apellido}</div>`:''}
+        </div>
+      </div>
+      <div style="background:#f8fafc;border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:12px">
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#64748b">Rol</span><span style="font-weight:700;color:#166534">${rolLabel}</span>
+        </div>
+        ${u.dni?`<div style="display:flex;justify-content:space-between;margin-top:4px"><span style="color:#64748b">DNI</span><span style="font-weight:600;color:#1e293b">${u.dni}</span></div>`:''}
+      </div>
+      ${acts.length?`<div style="margin-bottom:10px">${acts.map(a=>`<span style="display:inline-block;background:#166534;color:#fff;font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;margin:2px 2px 0 0">${a.nombre}</span>`).join('')}</div>`:''}
+      <div style="margin-top:10px;border-top:1px dashed #e2e8f0;padding-top:8px;text-align:center;font-size:10px;color:#94a3b8;letter-spacing:.04em">PERSONAL — madryn norte</div>
+    </div>
+  </div>`;
+  document.getElementById('carnet-body').innerHTML=`<div id="carnet-card">${html}</div>`;
+  abrir('m-carnet');
 }
 function imprimirCarnet(){
   const card=document.getElementById('carnet-card');

@@ -738,19 +738,21 @@ function fixFoto(url){
   if(m)return 'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w400';
   return url;
 }
+function _nextIdCompartido(){
+  const idsAl=db.alumnos.map(a=>parseInt(String(a.id).replace(/[^0-9]/g,''))||0);
+  const idsUs=db.usuarios.map(u=>parseInt(String(u.id).replace(/[^0-9]/g,''))||0);
+  const max=Math.max(...idsAl,...idsUs,999);
+  return Math.max(max+1,1000);
+}
 function nuevoIdPersona(){
-  const ids=db.alumnos.map(a=>parseInt(String(a.id).replace(/[^0-9]/g,''))||0);
-  const max=ids.length?Math.max(...ids):999;
-  const next=Math.max(max+1,1000);
+  const next=_nextIdCompartido();
   if(db.contadores)db.contadores.personas=next;
   return String(next);
 }
 function nuevoIdUsuario(){
-  const ids=db.usuarios.map(u=>parseInt(String(u.id).replace(/[^0-9]/g,''))||0);
-  const max=ids.length?Math.max(...ids):0;
-  const next=Math.max(max+1,1);
+  const next=_nextIdCompartido();
   if(db.contadores)db.contadores.usuarios=next;
-  return String(next).padStart(4,'0');
+  return 'I'+String(next);
 }
 function migrarIds(){
   if(db.version_migracion_ids) return;
@@ -1655,7 +1657,7 @@ function verCarnetUsuario(id){
     <div style="background:linear-gradient(135deg,#7f1d1d 0%,#991b1b 55%,#166534 100%);padding:16px 16px 28px;text-align:center;position:relative">
       <div style="font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.75);text-transform:uppercase;margin-bottom:2px">Complejo Deportivo</div>
       <div style="font-size:17px;font-weight:700;color:#fff;letter-spacing:.06em">MADRYN NORTE</div>
-      <div style="position:absolute;top:10px;right:12px;background:rgba(255,255,255,.15);border-radius:6px;padding:2px 8px;font-size:10px;color:rgba(255,255,255,.9);font-weight:600">${rolLabel}</div>
+      <div style="position:absolute;top:10px;right:12px;background:rgba(255,255,255,.15);border-radius:6px;padding:2px 8px;font-size:10px;color:rgba(255,255,255,.9);font-weight:600">${u.id||''}</div>
     </div>
     <div style="background:#fff;padding:0 16px 16px;position:relative">
       <div style="display:flex;gap:14px;margin-top:-24px;align-items:flex-end;margin-bottom:12px">
@@ -1666,12 +1668,18 @@ function verCarnetUsuario(id){
         </div>
       </div>
       <div style="background:#f8fafc;border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:12px">
-        <div style="display:flex;justify-content:space-between">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="color:#64748b">N° de Ficha</span><span style="font-weight:700;color:#166534">${u.id||'—'}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
           <span style="color:#64748b">Rol</span><span style="font-weight:700;color:#166534">${rolLabel}</span>
         </div>
         ${u.dni?`<div style="display:flex;justify-content:space-between;margin-top:4px"><span style="color:#64748b">DNI</span><span style="font-weight:600;color:#1e293b">${u.dni}</span></div>`:''}
       </div>
       ${acts.length?`<div style="margin-bottom:10px">${acts.map(a=>`<span style="display:inline-block;background:#166534;color:#fff;font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;margin:2px 2px 0 0">${a.nombre}</span>`).join('')}</div>`:''}
+      <div style="background:#15803d12;border:1.5px solid #15803d50;border-radius:8px;padding:8px 12px;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:700;color:#15803d">Vigente: ${fmes(MES)}</div>
+      </div>
       <div style="margin-top:10px;border-top:1px dashed #e2e8f0;padding-top:8px;text-align:center;font-size:10px;color:#94a3b8;letter-spacing:.04em">PERSONAL — madryn norte</div>
     </div>
   </div>`;

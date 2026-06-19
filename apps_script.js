@@ -15,7 +15,7 @@ const ESQUEMA = {
   actividades:   ['id','nombre','profesor_id','dias_horarios','valor_mensual','cupo_maximo','estado'],
   alumnos:       ['id','nombre','apellido','dni','fecha_nacimiento','telefono',
                   'es_menor','es_sponsor','responsable_nombre','responsable_dni','responsable_vinculo','responsable_telefono',
-                  'estado','tipo_socio',
+                  'estado',
                   'tipo_descuento','descuento_pct','motivo_descuento',
                   'observaciones','salud','contacto_emergencia',
                   'fecha_alta','fecha_baja','foto'],
@@ -186,6 +186,9 @@ function insertarFila(nombre, datos) {
   const ss   = getSS();
   const hoja = ss.getSheetByName(nombre);
   if (!hoja) throw new Error('Hoja no encontrada: ' + nombre);
+  // Autosincroniza columnas del esquema antes de escribir, así campos nuevos
+  // (ej: username/password) no se pierden si la hoja se creó antes del cambio.
+  if (ESQUEMA[nombre] && hoja.getLastRow() > 0) agregarColumnasNuevas(hoja, ESQUEMA[nombre]);
   const lastCol = hoja.getLastColumn();
   const hdrs = lastCol > 0
     ? hoja.getRange(1, 1, 1, lastCol).getValues()[0].map(String)
@@ -201,6 +204,7 @@ function actualizarFila(nombre, id, datos) {
   const ss   = getSS();
   const hoja = ss.getSheetByName(nombre);
   if (!hoja) throw new Error('Hoja no encontrada: ' + nombre);
+  if (ESQUEMA[nombre] && hoja.getLastRow() > 0) agregarColumnasNuevas(hoja, ESQUEMA[nombre]);
   const nCols = Math.max(ESQUEMA[nombre].length, hoja.getLastColumn());
   const hdrs  = hoja.getRange(1, 1, 1, nCols).getValues()[0].map(String);
   const ult   = hoja.getLastRow();
@@ -442,6 +446,21 @@ function onFormSubmit(e) {
 // ═══════════════════════════════════════════════════════════════════
 //  UTILIDADES — Ejecutar desde el editor, una sola vez
 // ═══════════════════════════════════════════════════════════════════
+
+// OPCIONAL / MANUAL: ejecutar una sola vez desde el editor de Apps Script.
+// Renombra el header 'tipo_socio' (columna ya retirada del ESQUEMA) a
+// '_legado_tipo_socio' para conservar el dato histórico sin que vuelva a
+// aparecer como columna activa de alumnos.
+function migrarEsquemaAlumnos() {
+  const ss = getSS();
+  const hoja = ss.getSheetByName('alumnos');
+  if (!hoja || hoja.getLastColumn() === 0) { Logger.log('Hoja alumnos vacía o inexistente'); return; }
+  const hdrs = hoja.getRange(1, 1, 1, hoja.getLastColumn()).getValues()[0];
+  const idx = hdrs.indexOf('tipo_socio');
+  if (idx < 0) { Logger.log('No hay columna tipo_socio para migrar'); return; }
+  hoja.getRange(1, idx + 1).setValue('_legado_tipo_socio');
+  Logger.log('Columna tipo_socio renombrada a _legado_tipo_socio');
+}
 
 // Convierte alumnos con IDs viejos → A1001+
 // Convierte actividades con IDs UUID → slug del nombre

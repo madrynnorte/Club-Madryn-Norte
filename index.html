@@ -111,6 +111,7 @@ tbody tr:hover td{background:var(--cr)}
 .ali-btn.ap{background:var(--vc);color:#155d30;border-color:var(--vb)}
 .ali-btn.aa{background:var(--rs);color:var(--rg);border-color:#f5c6c3}
 .ali-btn.av{background:#fff7e0;color:#7a4f00;border-color:#f5e6a3}
+.ali-btn.as{background:#f1f5f9;color:#475569;border-color:#cbd5e1}
 .sbar{position:relative}.sbar input{padding-left:34px;width:220px}
 .sico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--g2);font-size:14px;pointer-events:none}
 .lbox{display:flex;align-items:center;gap:8px;background:var(--vc);border:1px solid var(--vb);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--vd);word-break:break-all}
@@ -341,6 +342,7 @@ tbody tr:hover td{background:var(--cr)}
           <select class="fc" id="fil-act-asi" style="width:auto" onchange="renderAsi()"></select>
           <input class="fc" type="date" id="fil-fasi" style="width:auto" onchange="renderAsi()">
           <button class="btn btn-o btn-sm" onclick="abrirProvAsi()">+ Provisional</button>
+          <button class="btn btn-o btn-sm" onclick="suspenderClase()" title="Marcar toda la clase como suspendida">🚫 Suspender clase</button>
           <button class="btn btn-p" id="btn-guardar-asi" onclick="guardarAsi()">💾 Guardar</button>
         </div>
       </div>
@@ -1404,11 +1406,12 @@ function renderAsi(){
     const clasesDelMes=db.asistencia.filter(r=>String(r.alumno_id)===String(al.id)&&String(r.actividad_id)===String(actId)&&String(r.fecha).slice(0,7)===MES&&r.estado==='presente').length;
     const clasBadge=clasesDelMes>0?`<span style="font-size:10px;background:var(--vc);color:var(--vd);padding:1px 7px;border-radius:99px;margin-left:6px">${fmes(MES).split(' ')[0]}: ${clasesDelMes}cl</span>`:'';
     const prov=al.estado==='provisional'?'<span class="badge b-prov" style="font-size:10px;margin-left:4px">prov</span>':'';
-    return`<div class="ali-item" id="asi-${al.id}"><div style="flex:1;min-width:0"><div class="ali-nom">${al.nombre} ${al.apellido}${prov}${clasBadge}</div><div style="margin-top:3px">${qico}</div></div><div class="ali-btns"><button class="ali-btn${e==='presente'?' ap':''}" onclick="setAsi('${al.id}','presente')">✓ Pres.</button><button class="ali-btn${e==='ausente'?' aa':''}" onclick="setAsi('${al.id}','ausente')">✗ Aus.</button><button class="ali-btn${e==='aviso'?' av':''}" onclick="setAsi('${al.id}','aviso')">~ Avisó</button></div></div>`}).join('');
+    return`<div class="ali-item" id="asi-${al.id}"><div style="flex:1;min-width:0"><div class="ali-nom">${al.nombre} ${al.apellido}${prov}${clasBadge}</div><div style="margin-top:3px">${qico}</div></div><div class="ali-btns"><button class="ali-btn${e==='presente'?' ap':''}" onclick="setAsi('${al.id}','presente')">✓ Pres.</button><button class="ali-btn${e==='ausente'?' aa':''}" onclick="setAsi('${al.id}','ausente')">✗ Aus.</button><button class="ali-btn${e==='aviso'?' av':''}" onclick="setAsi('${al.id}','aviso')">~ Avisó</button><button class="ali-btn${e==='suspendida'?' as':''}" onclick="setAsi('${al.id}','suspendida')">🚫 Susp.</button></div></div>`}).join('');
   updResAsi(als.length);
 }
-function setAsi(al_id,est){asiT[al_id]=est;asiModificado=true;const el=document.getElementById('asi-'+al_id);if(!el)return;const bs=el.querySelectorAll('.ali-btn');bs[0].className='ali-btn'+(est==='presente'?' ap':'');bs[1].className='ali-btn'+(est==='ausente'?' aa':'');bs[2].className='ali-btn'+(est==='aviso'?' av':'');updResAsi(getActAls(document.getElementById('fil-act-asi').value).filter(a=>a.estado==='activo').length)}
-function updResAsi(total){const p=Object.values(asiT).filter(e=>e==='presente').length,av=Object.values(asiT).filter(e=>e==='aviso').length;document.getElementById('asi-res').textContent=`${p} presentes · ${av} avisos de ${total}`}
+function setAsi(al_id,est){asiT[al_id]=est;asiModificado=true;const el=document.getElementById('asi-'+al_id);if(!el)return;const bs=el.querySelectorAll('.ali-btn');bs[0].className='ali-btn'+(est==='presente'?' ap':'');bs[1].className='ali-btn'+(est==='ausente'?' aa':'');bs[2].className='ali-btn'+(est==='aviso'?' av':'');bs[3].className='ali-btn'+(est==='suspendida'?' as':'');updResAsi(getActAls(document.getElementById('fil-act-asi').value).filter(a=>a.estado==='activo').length)}
+function updResAsi(total){const vals=Object.values(asiT);const p=vals.filter(e=>e==='presente').length,av=vals.filter(e=>e==='aviso').length,su=vals.filter(e=>e==='suspendida').length;document.getElementById('asi-res').textContent=su===vals.length&&vals.length>0?'🚫 Clase suspendida':`${p} presentes · ${av} avisos de ${total}`}
+function suspenderClase(){if(!Object.keys(asiT).length){toast('Seleccioná actividad y fecha primero','err');return}Object.keys(asiT).forEach(id=>asiT[id]='suspendida');asiModificado=true;renderAsi();toast('Clase marcada como suspendida')}
 async function guardarAsi(){
   const actId=document.getElementById('fil-act-asi').value,fecha=document.getElementById('fil-fasi').value;
   if(!actId||!fecha){toast('Seleccioná actividad y fecha','err');return}
@@ -1429,7 +1432,7 @@ async function guardarAsi(){
 function abrirProvAsi(){const actId=document.getElementById('fil-act-asi').value;if(!actId){toast('Primero seleccioná una actividad','err');return}abrirProv(actId)}
 
 function toggleUsPwd(){const i=document.getElementById('us-pwd'),b=document.getElementById('us-eye');if(!i)return;i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁️':'🙈'}
-function renderUs(){document.getElementById('tb-us').innerHTML=db.usuarios.filter(u=>!_cf['us-rol']||_cf['us-rol'].has(u.rol)).map(u=>{const acts=db.actividades.filter(a=>a.profesor_id===u.id),esYo=u.id===CU.id;return`<tr><td style="font-weight:500">${u.nombre}${esYo?' <span style="font-size:11px;color:var(--g2)">(vos)</span>':''}</td><td style="color:var(--gt);font-family:monospace">${u.username||u.email||'-'}</td><td>${best(u.rol)}</td><td>${acts.map(a=>`<span class="badge b-act" style="margin:1px;font-size:11px">${a.nombre}</span>`).join('')||'-'}</td><td><div style="display:flex;gap:4px"><button class="btn btn-g btn-sm" onclick="editUs('${u.id}')">✏️</button>${esYo?'':`<button class="btn btn-g btn-sm" onclick="delUs('${u.id}')">🗑️</button>`}</div></td></tr>`}).join('')}
+function renderUs(){document.getElementById('tb-us').innerHTML=db.usuarios.filter(u=>!_cf['us-rol']||_cf['us-rol'].has(u.rol)).map(u=>{const acts=db.actividades.filter(a=>a.profesor_id===u.id),esYo=u.id===CU.id;return`<tr><td style="font-weight:500">${u.nombre}${esYo?' <span style="font-size:11px;color:var(--g2)">(vos)</span>':''}</td><td style="color:var(--gt);font-family:monospace">${u.username||u.email||'-'}</td><td>${best(u.rol)}</td><td>${acts.map(a=>`<span class="badge b-act" style="margin:1px;font-size:11px">${a.nombre}</span>`).join('')||'-'}</td><td><div style="display:flex;gap:4px"><button class="btn btn-g btn-sm" onclick="editUs('${u.id}')">✏️</button>${CU.rol==='admin'?`<button class="btn btn-g btn-sm" onclick="verCarnetUsuario('${u.id}')">🪪</button>`:''}${esYo?'':`<button class="btn btn-g btn-sm" onclick="delUs('${u.id}')">🗑️</button>`}</div></td></tr>`}).join('')}
 function editUs(id){
   const u=db.usuarios.find(x=>x.id===id);if(!u)return;
   document.getElementById('us-id').value=u.id;
@@ -1613,7 +1616,7 @@ function _carnetHTML(al,acts,cuotaColor,cuotaTxt,fotoUrl,edadNum,estVis){
     <div style="background:linear-gradient(135deg,#7f1d1d 0%,#991b1b 55%,#166534 100%);padding:16px 16px 28px;text-align:center;position:relative">
       <div style="font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.75);text-transform:uppercase;margin-bottom:2px">Complejo Deportivo</div>
       <div style="font-size:17px;font-weight:700;color:#fff;letter-spacing:.06em">MADRYN NORTE</div>
-      <div style="position:absolute;top:10px;right:12px;background:rgba(255,255,255,.15);border-radius:6px;padding:2px 8px;font-size:10px;color:rgba(255,255,255,.9);font-weight:600">Nro. ${al.id}</div>
+      <div style="position:absolute;top:10px;right:12px;background:rgba(255,255,255,.15);border-radius:6px;padding:2px 8px;font-size:10px;color:rgba(255,255,255,.9);font-weight:600">Ficha N° ${al.id}</div>
     </div>
     <div style="background:#fff;padding:0 16px 16px;position:relative">
       <div style="display:flex;gap:14px;margin-top:-24px;align-items:flex-end;margin-bottom:12px">
@@ -1642,8 +1645,10 @@ function _carnetHTML(al,acts,cuotaColor,cuotaTxt,fotoUrl,edadNum,estVis){
     </div>
   </div>`;
 }
-function verCarnetPropio(){
-  const u=CU;if(!u)return;
+function verCarnetPropio(){verCarnetUsuario(CU?.id)}
+function verCarnetUsuario(id){
+  const u=db.usuarios.find(x=>String(x.id)===String(id))||(String(CU?.id)===String(id)?CU:null);
+  if(!u)return;
   const rolLabel=u.rol==='admin'?'Administrador':'Instructor/a';
   const fotoUrl=fixFoto(u.foto||'');
   const acts=u.rol==='profesor'?db.actividades.filter(a=>String(a.profesor_id)===String(u.id)&&a.estado==='activa'):[];

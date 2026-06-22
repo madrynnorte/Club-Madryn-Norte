@@ -302,13 +302,15 @@ tbody tr:hover td{background:var(--cr)}
       </div>
     </div>
 
+    <div class="page" id="page-home"><div id="home-body"></div></div>
     <div class="page active" id="page-dashboard">
       <div class="ph"><div><div class="pt">Panel general</div><div class="ps">Resumen del club</div></div><button class="btn btn-o btn-sm" onclick="exportCSV()">↓ CSV</button></div>
       <div class="metrics" id="dash-metrics"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
         <div class="card"><div class="ch"><span class="ct">Alumnos por actividad</span></div><div class="cb" id="dash-acts"></div></div>
-        <div class="card"><div class="ch"><span class="ct">Cuotas pendientes</span><span class="badge b-pen" id="dpcount"></span></div><div class="cb" id="dash-deud"></div></div>
+        <div class="card"><div class="ch"><span class="ct">Cobranza del mes</span></div><div class="cb" id="dash-dona" style="display:flex;align-items:center;justify-content:center;flex-direction:column"></div></div>
       </div>
+      <div class="card" style="margin-bottom:16px"><div class="ch"><span class="ct">Cuotas pendientes</span><span class="badge b-pen" id="dpcount"></span></div><div class="cb" id="dash-deud"></div></div>
       <div class="card"><div class="ch"><span class="ct">Inscriptos nuevos por validar</span><span class="badge b-pen" id="dash-ncount">0</span></div><div class="cb" id="dash-nlista"></div></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
         <div class="card"><div class="ch"><span class="ct">Alumnos sin cuota generada</span></div><div class="cb" id="dash-scu"></div></div>
@@ -499,8 +501,10 @@ tbody tr:hover td{background:var(--cr)}
   <div class="mh"><span class="mt" id="m-us-t">Nuevo usuario</span><button class="bx" onclick="cerrar('m-us')">×</button></div>
   <div class="mb">
     <input type="hidden" id="us-id">
-    <div class="frow"><div class="fg"><label class="fl">Nombre *</label><input class="fc" id="us-nom"></div><div class="fg"><label class="fl">Usuario de acceso *</label><input class="fc" id="us-username" placeholder="ej: carlos (sin espacios)"></div></div>
-    <div class="frow"><div class="fg"><label class="fl">Email (opcional)</label><input class="fc" type="email" id="us-email" placeholder="usuario@gmail.com"></div><div class="fg"><label class="fl">Rol</label><select class="fc" id="us-rol" onchange="toggleActsUs()"><option value="profesor">Instructor/a</option><option value="admin">Administrador</option></select></div></div>
+    <div class="frow"><div class="fg"><label class="fl">Nombre *</label><input class="fc" id="us-nom"></div><div class="fg"><label class="fl">Apellido *</label><input class="fc" id="us-ape"></div></div>
+    <div class="frow"><div class="fg"><label class="fl">Usuario de acceso *</label><input class="fc" id="us-username" placeholder="ej: carlos (sin espacios)"></div><div class="fg"><label class="fl">Rol</label><select class="fc" id="us-rol" onchange="toggleActsUs()"><option value="profesor">Instructor/a</option><option value="admin">Administrador</option></select></div></div>
+    <div class="frow"><div class="fg"><label class="fl">DNI</label><input class="fc" id="us-dni" placeholder="30123456"></div><div class="fg"><label class="fl">Fecha nacimiento</label><input class="fc" type="date" id="us-fnac"></div></div>
+    <div class="frow"><div class="fg"><label class="fl">Teléfono</label><input class="fc" id="us-tel" placeholder="2804000000"></div><div class="fg"><label class="fl">Email (opcional)</label><input class="fc" type="email" id="us-email" placeholder="usuario@gmail.com"></div></div>
     <div class="fg"><label class="fl">Contraseña *</label><div style="position:relative"><input class="fc" type="password" id="us-pwd" placeholder="Contraseña de acceso" style="padding-right:40px"><button type="button" onclick="toggleUsPwd()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gt);font-size:16px" id="us-eye">👁️</button></div><small style="color:var(--g2);font-size:12px">Dejá vacío para no cambiar la contraseña al editar</small></div>
     <div id="us-acts-sec" class="fg">
       <label class="fl">Actividades a cargo</label>
@@ -733,13 +737,13 @@ function iniciarSesion(){
   document.getElementById('app').style.display='flex';
   buildNav();initSels();
   document.getElementById('fil-fasi').value=new Date().toISOString().slice(0,10);
-  navA(CU.rol==='admin'?'dashboard':'mis-actividades');
+  navA('home');
   if(!DEMO)setInterval(async()=>{try{await cargarTodo();renderPag()}catch(e){}},120000);
 }
 
-const NVA=[{id:'dashboard',l:'Dashboard',i:'📊'},{id:'alumnos',l:'Alumnos y Colaboradores',i:'👥'},{id:'actividades',l:'Actividades',i:'🏃'},{id:'cuotas',l:'Cuotas',i:'💰'},{id:'asistencia',l:'Asistencia',i:'✅'},{id:'inscripcion',l:'Formulario público',i:'📬'},{id:'usuarios',l:'Usuarios',i:'👤'}];
-const NVP=[{id:'mis-actividades',l:'Mis actividades',i:'🏃'},{id:'cuotas',l:'Cuotas',i:'💰'},{id:'asistencia',l:'Asistencia',i:'✅'}];
-const PT={dashboard:'Panel general',alumnos:'Alumnos y Colaboradores',actividades:'Actividades',cuotas:'Cuotas',asistencia:'Asistencia',usuarios:'Usuarios',inscripcion:'Formulario público','mis-actividades':'Mis actividades'};
+const NVA=[{id:'home',l:'Inicio',i:'🏠'},{id:'dashboard',l:'Panel general',i:'📊'},{id:'alumnos',l:'Alumnos y Colaboradores',i:'👥'},{id:'actividades',l:'Actividades',i:'🏃'},{id:'cuotas',l:'Cuotas',i:'💰'},{id:'asistencia',l:'Asistencia',i:'✅'},{id:'inscripcion',l:'Formulario público',i:'📬'},{id:'usuarios',l:'Usuarios',i:'👤'}];
+const NVP=[{id:'home',l:'Inicio',i:'🏠'},{id:'mis-actividades',l:'Mis actividades',i:'🏃'},{id:'cuotas',l:'Cuotas',i:'💰'},{id:'asistencia',l:'Asistencia',i:'✅'}];
+const PT={home:'Inicio',dashboard:'Panel general',alumnos:'Alumnos y Colaboradores',actividades:'Actividades',cuotas:'Cuotas',asistencia:'Asistencia',usuarios:'Usuarios',inscripcion:'Formulario público','mis-actividades':'Mis actividades'};
 
 function buildNav(){
   const esAdmin=CU_REAL?CU_REAL.rol==='admin':CU.rol==='admin';
@@ -787,7 +791,7 @@ function navA(page){
   document.getElementById('nav-'+page)?.classList.add('active');
   document.getElementById('tb-title').textContent=PT[page]||page;
   closeSB();
-  ({dashboard:renderDash,alumnos:renderAlumnos,actividades:renderActs,cuotas:renderCuotas,asistencia:renderAsi,usuarios:renderUs,inscripcion:renderInsc,'mis-actividades':renderMis})[page]?.();
+  ({home:renderHome,dashboard:renderDash,alumnos:renderAlumnos,actividades:renderActs,cuotas:renderCuotas,asistencia:renderAsi,usuarios:renderUs,inscripcion:renderInsc,'mis-actividades':renderMis})[page]?.();
 }
 function renderPag(){navA(PAG)}
 
@@ -908,6 +912,40 @@ function getAlEstVals(){const ests=[...new Set(db.alumnos.map(a=>estadoVis(a)))]
 function btnOff(id){const b=document.getElementById(id);if(b){b._t=b.textContent;b.disabled=true;b.textContent='Guardando…'}}
 function btnOn(id){const b=document.getElementById(id);if(b){b.disabled=false;if(b._t)b.textContent=b._t}}
 
+function renderHome(){
+  const activos=db.alumnos.filter(a=>a.estado==='activo'||a.estado==='provisional').length;
+  const pend=db.cuotas.filter(c=>c.mes_anio&&c.mes_anio.slice(0,7)===MES&&(c.estado==='pendiente'||c.estado==='parcial')).length;
+  const h=new Date().getHours();
+  const saludo=h<13?'Buenos días':h<20?'Buenas tardes':'Buenas noches';
+  const isA=CU?.rol==='admin';
+  const secs=isA?[
+    {id:'alumnos',l:'Alumnos',i:'👥',bg:'#166534',val:activos+' activos'},
+    {id:'cuotas',l:'Cuotas',i:'💰',bg:'#7f1d1d',val:pend+' pendientes'},
+    {id:'asistencia',l:'Asistencia',i:'✅',bg:'#0c4a6e',val:''},
+    {id:'actividades',l:'Actividades',i:'🏃',bg:'#78350f',val:''},
+    {id:'dashboard',l:'Panel general',i:'📊',bg:'#1e293b',val:''},
+    {id:'usuarios',l:'Usuarios',i:'👤',bg:'#4a1d96',val:''},
+  ]:[
+    {id:'mis-actividades',l:'Mis actividades',i:'🏃',bg:'#166534',val:''},
+    {id:'cuotas',l:'Cuotas',i:'💰',bg:'#7f1d1d',val:pend+' pendientes'},
+    {id:'asistencia',l:'Asistencia',i:'✅',bg:'#0c4a6e',val:''},
+  ];
+  document.getElementById('home-body').innerHTML=`
+    <div style="background:linear-gradient(150deg,#7f1d1d 0%,#991b1b 40%,#166534 100%);padding:32px 20px 40px;margin:-0px;border-radius:0 0 28px 28px;text-align:center;margin-bottom:20px">
+      <img src="escudo.png" style="width:72px;height:72px;object-fit:contain;border-radius:50%;background:#fff;padding:6px;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.25)">
+      <div style="color:rgba(255,255,255,.8);font-size:13px;margin-bottom:4px">${saludo}, <strong>${CU.nombre}</strong> 👋</div>
+      <div style="color:#fff;font-size:22px;font-weight:700;letter-spacing:.02em">Madryn Norte</div>
+      <div style="color:rgba(255,255,255,.55);font-size:11px;letter-spacing:.15em;text-transform:uppercase;margin-top:2px">Complejo Deportivo</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 4px 24px">
+      ${secs.map(s=>`<button onclick="navA('${s.id}')" style="background:${s.bg};border:none;border-radius:18px;padding:22px 12px 18px;text-align:center;cursor:pointer;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.18);transition:transform .12s,opacity .12s" onmousedown="this.style.transform='scale(.96)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.96)'" ontouchend="this.style.transform=''">
+        <div style="font-size:30px;margin-bottom:8px">${s.i}</div>
+        <div style="font-size:13px;font-weight:600;line-height:1.3">${s.l}</div>
+        ${s.val?`<div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:5px">${s.val}</div>`:''}
+      </button>`).join('')}
+    </div>`;
+}
+
 function renderDash(){
   const isA=CU?.rol==='admin';
   const cuId=String(CU?.id||'');
@@ -955,7 +993,43 @@ function renderDash(){
     `<div class="metric m-g2"><div class="ml">Colaboradores</div><div class="mv">${sinAct}</div></div>`+
     `<div class="metric m-g2"><div class="ml">Actividades activas</div><div class="mv">${db.actividades.filter(a=>a.estado==='activa').length}</div></div>`;
 
-  document.getElementById('dash-acts').innerHTML=db.actividades.filter(a=>a.estado==='activa').map(a=>{const cnt=db.inscripciones.filter(i=>i.actividad_id===a.id&&i.estado==='activa').length;const pct=a.cupo_maximo?Math.round(cnt/Number(a.cupo_maximo)*100):0;return`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="font-weight:500">${a.nombre}</span><span style="color:var(--gt)">${cnt}/${a.cupo_maximo||'∞'}</span></div><div class="ab"><div class="abf" style="width:${pct}%"></div></div></div>`}).join('');
+  (()=>{
+    const actsA=db.actividades.filter(a=>a.estado==='activa');
+    const datos=actsA.map(a=>({n:a.nombre,cnt:db.inscripciones.filter(i=>i.actividad_id===a.id&&i.estado==='activa').length,cupo:Number(a.cupo_maximo)||0}));
+    const maxVal=Math.max(...datos.map(d=>d.cnt),1);
+    const barH=26,gap=10,svgH=datos.length*(barH+gap);
+    const svgBars=datos.map((d,i)=>{
+      const y=i*(barH+gap);
+      const pct=Math.round(d.cnt/maxVal*100);
+      const fill=d.cupo&&d.cnt/d.cupo>0.85?'#991b1b':'#166534';
+      return`<g>
+        <rect x="0" y="${y}" width="100%" height="${barH}" rx="6" fill="#f1f5f9"/>
+        <rect x="0" y="${y}" width="${pct}%" height="${barH}" rx="6" fill="${fill}" opacity=".85"/>
+        <text x="8" y="${y+barH/2+5}" font-size="12" fill="#fff" font-weight="600" style="pointer-events:none">${d.n}</text>
+        <text x="calc(100% - 6px)" y="${y+barH/2+5}" font-size="12" fill="${pct>40?'#fff':'#475569'}" text-anchor="end" style="pointer-events:none">${d.cnt}${d.cupo?' / '+d.cupo:''}</text>
+      </g>`;
+    }).join('');
+    document.getElementById('dash-acts').innerHTML=datos.length
+      ?`<svg width="100%" height="${svgH}" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">${svgBars}</svg>`
+      :'<div class="empty"><div class="eico">🏃</div><p>Sin actividades activas</p></div>';
+  })();
+  (()=>{
+    const pagado=qm.filter(c=>c.estado==='pagado').length;
+    const pendN=qm.filter(c=>c.estado==='pendiente'||c.estado==='parcial').length;
+    const bonif=qm.filter(c=>c.estado==='bonificado').length;
+    const total=pagado+pendN+bonif||1;
+    const segs=[{v:pagado,c:'#166534',l:'Pagado'},{v:pendN,c:'#991b1b',l:'Pendiente'},{v:bonif,c:'#64748b',l:'Bonificado'}].filter(s=>s.v>0);
+    const r=52,cx=64,cy=64,stroke=20;
+    let offset=0;
+    const arcs=segs.map(s=>{
+      const pct=s.v/total,len=pct*2*Math.PI*r,gap=1;
+      const arc=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.c}" stroke-width="${stroke}" stroke-dasharray="${len-gap} ${2*Math.PI*r-(len-gap)}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})" opacity=".9"/>`;
+      offset+=len;return arc;
+    }).join('');
+    const legend=segs.map(s=>`<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ng)"><span style="width:10px;height:10px;border-radius:50%;background:${s.c};flex-shrink:0"></span>${s.l} <strong>${s.v}</strong></div>`).join('');
+    const el=document.getElementById('dash-dona');
+    if(el)el.innerHTML=`<svg width="128" height="128" viewBox="0 0 128 128"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#f1f5f9" stroke-width="${stroke}"/>${arcs}<text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="18" font-weight="700" fill="var(--ng)">${pagado}</text><text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="10" fill="var(--gt)">pagadas</text></svg><div style="display:flex;flex-direction:column;gap:4px;margin-top:6px">${legend}</div>`;
+  })();
   document.getElementById('dpcount').textContent=pend.length;
   document.getElementById('dash-deud').innerHTML=pend.length?pend.slice(0,8).map(c=>{const al=db.alumnos.find(a=>a.id===c.alumno_id);const ac=db.actividades.find(a=>a.id===c.actividad_id);return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--cr)"><div><div style="font-size:13px;font-weight:500">${al?al.nombre+' '+al.apellido:'?'}</div><div style="font-size:12px;color:var(--gt)">${ac?ac.nombre:''}</div></div>${bquo(c.estado)}</div>`}).join(''):'<div class="empty"><div class="eico">🎉</div><p>Sin pendientes este mes</p></div>';
   const np=(db.nuevos||[]).filter(i=>i.estado==='pendiente').length;
@@ -999,9 +1073,11 @@ function renderDash(){
 
   // Card: Cumpleaños del mes
   const mesActual=HOY.getMonth()+1;
-  const bdays=db.alumnos.filter(a=>a.estado!=='baja'&&a.fecha_nacimiento&&parseInt(a.fecha_nacimiento.slice(5,7))===mesActual).sort((a,b)=>a.fecha_nacimiento.slice(8,10).localeCompare(b.fecha_nacimiento.slice(8,10)));
+  const bdayAls=db.alumnos.filter(a=>a.estado!=='baja'&&a.fecha_nacimiento&&parseInt(a.fecha_nacimiento.slice(5,7))===mesActual).map(a=>({...a,_tag:''}));
+  const bdayUs=db.usuarios.filter(u=>u.activo!==false&&u.fecha_nacimiento&&parseInt(u.fecha_nacimiento.slice(5,7))===mesActual).map(u=>({...u,_tag:'👤'}));
+  const bdays=[...bdayAls,...bdayUs].sort((a,b)=>parseInt(a.fecha_nacimiento.slice(8,10))-parseInt(b.fecha_nacimiento.slice(8,10)));
   const bdayEl=document.getElementById('dash-bday');
-  if(bdayEl)bdayEl.innerHTML=bdays.length?bdays.map(a=>{const dia=parseInt(a.fecha_nacimiento.slice(8,10));const edad=HOY.getFullYear()-parseInt(a.fecha_nacimiento.slice(0,4));return`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--cr)"><div style="font-size:13px;font-weight:500">${a.nombre} ${a.apellido}</div><span style="font-size:12px;color:var(--gt)">${dia}/${mesActual} · ${edad} años</span></div>`}).join(''):'<div class="empty"><div class="eico">🎂</div><p>Sin cumpleaños este mes</p></div>';
+  if(bdayEl)bdayEl.innerHTML=bdays.length?bdays.map(a=>{const dia=parseInt(a.fecha_nacimiento.slice(8,10));const edad=HOY.getFullYear()-parseInt(a.fecha_nacimiento.slice(0,4));return`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--cr)"><div style="font-size:13px;font-weight:500">${a._tag} ${a.nombre} ${a.apellido||''}</div><span style="font-size:12px;color:var(--gt)">${dia}/${mesActual} · ${edad} años</span></div>`}).join(''):'<div class="empty"><div class="eico">🎂</div><p>Sin cumpleaños este mes</p></div>';
 
   // Card: Meta de membresías
   const objEl=document.getElementById('dash-obj');
@@ -1501,10 +1577,14 @@ function editUs(id){
   document.getElementById('us-id').value=u.id;
   document.getElementById('m-us-t').textContent='Editar usuario';
   document.getElementById('us-nom').value=u.nombre||'';
+  const apeEl=document.getElementById('us-ape');if(apeEl)apeEl.value=u.apellido||'';
   document.getElementById('us-username').value=u.username||u.email||'';
   document.getElementById('us-email').value=u.email||'';
   document.getElementById('us-pwd').value='';
   document.getElementById('us-rol').value=u.rol||'profesor';
+  const dniEl=document.getElementById('us-dni');if(dniEl)dniEl.value=u.dni||'';
+  const fnacEl=document.getElementById('us-fnac');if(fnacEl)fnacEl.value=u.fecha_nacimiento||'';
+  const telEl=document.getElementById('us-tel');if(telEl)telEl.value=u.telefono||'';
   toggleActsUs();
   const actIds=db.actividades.filter(a=>a.profesor_id===u.id).map(a=>a.id);
   document.getElementById('us-acts-list').innerHTML=db.actividades.filter(a=>a.estado==='activa').map(a=>`<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" class="us-act-cb" value="${a.id}" ${actIds.includes(a.id)?'checked':''} style="width:14px;height:14px"> ${a.nombre}</label>`).join('');
@@ -1513,21 +1593,21 @@ function editUs(id){
 function toggleActsUs(){const rol=document.getElementById('us-rol').value;document.getElementById('us-acts-sec').style.display=rol==='profesor'?'block':'none'}
 function abrirMUs(){
   document.getElementById('us-id').value='';document.getElementById('m-us-t').textContent='Nuevo usuario';
-  ['us-nom','us-username','us-email','us-pwd'].forEach(id=>document.getElementById(id).value='');
+  ['us-nom','us-ape','us-username','us-email','us-pwd','us-dni','us-fnac','us-tel'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('us-rol').value='profesor';toggleActsUs();
   document.getElementById('us-acts-list').innerHTML=db.actividades.filter(a=>a.estado==='activa').map(a=>`<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" class="us-act-cb" value="${a.id}" style="width:14px;height:14px"> ${a.nombre}</label>`).join('');
   abrir('m-us');
 }
 async function guardarUs(){
   const uid_edit=document.getElementById('us-id').value;
-  const nom=document.getElementById('us-nom').value.trim(),username=document.getElementById('us-username').value.trim().toLowerCase(),email=document.getElementById('us-email').value.trim().toLowerCase(),pwd=document.getElementById('us-pwd').value,rol=document.getElementById('us-rol').value;
+  const nom=document.getElementById('us-nom').value.trim(),ape=(document.getElementById('us-ape')?.value||'').trim(),username=document.getElementById('us-username').value.trim().toLowerCase(),email=document.getElementById('us-email').value.trim().toLowerCase(),pwd=document.getElementById('us-pwd').value,rol=document.getElementById('us-rol').value,dni=(document.getElementById('us-dni')?.value||'').trim(),fnac=(document.getElementById('us-fnac')?.value||'').trim(),tel=(document.getElementById('us-tel')?.value||'').trim();
   if(!nom||!username){toast('Nombre y usuario de acceso son obligatorios','err');return}
   if(db.usuarios.find(u=>(u.username||u.email||'').toLowerCase()===username&&u.id!==uid_edit)){toast('Ya existe ese nombre de usuario','err');return}
   btnOff('btn-us');
   try{
     const selActs=Array.from(document.querySelectorAll('.us-act-cb:checked')).map(cb=>cb.value);
     if(uid_edit){
-      const d={nombre:nom,username,email,rol};
+      const d={nombre:nom,apellido:ape,username,email,rol,dni,fecha_nacimiento:fnac,telefono:tel};
       if(pwd)d.password=await sha256(pwd);
       const ix=db.usuarios.findIndex(u=>u.id===uid_edit);
       db.usuarios[ix]={...db.usuarios[ix],...d};
@@ -1541,7 +1621,7 @@ async function guardarUs(){
     }else{
       if(!pwd){toast('Ingresá una contraseña','err');btnOn('btn-us');return}
       const nid=nuevoIdUsuario();
-      const n={id:nid,nombre:nom,username,email,password:await sha256(pwd),rol,activo:true,foto:''};
+      const n={id:nid,nombre:nom,apellido:ape,username,email,password:await sha256(pwd),rol,activo:true,foto:'',dni,fecha_nacimiento:fnac,telefono:tel};
       db.usuarios.push(n);await guardar('insertar','usuarios',null,n);
       for(const aid of selActs){const a=db.actividades.find(x=>x.id===aid);if(!a)continue;a.profesor_id=nid;await guardar('actualizar','actividades',aid,{profesor_id:nid})}
       toast(nom+' creado — usuario: '+username);
@@ -1719,7 +1799,6 @@ function verCarnetUsuario(id){
     <div style="background:linear-gradient(135deg,#7f1d1d 0%,#991b1b 55%,#166534 100%);padding:16px 16px 28px;text-align:center;position:relative">
       <div style="font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.75);text-transform:uppercase;margin-bottom:2px">Complejo Deportivo</div>
       <div style="font-size:17px;font-weight:700;color:#fff;letter-spacing:.06em">MADRYN NORTE</div>
-      <div style="position:absolute;top:10px;right:12px;background:rgba(255,255,255,.15);border-radius:6px;padding:2px 8px;font-size:10px;color:rgba(255,255,255,.9);font-weight:600">${u.id||''}</div>
     </div>
     <div style="background:#fff;padding:0 16px 16px;position:relative">
       <div style="display:flex;gap:14px;margin-top:-24px;align-items:flex-end;margin-bottom:12px">
@@ -1736,7 +1815,9 @@ function verCarnetUsuario(id){
         <div style="display:flex;justify-content:space-between;margin-bottom:4px">
           <span style="color:#64748b">Rol</span><span style="font-weight:700;color:#166534">${rolLabel}</span>
         </div>
-        ${u.dni?`<div style="display:flex;justify-content:space-between;margin-top:4px"><span style="color:#64748b">DNI</span><span style="font-weight:600;color:#1e293b">${u.dni}</span></div>`:''}
+        ${u.dni?`<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#64748b">DNI</span><span style="font-weight:600;color:#1e293b">${u.dni}</span></div>`:''}
+        ${u.fecha_nacimiento?`<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#64748b">Fecha nac.</span><span style="font-weight:600;color:#1e293b">${u.fecha_nacimiento.split('-').reverse().join('/')}</span></div>`:''}
+        ${u.telefono?`<div style="display:flex;justify-content:space-between"><span style="color:#64748b">Teléfono</span><span style="font-weight:600;color:#1e293b">${u.telefono}</span></div>`:''}
       </div>
       ${acts.length?`<div style="margin-bottom:10px">${acts.map(a=>`<span style="display:inline-block;background:#166534;color:#fff;font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;margin:2px 2px 0 0">${a.nombre}</span>`).join('')}</div>`:''}
       <div style="background:#15803d12;border:1.5px solid #15803d50;border-radius:8px;padding:8px 12px;margin-bottom:10px">

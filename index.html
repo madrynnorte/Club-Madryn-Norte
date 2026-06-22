@@ -20,8 +20,12 @@
         const c=document.createElement('canvas');c.width=c.height=sz;
         const x=c.getContext('2d');
         x.fillStyle='#ffffff';x.fillRect(0,0,sz,sz);
-        const p=Math.round(sz*.04);
-        x.drawImage(img,p,p,sz-p*2,sz-p*2);
+        const p=Math.round(sz*.06);
+        const avail=sz-p*2;
+        const ratio=img.naturalWidth/img.naturalHeight;
+        const w=ratio>=1?avail:avail*ratio;
+        const h=ratio>=1?avail/ratio:avail;
+        x.drawImage(img,(sz-w)/2,(sz-h)/2,w,h);
         return c.toDataURL('image/png');
       }catch(e){return null}
     }

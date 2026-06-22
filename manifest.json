@@ -1,15 +1,16 @@
 {
-  "name": "Madryn Norte Gestión",
+  "name": "Madryn Norte",
   "short_name": "Madryn Norte",
   "description": "Gestión del Complejo Deportivo Madryn Norte",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0f2318",
-  "theme_color": "#1a6636",
+  "background_color": "#ffffff",
+  "theme_color": "#7f1d1d",
   "orientation": "portrait-primary",
+  "lang": "es",
   "icons": [
-    { "src": "escudo.jpg", "sizes": "192x192", "type": "image/jpeg" },
-    { "src": "escudo.jpg", "sizes": "512x512", "type": "image/jpeg" }
+    { "src": "escudo.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "escudo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }

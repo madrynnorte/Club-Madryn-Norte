@@ -9,40 +9,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Madryn Norte">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<link rel="manifest" id="mn-manifest" href="manifest.json">
-<link rel="apple-touch-icon" id="mn-ati" href="escudo.jpg">
-<script>
-(function(){
-  function mkIcon(sz){
-    try{
-      const c=document.createElement('canvas');c.width=c.height=sz;
-      const x=c.getContext('2d'),g=x.createLinearGradient(0,0,sz,sz);
-      g.addColorStop(0,'#7f1d1d');g.addColorStop(1,'#166534');
-      x.fillStyle=g;const r=sz*.18;
-      x.beginPath();x.moveTo(r,0);x.lineTo(sz-r,0);x.quadraticCurveTo(sz,0,sz,r);
-      x.lineTo(sz,sz-r);x.quadraticCurveTo(sz,sz,sz-r,sz);
-      x.lineTo(r,sz);x.quadraticCurveTo(0,sz,0,sz-r);
-      x.lineTo(0,r);x.quadraticCurveTo(0,0,r,0);x.closePath();x.fill();
-      x.fillStyle='#fff';x.font='bold '+Math.round(sz*.38)+'px system-ui,sans-serif';
-      x.textAlign='center';x.textBaseline='middle';x.fillText('MN',sz/2,sz/2);
-      return c.toDataURL('image/png');
-    }catch(e){return null}
-  }
-  const i180=mkIcon(180),i192=mkIcon(192),i512=mkIcon(512);
-  if(i180){const a=document.getElementById('mn-ati');if(a)a.href=i180;}
-  if(i192&&i512){
-    const mf={name:'Madryn Norte',short_name:'MN',description:'Gestión del Complejo Deportivo Madryn Norte',
-      start_url:'./',scope:'./',display:'standalone',background_color:'#0f2318',
-      theme_color:'#7f1d1d',orientation:'portrait-primary',lang:'es',
-      icons:[{src:i192,sizes:'192x192',type:'image/png',purpose:'any maskable'},
-             {src:i512,sizes:'512x512',type:'image/png',purpose:'any maskable'}]};
-    try{
-      const b=new Blob([JSON.stringify(mf)],{type:'application/json'});
-      const l=document.getElementById('mn-manifest');if(l)l.href=URL.createObjectURL(b);
-    }catch(e){}
-  }
-})();
-</script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="escudo.png">
 <title>Madryn Norte</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>

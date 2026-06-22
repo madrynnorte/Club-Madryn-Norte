@@ -11,7 +11,7 @@
 const SS_ID = '15BswSBX6aaKWoRyNaRfqha5JPji8LylgG01wEYjlxnA';
 
 const ESQUEMA = {
-  usuarios:      ['id','nombre','username','email','password','rol','activo','foto'],
+  usuarios:      ['id','nombre','apellido','username','email','password','rol','activo','foto','dni','fecha_nacimiento','telefono'],
   actividades:   ['id','nombre','profesor_id','dias_horarios','valor_mensual','cupo_maximo','estado'],
   alumnos:       ['id','nombre','apellido','dni','fecha_nacimiento','telefono',
                   'es_menor','es_sponsor','responsable_nombre','responsable_dni','responsable_vinculo','responsable_telefono',

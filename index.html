@@ -562,6 +562,23 @@ const HOY=new Date(),MES=HOY.toISOString().slice(0,7);
 let CU=null,CU_REAL=null,db={usuarios:[],actividades:[],alumnos:[],inscripciones:[],cuotas:[],asistencia:[],nuevos:[],contadores:{personas:1000,usuarios:1}},DEMO=false,PAG='dashboard',vt=null,asiT={},asiModificado=false;
 
 window.addEventListener('load',()=>{
+  // Arranque instantáneo: si hay sesión + caché, va directo al menú
+  if(cfg.scriptUrl){
+    const sv=localStorage.getItem('mn_session');
+    const dc=localStorage.getItem('mn_db_cache');
+    if(sv&&dc){
+      try{
+        CU=JSON.parse(sv);
+        db=JSON.parse(dc);
+        ['usuarios','actividades','alumnos','inscripciones','cuotas','asistencia','nuevos'].forEach(k=>{if(!db[k])db[k]=[]});
+        if(!db.config)db.config={};
+        if(!db.contadores)db.contadores={personas:1000,usuarios:1};
+        hideSpl();iniciarSesion();
+        cargarTodo().then(()=>renderPag()).catch(()=>{});
+        return;
+      }catch(e){localStorage.removeItem('mn_session');localStorage.removeItem('mn_db_cache')}
+    }
+  }
   setSpl('Iniciando…');
   setTimeout(async()=>{
     if(cfg.demo){
@@ -907,9 +924,9 @@ function renderDash(){
   const deuda=qm.filter(c=>['pendiente','parcial'].includes(c.estado)).reduce((s,c)=>s+Number(c.monto),0);
 
   // new metrics
-  const ingMes=filtActs(qmAll).filter(c=>c.estado==='pagado'||c.estado==='bonificado').reduce((s,c)=>s+Number(c.monto),0);
+  const ingMes=filtActs(qmAll).filter(c=>c.estado==='pagado').reduce((s,c)=>s+Number(c.monto),0);
   const qmAnt=filtActs(db.cuotas.filter(c=>String(c.mes_anio).slice(0,7)===MES_ANT));
-  const ingMesAnt=qmAnt.filter(c=>c.estado==='pagado'||c.estado==='bonificado').reduce((s,c)=>s+Number(c.monto),0);
+  const ingMesAnt=qmAnt.filter(c=>c.estado==='pagado').reduce((s,c)=>s+Number(c.monto),0);
   const meses2=[MES,MES_ANT];
   const conDeuda=new Set(filtActs(db.cuotas.filter(c=>meses2.includes(String(c.mes_anio).slice(0,7))&&['pendiente','parcial'].includes(c.estado))).map(c=>c.alumno_id)).size;
   const pagN=qm.filter(c=>c.estado==='pagado').length,pendN=qm.filter(c=>['pendiente','parcial'].includes(c.estado)).length;

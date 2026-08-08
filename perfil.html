@@ -149,6 +149,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .msg.ok{color:#86efac}
 .msg.err{color:#fca5a5}
 
+/* DISCIPLINE BLOCKS (profe actividades) */
+.disc-blk{margin-bottom:16px;border-radius:12px;overflow:hidden}
+.disc-blk-hdr{padding:10px 14px;font-weight:700;font-size:.82rem;letter-spacing:.6px;text-transform:uppercase;color:#fff}
+.disc-blk-futbol{background:linear-gradient(135deg,var(--rojo3),var(--rojo))}
+.disc-blk-hockey{background:linear-gradient(135deg,#14532d,var(--verde))}
+.disc-blk-basquet{background:linear-gradient(135deg,#7c2d12,#c2410c)}
+.disc-blk-natacion{background:linear-gradient(135deg,#1e3a5f,#1d4ed8)}
+.disc-blk-default{background:var(--bg3)}
+.disc-blk-body{background:var(--card);border:1px solid var(--bord);border-top:none;padding:4px 14px 14px}
+.disc-act-blk{padding:12px 0;border-bottom:1px solid var(--bord)}
+.disc-act-blk:last-child{border-bottom:none;padding-bottom:0}
+.disc-act-nom{font-size:.95rem;font-weight:600;margin-bottom:4px}
+.disc-act-hora{font-size:.78rem;color:var(--txt2);margin-bottom:6px}
+.disc-act-count{font-size:.7rem;font-weight:600;color:var(--txt2);text-transform:uppercase;margin-bottom:4px;margin-top:8px}
+.al-chip-foto{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg3);flex-shrink:0}
+.al-chip-foto-ph{width:36px;height:36px;border-radius:50%;background:var(--bg3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1rem}
+
 /* MISC */
 .spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -530,7 +547,13 @@ function renderAsi(){
   if(!asiActId||!acts.find(a=>String(a.id)===asiActId))asiActId=String(acts[0].id);
   if(!asiFecha)asiFecha=hoy();
 
-  const actOpts=acts.map(a=>`<option value="${a.id}"${String(a.id)===asiActId?' selected':''}>${a.nombre}${a.deporte?' — '+a.deporte:''}</option>`).join('');
+  // Agrupar actividades por disciplina en el selector
+  const gruposAsi={};
+  acts.forEach(a=>{const dep=a.deporte||'Sin disciplina';if(!gruposAsi[dep])gruposAsi[dep]=[];gruposAsi[dep].push(a)});
+  const depKeys=Object.keys(gruposAsi);
+  const actOpts=depKeys.length===1
+    ?acts.map(a=>`<option value="${a.id}"${String(a.id)===asiActId?' selected':''}>${a.nombre}</option>`).join('')
+    :depKeys.map(dep=>`<optgroup label="${dep}">${gruposAsi[dep].map(a=>`<option value="${a.id}"${String(a.id)===asiActId?' selected':''}>${a.nombre}</option>`).join('')}</optgroup>`).join('');
 
   // Alumnos de la actividad seleccionada
   const alumsActIds=insc.filter(i=>String(i.actividad_id)===asiActId).map(i=>String(i.alumno_id));
@@ -649,6 +672,15 @@ async function guardarAsi(){
 }
 
 // ── Tab Actividades ───────────────────────────────────────────────────
+function depInfo(dep){
+  const d=(dep||'').toLowerCase();
+  if(d.includes('fut'))return{ico:'⚽',cls:'futbol'};
+  if(d.includes('hock'))return{ico:'🏑',cls:'hockey'};
+  if(d.includes('basq'))return{ico:'🏀',cls:'basquet'};
+  if(d.includes('nat'))return{ico:'🏊',cls:'natacion'};
+  return{ico:'🏃',cls:'default'};
+}
+
 function renderActsProfe(){
   if(!dataPerfil){document.getElementById('pr-content').innerHTML='<div class="empty"><span class="spin"></span></div>';return}
   const acts=dataPerfil.actividades||[];
@@ -656,20 +688,40 @@ function renderActsProfe(){
   const alumnos=dataPerfil.alumnos||[];
   const cont=document.getElementById('pr-content');
   if(!acts.length){cont.innerHTML='<div class="empty">No tenés actividades asignadas.</div>';return}
-  const html=acts.map(a=>{
-    const alumsIds=insc.filter(i=>String(i.actividad_id)===String(a.id)).map(i=>String(i.alumno_id));
-    const alums=alumnos.filter(al=>alumsIds.includes(String(al.id)));
-    const alumsHtml=alums.length?alums.map(al=>{
-      var foto=al.foto?`<img src="${al.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg3)" onerror="this.outerHTML='<div style=width:36px;height:36px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center>👤</div>'">`:'<div style="width:36px;height:36px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center">👤</div>';
-      return`<div class="al-chip">${foto}<div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:500">${al.nombre} ${al.apellido||''}</div><div style="font-size:.72rem;color:var(--txt2)">DNI ${al.dni||'—'}</div></div></div>`;
-    }).join(''):'<div style="font-size:.8rem;color:var(--txt2);padding:8px 0">Sin alumnos inscriptos</div>';
-    return`<div class="card">
-      <div class="act-nombre">${a.nombre}</div>
-      <div class="act-meta">${a.deporte?`<span class="act-badge">🏃 ${a.deporte}</span>`:''}${a.categoria?`<span class="act-badge">${a.categoria}</span>`:''}${a.dias_horarios?`<span class="act-badge">🕐 ${a.dias_horarios}</span>`:''}</div>
-      <div class="act-alumnos-count" style="margin-top:8px;margin-bottom:4px;font-size:.75rem;font-weight:600;color:var(--txt2);text-transform:uppercase">👥 ${alums.length} alumno${alums.length!==1?'s':''}</div>
-      ${alumsHtml}
+
+  // Agrupar por disciplina (deporte)
+  const grupos={};
+  acts.forEach(a=>{
+    const dep=a.deporte||'Actividades';
+    if(!grupos[dep])grupos[dep]=[];
+    grupos[dep].push(a);
+  });
+
+  const html=Object.entries(grupos).map(([dep,depActs])=>{
+    const {ico,cls}=depInfo(dep);
+    const actsHtml=depActs.map(a=>{
+      const alumsIds=insc.filter(i=>String(i.actividad_id)===String(a.id)).map(i=>String(i.alumno_id));
+      const alums=alumnos.filter(al=>alumsIds.includes(String(al.id)));
+      const alumsHtml=alums.length?alums.map(al=>{
+        const foto=al.foto
+          ?`<img src="${al.foto}" class="al-chip-foto" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`+
+           `<div class="al-chip-foto-ph" style="display:none">👤</div>`
+          :`<div class="al-chip-foto-ph">👤</div>`;
+        return`<div class="al-chip">${foto}<div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:500">${al.nombre} ${al.apellido||''}</div><div style="font-size:.72rem;color:var(--txt2)">DNI ${al.dni||'—'}</div></div></div>`;
+      }).join(''):'<div style="font-size:.8rem;color:var(--txt2);padding:6px 0">Sin alumnos inscriptos</div>';
+      return`<div class="disc-act-blk">
+        <div class="disc-act-nom">${a.nombre}</div>
+        ${a.dias_horarios?`<div class="disc-act-hora">🕐 ${a.dias_horarios}</div>`:''}
+        <div class="disc-act-count">👥 ${alums.length} alumno${alums.length!==1?'s':''}</div>
+        <div>${alumsHtml}</div>
+      </div>`;
+    }).join('');
+    return`<div class="disc-blk">
+      <div class="disc-blk-hdr disc-blk-${cls}">${ico} ${dep}</div>
+      <div class="disc-blk-body">${actsHtml}</div>
     </div>`;
   }).join('');
+
   cont.innerHTML=html;
 }
 

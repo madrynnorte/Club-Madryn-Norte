@@ -470,6 +470,11 @@ tbody tr:hover td{background:var(--cr)}
       <div class="fg" style="margin-bottom:0"><label class="fl">Motivo / observación del descuento</label><input class="fc" id="al-motivo-desc" placeholder="Ej: beca por rendimiento, hermano/a de un alumno…"></div>
     </div>
     <div class="fg"><label class="fl">Observaciones generales</label><textarea class="fc" id="al-obs" rows="2"></textarea></div>
+    <div style="background:var(--cr);border-radius:var(--r);padding:12px;margin-top:6px">
+      <div style="font-size:11px;font-weight:600;color:var(--gt);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">🔐 Acceso al portal del alumno</div>
+      <div class="frow"><div class="fg"><label class="fl">Email</label><input class="fc" id="al-email" type="email" placeholder="alumno@ejemplo.com"></div><div class="fg"><label class="fl">Contraseña del portal</label><input class="fc" id="al-pwd" type="password" placeholder="Dejar vacío para no cambiar"></div></div>
+      <div style="font-size:11px;color:var(--gs);margin-top:4px">El alumno usará su DNI + esta contraseña para ingresar a <strong>perfil.html</strong>. Dejá la contraseña vacía si no querés modificarla.</div>
+    </div>
   </div>
   <div class="mf"><button class="btn btn-o" onclick="cerrar('m-al')">Cancelar</button><button class="btn btn-p" id="btn-al" onclick="guardarAl()">Guardar</button></div>
 </div></div>
@@ -1142,7 +1147,7 @@ function toggleDescPct(){
 }
 function abrirMAl(){
   document.getElementById('al-id').value='';document.getElementById('m-al-t').textContent='Nueva persona';
-  ['al-nom','al-ape','al-dni','al-obs','al-tel','al-rnom','al-rdni','al-rtel','al-sal','al-emg','al-motivo-desc'].forEach(id=>document.getElementById(id).value='');
+  ['al-nom','al-ape','al-dni','al-obs','al-tel','al-rnom','al-rdni','al-rtel','al-sal','al-emg','al-motivo-desc','al-email','al-pwd'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('al-fnac').value='';document.getElementById('al-est').value='activo';
   document.getElementById('al-menor').checked=false;document.getElementById('al-sponsor').checked=false;document.getElementById('al-rvin').value='madre';
   document.getElementById('al-tipo-desc').value='ninguno';document.getElementById('al-desc-pct').value='0';
@@ -1164,6 +1169,8 @@ function editAl(id){
   document.getElementById('al-rtel').value=al.responsable_telefono||'';
   document.getElementById('al-sal').value=al.salud||'';
   document.getElementById('al-emg').value=al.contacto_emergencia||'';
+  document.getElementById('al-email').value=al.email||'';
+  document.getElementById('al-pwd').value='';
   document.getElementById('al-tipo-desc').value=al.tipo_descuento||'ninguno';
   document.getElementById('al-desc-pct').value=al.descuento_pct||'0';
   document.getElementById('al-motivo-desc').value=al.motivo_descuento||'';
@@ -1180,7 +1187,10 @@ async function guardarAl(){
   btnOff('btn-al');const acts=Array.from(document.querySelectorAll('.al-act-cb:checked')).map(cb=>cb.value);
   const tipoDesc=document.getElementById('al-tipo-desc').value;
   const pctDesc=tipoDesc==='ninguno'?0:tipoDesc==='beca_total'?100:parseFloat(document.getElementById('al-desc-pct').value)||0;
-  const d={nombre:nom,apellido:ape,dni:document.getElementById('al-dni').value.trim(),fecha_nacimiento:document.getElementById('al-fnac').value,telefono:document.getElementById('al-tel').value.trim(),estado:document.getElementById('al-est').value,es_menor:menor?'SI':'NO',es_sponsor:document.getElementById('al-sponsor').checked?'SI':'NO',responsable_nombre:document.getElementById('al-rnom').value.trim(),responsable_dni:document.getElementById('al-rdni').value.trim(),responsable_vinculo:document.getElementById('al-rvin').value,responsable_telefono:document.getElementById('al-rtel').value.trim(),salud:document.getElementById('al-sal').value.trim(),contacto_emergencia:document.getElementById('al-emg').value.trim(),observaciones:document.getElementById('al-obs').value.trim(),tipo_descuento:tipoDesc,descuento_pct:pctDesc,motivo_descuento:document.getElementById('al-motivo-desc').value.trim()};
+  const alPwd=document.getElementById('al-pwd').value;
+  const alPwdHash=alPwd?await sha256(alPwd):null;
+  const d={nombre:nom,apellido:ape,dni:document.getElementById('al-dni').value.trim(),fecha_nacimiento:document.getElementById('al-fnac').value,telefono:document.getElementById('al-tel').value.trim(),email:document.getElementById('al-email').value.trim(),estado:document.getElementById('al-est').value,es_menor:menor?'SI':'NO',es_sponsor:document.getElementById('al-sponsor').checked?'SI':'NO',responsable_nombre:document.getElementById('al-rnom').value.trim(),responsable_dni:document.getElementById('al-rdni').value.trim(),responsable_vinculo:document.getElementById('al-rvin').value,responsable_telefono:document.getElementById('al-rtel').value.trim(),salud:document.getElementById('al-sal').value.trim(),contacto_emergencia:document.getElementById('al-emg').value.trim(),observaciones:document.getElementById('al-obs').value.trim(),tipo_descuento:tipoDesc,descuento_pct:pctDesc,motivo_descuento:document.getElementById('al-motivo-desc').value.trim()};
+  if(alPwdHash)d.password=alPwdHash;
   try{
     if(id){const ix=db.alumnos.findIndex(a=>a.id===id);db.alumnos[ix]={...db.alumnos[ix],...d};await guardar('actualizar','alumnos',id,d);const viejas=db.inscripciones.filter(i=>i.alumno_id===id&&i.estado==='activa');for(const v of viejas){if(!acts.includes(v.actividad_id)){db.inscripciones=db.inscripciones.filter(i=>i.id!==v.id);await guardar('eliminar','inscripciones',v.id,null)}}for(const ai of acts){if(!viejas.find(v=>v.actividad_id===ai)){const ni={id:uid(),alumno_id:id,actividad_id:ai,estado:'activa',fecha_inscripcion:new Date().toISOString().slice(0,10)};db.inscripciones.push(ni);await guardar('insertar','inscripciones',null,ni)}}toast('Persona actualizada')}
     else{const nid=nuevoIdPersona(),nuevo={id:nid,...d,fecha_alta:new Date().toISOString().slice(0,10)};db.alumnos.push(nuevo);await guardar('insertar','alumnos',null,nuevo);for(const ai of acts){const ni={id:uid(),alumno_id:nid,actividad_id:ai,estado:'activa',fecha_inscripcion:new Date().toISOString().slice(0,10)};db.inscripciones.push(ni);await guardar('insertar','inscripciones',null,ni)}toast('Persona creada')}
@@ -1454,7 +1464,29 @@ function verDetalleAl(alId){
 function renderDetBody(alId){
   const finHtml=renderDetFin(alId);
   const asiHtml=renderDetAsi(alId);
-  document.getElementById('det-body').innerHTML=finHtml+asiHtml;
+  const portalHtml=renderDetPortal(alId);
+  document.getElementById('det-body').innerHTML=portalHtml+finHtml+asiHtml;
+}
+function renderDetPortal(alId){
+  const al=db.alumnos.find(a=>String(a.id)===String(alId));
+  if(!al)return'';
+  const tienePwd=!!(al.password);
+  const portalUrl=window.location.origin+window.location.pathname.replace('index.html','')+'perfil.html';
+  const estadoBadge=tienePwd
+    ?`<span style="background:#14532d;color:#86efac;padding:2px 8px;border-radius:99px;font-size:11px">✅ Contraseña configurada</span>`
+    :`<span style="background:#431407;color:#fdba74;padding:2px 8px;border-radius:99px;font-size:11px">⚠️ Sin contraseña — no puede ingresar</span>`;
+  return`<div style="background:var(--cr);border-radius:10px;padding:12px;margin-bottom:16px">
+    <div style="font-size:12px;font-weight:700;color:var(--gt);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔐 Acceso al portal</div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      ${estadoBadge}
+      ${al.email?`<span style="font-size:12px;color:var(--gs)">📧 ${al.email}</span>`:''}
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+      <span style="font-size:11px;color:var(--gs);flex:1;word-break:break-all">${portalUrl}</span>
+      <button class="btn" style="padding:4px 10px;font-size:11px" onclick="navigator.clipboard.writeText('${portalUrl}').then(()=>toast('URL copiada'))">Copiar link</button>
+      <button class="btn btn-p" style="padding:4px 10px;font-size:11px" onclick="cerrar('m-al-det');editAl('${alId}')">Establecer contraseña</button>
+    </div>
+  </div>`;
 }
 function getUltimos3Meses(){
   const hoy=new Date();

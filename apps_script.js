@@ -18,7 +18,7 @@ const ESQUEMA = {
                   'estado',
                   'tipo_descuento','descuento_pct','motivo_descuento',
                   'observaciones','salud','contacto_emergencia',
-                  'fecha_alta','fecha_baja','foto'],
+                  'fecha_alta','fecha_baja','foto','password','email'],
   inscripciones: ['id','alumno_id','actividad_id','estado','fecha_inscripcion'],
   cuotas:        ['id','alumno_id','actividad_id','tipo','mes_anio','monto','descuento','estado','medio_pago','fecha_pago','observaciones'],
   asistencia:    ['id','alumno_id','actividad_id','fecha','estado','observacion','registrado_por'],
@@ -360,6 +360,68 @@ function doPost(e) {
       };
       insertarFila('nuevos', reg);
       return respOk({ message: 'Inscripción recibida' });
+    }
+
+    // ── Login alumno (portal) ──
+    if (accion === 'login_alumno') {
+      const dniA   = String(body.dni  || '').trim();
+      const pwdA   = String(body.pwd  || '').trim();
+      if (!dniA || !pwdA) return respErr('DNI y contraseña requeridos');
+      const alumnos = leerHoja('alumnos');
+      const al = alumnos.find(function(a) {
+        return String(a.dni).trim() === dniA && a.estado !== 'baja';
+      });
+      if (!al) return respErr('DNI no encontrado o alumno dado de baja');
+      if (!al.password) return respErr('Contraseña no configurada. Contactá al club para obtenerla.');
+      if (String(al.password).trim() !== pwdA) return respErr('Contraseña incorrecta');
+      const safe = Object.assign({}, al); delete safe.password;
+      return respOk({ alumno: safe });
+    }
+
+    // ── Obtener perfil completo (portal alumno) ──
+    if (accion === 'get_perfil') {
+      const dniA = String(body.dni || '').trim();
+      const pwdA = String(body.pwd || '').trim();
+      if (!dniA || !pwdA) return respErr('No autorizado');
+      const alumnos = leerHoja('alumnos');
+      const al = alumnos.find(function(a) {
+        return String(a.dni).trim() === dniA && a.estado !== 'baja';
+      });
+      if (!al || !al.password || String(al.password).trim() !== pwdA) return respErr('No autorizado');
+      const safe = Object.assign({}, al); delete safe.password;
+      const insc  = leerHoja('inscripciones').filter(function(i) { return String(i.alumno_id) === String(al.id); });
+      const acts  = leerHoja('actividades');
+      const cuotas = leerHoja('cuotas').filter(function(c) { return String(c.alumno_id) === String(al.id); });
+      return respOk({ alumno: safe, inscripciones: insc, actividades: acts, cuotas: cuotas });
+    }
+
+    // ── Actualizar perfil (portal alumno) ──
+    if (accion === 'update_perfil') {
+      const dniA = String(body.dni || '').trim();
+      const pwdA = String(body.pwd || '').trim();
+      if (!dniA || !pwdA || !datos) return respErr('Faltan parámetros');
+      const alumnos = leerHoja('alumnos');
+      const al = alumnos.find(function(a) {
+        return String(a.dni).trim() === dniA && a.estado !== 'baja';
+      });
+      if (!al || !al.password || String(al.password).trim() !== pwdA) return respErr('No autorizado');
+      const newData = {};
+      // Foto: si viene base64 la subimos a Drive
+      if (datos.foto && datos.foto.length > 100 && datos.foto.startsWith('data:')) {
+        const nom = (al.nombre || 'alumno') + '_' + (al.dni || Date.now());
+        const url = guardarFotoEnDrive(datos.foto, nom);
+        if (url) newData.foto = url;
+      } else if (datos.foto) {
+        newData.foto = datos.foto;
+      }
+      // Campos editables por el alumno
+      ['telefono','email','contacto_emergencia','salud','observaciones'].forEach(function(k) {
+        if (datos[k] !== undefined && datos[k] !== null) newData[k] = datos[k];
+      });
+      // Cambio de contraseña (nueva_pwd ya viene hasheada)
+      if (datos.nueva_pwd) newData.password = datos.nueva_pwd;
+      actualizarFila('alumnos', al.id, newData);
+      return respOk({ message: 'Perfil actualizado' });
     }
 
     // ── Acciones autenticadas ──

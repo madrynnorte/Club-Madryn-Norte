@@ -264,6 +264,19 @@ tbody tr:hover td{background:var(--cr)}
   </div>
 </div>
 
+<!-- Modal cambiar URL -->
+<div class="mbg" id="m-url" style="display:none"><div class="modal" style="max-width:420px">
+  <div class="mh"><span class="mt">⚙️ URL del servidor</span><button class="bx" onclick="cerrar('m-url')">×</button></div>
+  <div class="mb">
+    <p style="font-size:13px;color:var(--gs);margin-bottom:12px">Pegá la URL del Apps Script (empieza con <code>https://script.google.com</code>)</p>
+    <div class="fg"><label class="fl">URL actual / nueva</label><input class="fc" id="url-inp" type="url" placeholder="https://script.google.com/macros/s/…/exec"></div>
+  </div>
+  <div class="mf">
+    <button class="btn btn-o" onclick="cerrar('m-url')">Cancelar</button>
+    <button class="btn btn-p" onclick="guardarUrl()">Guardar</button>
+  </div>
+</div></div>
+
 <div id="no-access">
   <div style="font-size:48px;margin-bottom:16px">⛔</div>
   <div style="font-family:var(--fd);font-size:22px;color:var(--ng);margin-bottom:8px">Sin acceso</div>
@@ -731,14 +744,17 @@ async function loginUser(){
 
 function volverLogin(){document.getElementById('no-access').style.display='none';mostrarLogin()}
 function resetCfg(){
-  const url=prompt('URL del servidor (Apps Script):\n\nPegá la URL nueva o dejá la actual:',cfg.scriptUrl||'');
-  if(url===null)return; // canceló
-  const u=url.trim();
-  if(!u){toast('URL vacía — no se cambió nada','err');return}
-  if(!u.includes('script.google.com')){toast('URL inválida — debe ser de Apps Script','err');return}
+  document.getElementById('url-inp').value=cfg.scriptUrl||'';
+  abrir('m-url');
+}
+function guardarUrl(){
+  const u=document.getElementById('url-inp').value.trim();
+  if(!u){toast('Ingresá la URL','err');return}
+  if(!u.includes('script.google.com')){toast('URL inválida','err');return}
   cfg.scriptUrl=u;
   localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
   localStorage.removeItem('mn_db_cache');
+  cerrar('m-url');
   toast('URL actualizada ✓');
 }
 function cerrarSesion(){CU=null;localStorage.removeItem('mn_session');document.getElementById('app').style.display='none';mostrarLogin()}

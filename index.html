@@ -1666,6 +1666,34 @@ async function guardarAsi(){
 }
 function abrirProvAsi(){const actId=document.getElementById('fil-act-asi').value;if(!actId){toast('Primero seleccioná una actividad','err');return}abrirProv(actId)}
 
+function buildActsCheckboxList(actIds=[]){
+  const acts=db.actividades.filter(a=>a.estado==='activa');
+  if(!acts.length)return'<span style="font-size:13px;color:var(--g2)">Sin actividades activas</span>';
+  const grupos={};
+  acts.forEach(a=>{const dep=a.deporte||'Sin disciplina';if(!grupos[dep])grupos[dep]=[];grupos[dep].push(a)});
+  const ico=dep=>{const d=dep.toLowerCase();if(d.includes('fut'))return'⚽';if(d.includes('hock'))return'🏑';if(d.includes('basq'))return'🏀';if(d.includes('nat'))return'🏊';return'🏃'};
+  const deps=Object.keys(grupos);
+  // Por defecto: primera disciplina con actividades ya asignadas, o la primera
+  let defIdx=0;
+  for(let i=0;i<deps.length;i++){if(grupos[deps[i]].some(a=>actIds.includes(a.id))){defIdx=i;break}}
+  const pillStyle=(act)=>`padding:5px 13px;border-radius:20px;border:1.5px solid ${act?'var(--vd)':'var(--gb)'};background:${act?'var(--vd)':'transparent'};color:${act?'#fff':'var(--gt)'};font-size:12px;font-weight:600;cursor:pointer;transition:all .15s`;
+  const pills=deps.map((dep,i)=>`<button type="button" onclick="selectDepUs(${i})" id="usdp-${i}" style="${pillStyle(i===defIdx)}">${ico(dep)} ${dep}</button>`).join('');
+  const groups=deps.map((dep,i)=>{
+    const checks=grupos[dep].map(a=>`<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:5px 0;border-bottom:1px solid var(--gb)"><input type="checkbox" class="us-act-cb" value="${a.id}" ${actIds.includes(a.id)?'checked':''} style="width:15px;height:15px;accent-color:var(--vd);cursor:pointer;flex-shrink:0"> ${a.nombre}</label>`).join('');
+    return`<div id="usdg-${i}" style="display:${i===defIdx?'block':'none'};padding-top:4px">${checks}</div>`;
+  }).join('');
+  return`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">${pills}</div>${groups}`;
+}
+function selectDepUs(idx){
+  document.querySelectorAll('[id^="usdp-"]').forEach(el=>{
+    const act=el.id==='usdp-'+idx;
+    el.style.background=act?'var(--vd)':'transparent';
+    el.style.borderColor=act?'var(--vd)':'var(--gb)';
+    el.style.color=act?'#fff':'var(--gt)';
+  });
+  document.querySelectorAll('[id^="usdg-"]').forEach(el=>el.style.display='none');
+  const g=document.getElementById('usdg-'+idx);if(g)g.style.display='block';
+}
 function toggleUsPwd(){const i=document.getElementById('us-pwd'),b=document.getElementById('us-eye');if(!i)return;i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁️':'🙈'}
 function renderUs(){document.getElementById('tb-us').innerHTML=db.usuarios.filter(u=>!_cf['us-rol']||_cf['us-rol'].has(u.rol)).map(u=>{const acts=db.actividades.filter(a=>a.profesor_id===u.id),esYo=u.id===CU.id;return`<tr><td style="font-weight:500">${u.nombre}${esYo?' <span style="font-size:11px;color:var(--g2)">(vos)</span>':''}</td><td style="color:var(--gt);font-family:monospace">${u.username||u.email||'-'}</td><td>${best(u.rol)}</td><td>${acts.map(a=>`<span class="badge b-act" style="margin:1px;font-size:11px">${a.nombre}</span>`).join('')||'-'}</td><td><div style="display:flex;gap:4px"><button class="btn btn-g btn-sm" onclick="editUs('${u.id}')">✏️</button>${CU.rol==='admin'?`<button class="btn btn-g btn-sm" onclick="verCarnetUsuario('${u.id}')">🪪</button>`:''}${esYo?'':`<button class="btn btn-g btn-sm" onclick="delUs('${u.id}')">🗑️</button>`}</div></td></tr>`}).join('')}
 function editUs(id){
@@ -1683,7 +1711,7 @@ function editUs(id){
   const telEl=document.getElementById('us-tel');if(telEl)telEl.value=u.telefono||'';
   toggleActsUs();
   const actIds=db.actividades.filter(a=>a.profesor_id===u.id).map(a=>a.id);
-  document.getElementById('us-acts-list').innerHTML=db.actividades.filter(a=>a.estado==='activa').map(a=>`<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" class="us-act-cb" value="${a.id}" ${actIds.includes(a.id)?'checked':''} style="width:14px;height:14px"> ${a.nombre}</label>`).join('');
+  document.getElementById('us-acts-list').innerHTML=buildActsCheckboxList(actIds);
   // Mostrar link de invitación
   const invSec=document.getElementById('us-inv-sec');
   const invUrl=document.getElementById('us-inv-url');
@@ -1704,7 +1732,7 @@ function abrirMUs(){
   document.getElementById('us-id').value='';document.getElementById('m-us-t').textContent='Nuevo usuario';
   ['us-nom','us-ape','us-username','us-email','us-pwd','us-dni','us-fnac','us-tel'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('us-rol').value='profesor';toggleActsUs();
-  document.getElementById('us-acts-list').innerHTML=db.actividades.filter(a=>a.estado==='activa').map(a=>`<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" class="us-act-cb" value="${a.id}" style="width:14px;height:14px"> ${a.nombre}</label>`).join('');
+  document.getElementById('us-acts-list').innerHTML=buildActsCheckboxList([]);
   const invSec=document.getElementById('us-inv-sec');if(invSec)invSec.style.display='none';
   abrir('m-us');
 }

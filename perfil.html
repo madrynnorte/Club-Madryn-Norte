@@ -22,107 +22,139 @@
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);min-height:100dvh}
 
-/* ── SPLASH ── */
+/* SPLASH */
 #splash{position:fixed;inset:0;background:linear-gradient(160deg,var(--rojo3),var(--bg));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;z-index:999;transition:opacity .4s}
 #splash img{width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 4px 20px rgba(0,0,0,.5))}
-#splash h1{font-size:1.5rem;font-weight:700;color:#fff;text-align:center}
+#splash h1{font-size:1.5rem;font-weight:700;color:#fff}
 #splash p{font-size:.85rem;color:rgba(255,255,255,.6)}
-#splash.oculto{opacity:0;pointer-events:none}
+#splash.out{opacity:0;pointer-events:none}
 
-/* ── LOGIN ── */
-#login-view{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:24px;padding-top:calc(24px + var(--saf));gap:0}
+/* LOGIN */
+#login-view{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:24px;padding-top:calc(24px + var(--saf))}
 .login-logo{margin-bottom:24px;display:flex;flex-direction:column;align-items:center;gap:10px}
 .login-logo img{width:80px;height:80px;object-fit:contain}
 .login-logo h1{font-size:1.4rem;font-weight:700;color:#fff}
 .login-logo p{font-size:.8rem;color:var(--txt2)}
 .login-card{background:var(--card);border:1px solid var(--bord);border-radius:16px;padding:28px 24px;width:100%;max-width:380px}
-.login-card h2{font-size:1.1rem;font-weight:600;margin-bottom:20px;color:#fff}
+.login-card h2{font-size:1.1rem;font-weight:600;margin-bottom:20px}
 .fl{font-size:.78rem;color:var(--txt2);margin-bottom:5px;display:block}
 .fc{width:100%;background:#0f172a;border:1.5px solid var(--bord);border-radius:8px;padding:11px 12px;color:var(--txt);font-size:.95rem;outline:none;transition:border-color .2s}
 .fc:focus{border-color:var(--rojo2)}
-.fgroup{margin-bottom:16px}
-.btn-prim{width:100%;background:linear-gradient(135deg,var(--rojo),var(--rojo2));border:none;border-radius:10px;padding:13px;color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:4px}
-.btn-prim:active{opacity:.8}
-.btn-prim:disabled{opacity:.5;cursor:default}
+.fgroup{margin-bottom:14px}
+.btn-p{width:100%;background:linear-gradient(135deg,var(--rojo),var(--rojo2));border:none;border-radius:10px;padding:13px;color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.btn-p:active{opacity:.8}
+.btn-p:disabled{opacity:.5;cursor:default}
 .err-box{background:#450a0a;border:1px solid var(--rojo2);border-radius:8px;padding:10px 12px;font-size:.83rem;color:#fca5a5;margin-bottom:14px;display:none}
 .err-box.vis{display:block}
 .login-hint{text-align:center;font-size:.75rem;color:var(--txt2);margin-top:14px;line-height:1.5}
 
-/* ── TOPBAR ── */
-#app-view{display:none;flex-direction:column;min-height:100dvh}
+/* APP LAYOUT */
+#alumno-view,#profe-view{display:none;flex-direction:column;min-height:100dvh}
+
+/* TOPBAR */
 .topbar{background:linear-gradient(135deg,var(--rojo3),var(--rojo));display:flex;align-items:flex-end;padding:calc(var(--saf) + 12px) 16px 12px;gap:12px;flex-shrink:0}
-.tb-back{background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:8px;padding:7px 10px;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:5px}
-.tb-title{flex:1;font-size:1rem;font-weight:600;color:#fff}
-.tb-logout{background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:8px;padding:7px 10px;font-size:.8rem;cursor:pointer}
+.tb-title{flex:1;font-size:1rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-btn{background:rgba(255,255,255,.12);border:none;color:#fff;border-radius:8px;padding:7px 12px;font-size:.8rem;cursor:pointer;white-space:nowrap}
 
-/* ── CONTENT ── */
-.content{flex:1;overflow-y:auto;padding:16px;padding-bottom:calc(16px + var(--sab));max-width:600px;width:100%;margin:0 auto}
+/* CONTENT SCROLL */
+.content{flex:1;overflow-y:auto;padding:14px;max-width:640px;width:100%;margin:0 auto}
+.content.has-nav{padding-bottom:calc(70px + var(--sab))}
 
-/* ── PROFILE CARD ── */
-.prof-card{background:var(--card);border:1px solid var(--bord);border-radius:16px;padding:20px;margin-bottom:16px}
-.prof-header{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px}
-.prof-foto{width:80px;height:80px;border-radius:50%;object-fit:cover;background:var(--bg3);flex-shrink:0;border:2px solid var(--bord)}
-.prof-foto-ph{width:80px;height:80px;border-radius:50%;background:var(--bg3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:2rem;border:2px solid var(--bord)}
-.prof-info{flex:1;min-width:0}
-.prof-nombre{font-size:1.2rem;font-weight:700;color:#fff;line-height:1.2}
-.prof-estado{display:inline-block;font-size:.7rem;font-weight:600;padding:3px 8px;border-radius:20px;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
-.est-activo{background:#14532d;color:#86efac}
-.est-provisional{background:#451a03;color:#fdba74}
-.est-baja{background:#1c1917;color:#a8a29e}
-.prof-dni{font-size:.82rem;color:var(--txt2);margin-top:6px}
-.prof-datos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.dato-item{background:var(--bg2);border-radius:8px;padding:8px 10px}
-.dato-label{font-size:.68rem;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px}
-.dato-val{font-size:.88rem;color:var(--txt3);margin-top:2px;word-break:break-word}
-.dato-item.full{grid-column:1/-1}
-.btn-edit{width:100%;background:transparent;border:1.5px solid var(--bord);border-radius:10px;padding:10px;color:var(--txt3);font-size:.9rem;cursor:pointer;margin-top:14px;transition:border-color .2s,color .2s}
-.btn-edit:hover{border-color:var(--rojo2);color:#fff}
+/* BOTTOM NAV (profe) */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--bord);display:flex;padding-bottom:var(--sab);z-index:50}
+.bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 8px;border:none;background:transparent;color:var(--txt2);font-size:.65rem;cursor:pointer;transition:color .15s}
+.bn-btn.act{color:#f87171}
+.bn-btn .bn-ico{font-size:1.3rem}
 
-/* ── SECCIÓN ── */
-.sec{margin-bottom:16px}
-.sec-tit{font-size:.75rem;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--bord);border-radius:14px;padding:14px;margin-bottom:12px}
+.card-tit{font-size:.7rem;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.sec-tit{font-size:.7rem;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-top:4px}
 
-/* ── ACTIVIDAD CHIP ── */
-.act-chip{background:var(--card);border:1px solid var(--bord);border-radius:12px;padding:12px 14px;margin-bottom:8px}
-.act-nombre{font-size:.95rem;font-weight:600;color:#fff}
-.act-meta{font-size:.78rem;color:var(--txt2);margin-top:3px}
+/* PROFILE */
+.prof-header{display:flex;gap:14px;align-items:flex-start}
+.prof-foto{width:72px;height:72px;border-radius:50%;object-fit:cover;background:var(--bg3);flex-shrink:0;border:2px solid var(--bord)}
+.prof-foto-ph{width:72px;height:72px;border-radius:50%;background:var(--bg3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.8rem;border:2px solid var(--bord)}
+.prof-nombre{font-size:1.1rem;font-weight:700;line-height:1.2}
+.prof-rol{display:inline-block;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
+.rol-admin{background:#1e1b4b;color:#a5b4fc}
+.rol-profesor{background:#172554;color:#93c5fd}
+.rol-alumno-activo{background:#14532d;color:#86efac}
+.rol-alumno-prov{background:#451a03;color:#fdba74}
+.prof-meta{font-size:.8rem;color:var(--txt2);margin-top:6px;line-height:1.6}
+.dato-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.dato{background:var(--bg2);border-radius:8px;padding:8px 10px}
+.dato-l{font-size:.65rem;color:var(--txt2);text-transform:uppercase}
+.dato-v{font-size:.85rem;color:var(--txt3);margin-top:2px}
+.dato.full{grid-column:1/-1}
+.btn-edit{width:100%;background:transparent;border:1.5px solid var(--bord);border-radius:9px;padding:9px;color:var(--txt3);font-size:.88rem;cursor:pointer;margin-top:12px}
 
-/* ── CUOTAS ── */
-.cuota-row{background:var(--card);border:1px solid var(--bord);border-radius:10px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:12px}
-.cuota-mes{flex:1;font-size:.88rem;color:var(--txt3)}
-.cuota-monto{font-size:.9rem;font-weight:600;color:#fff}
-.cuota-badge{font-size:.65rem;font-weight:600;padding:3px 8px;border-radius:20px;text-transform:uppercase;white-space:nowrap}
-.cb-pagado{background:#14532d;color:#86efac}
-.cb-pendiente{background:#431407;color:#fdba74}
-.cb-parcial{background:#1e3a5f;color:#93c5fd}
-.cb-bonificado{background:#2e1065;color:#c4b5fd}
-.cuota-act{font-size:.72rem;color:var(--txt2)}
+/* ACTIVIDAD CARD (profe) */
+.act-card{background:var(--card);border:1px solid var(--bord);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.act-card:active{border-color:var(--rojo2)}
+.act-nombre{font-size:.95rem;font-weight:600}
+.act-meta{font-size:.75rem;color:var(--txt2);margin-top:4px;display:flex;flex-wrap:wrap;gap:6px}
+.act-badge{background:var(--bg2);border-radius:6px;padding:2px 7px;font-size:.68rem;color:var(--txt3)}
+.act-alumnos-count{font-size:.78rem;color:var(--txt2);margin-top:6px}
 
-/* ── EDIT PANEL ── */
-#edit-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;overflow-y:auto;padding:16px;padding-top:calc(var(--saf)+16px);padding-bottom:calc(var(--sab)+16px);align-items:flex-start;justify-content:center}
+/* ASISTENCIA */
+.asi-header{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.asi-header select,.asi-header input[type=date]{flex:1;min-width:130px}
+.asi-list{display:flex;flex-direction:column;gap:6px}
+.asi-row{background:var(--card);border:1.5px solid var(--bord);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;transition:border-color .15s}
+.asi-row.presente{border-color:#15803d}
+.asi-row.ausente{border-color:#b91c1c}
+.asi-row.justificado{border-color:#1d4ed8}
+.asi-foto{width:40px;height:40px;border-radius:50%;object-fit:cover;background:var(--bg3);flex-shrink:0;font-size:1.2rem;display:flex;align-items:center;justify-content:center}
+.asi-nom{flex:1;font-size:.9rem;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.asi-btns{display:flex;gap:4px;flex-shrink:0}
+.asi-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--bord);background:transparent;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.asi-btn.sel-p{background:#14532d;border-color:#15803d}
+.asi-btn.sel-a{background:#7f1d1d;border-color:#b91c1c}
+.asi-btn.sel-j{background:#1e3a5f;border-color:#1d4ed8}
+.asi-save{width:100%;margin-top:12px;background:linear-gradient(135deg,var(--rojo),var(--rojo2));border:none;border-radius:10px;padding:13px;color:#fff;font-size:.95rem;font-weight:600;cursor:pointer}
+.asi-save:disabled{opacity:.5;cursor:default}
+.asi-stats{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.asi-stat{background:var(--bg2);border-radius:8px;padding:6px 10px;font-size:.75rem}
+.asi-stat span{font-weight:700}
+
+/* ALUMNO chip (en actividad de profe) */
+.al-chip{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bord)}
+.al-chip:last-child{border-bottom:none}
+
+/* CUOTA BADGE */
+.cbadge{font-size:.65rem;font-weight:600;padding:2px 7px;border-radius:20px;white-space:nowrap}
+.cb-p{background:#14532d;color:#86efac}
+.cb-pe{background:#431407;color:#fdba74}
+.cb-b{background:#2e1065;color:#c4b5fd}
+.cb-pa{background:#1e3a5f;color:#93c5fd}
+
+/* EDIT PANEL */
+#edit-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;overflow-y:auto;padding:16px;padding-top:calc(var(--saf)+16px);padding-bottom:calc(var(--sab)+16px);align-items:flex-start;justify-content:center}
 #edit-panel.vis{display:flex}
-.edit-card{background:var(--card);border:1px solid var(--bord);border-radius:16px;padding:24px;width:100%;max-width:500px;margin:auto}
-.edit-card h3{font-size:1.1rem;font-weight:600;margin-bottom:18px;color:#fff}
-.edit-frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-@media(max-width:400px){.edit-frow{grid-template-columns:1fr}}
-.foto-preview{width:100%;max-height:200px;object-fit:contain;border-radius:8px;border:1px solid var(--bord);margin-bottom:8px;display:none}
-.foto-preview.vis{display:block}
-.foto-hint{font-size:.72rem;color:var(--txt2);margin-top:4px}
-.pwd-section{border-top:1px solid var(--bord);margin-top:16px;padding-top:16px}
-.pwd-section h4{font-size:.85rem;font-weight:600;color:var(--txt3);margin-bottom:12px}
-.edit-btns{display:flex;gap:10px;margin-top:18px}
-.btn-sec{flex:1;background:transparent;border:1.5px solid var(--bord);border-radius:10px;padding:11px;color:var(--txt3);font-size:.9rem;cursor:pointer}
-.btn-ok{flex:1;background:linear-gradient(135deg,var(--rojo),var(--rojo2));border:none;border-radius:10px;padding:11px;color:#fff;font-size:.9rem;font-weight:600;cursor:pointer}
-.btn-ok:disabled{opacity:.5;cursor:default}
-.save-msg{font-size:.8rem;text-align:center;margin-top:10px;min-height:1.2em}
-.save-ok{color:#86efac}
-.save-err{color:#fca5a5}
+.edit-card{background:var(--card);border:1px solid var(--bord);border-radius:16px;padding:22px 20px;width:100%;max-width:480px;margin:auto}
+.edit-card h3{font-size:1rem;font-weight:600;margin-bottom:16px}
+.edit-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+@media(max-width:360px){.edit-row{grid-template-columns:1fr}}
+.foto-prev{width:100%;max-height:180px;object-fit:contain;border-radius:8px;border:1px solid var(--bord);margin-bottom:6px;display:none}
+.foto-prev.vis{display:block}
+.foto-hint{font-size:.7rem;color:var(--txt2);margin-top:4px}
+.pwd-sec{border-top:1px solid var(--bord);margin-top:14px;padding-top:14px}
+.pwd-sec h4{font-size:.82rem;font-weight:600;color:var(--txt3);margin-bottom:10px}
+.edit-btns{display:flex;gap:8px;margin-top:16px}
+.btn-sec{flex:1;background:transparent;border:1.5px solid var(--bord);border-radius:9px;padding:10px;color:var(--txt3);font-size:.88rem;cursor:pointer}
+.btn-ok{flex:1;background:linear-gradient(135deg,var(--rojo),var(--rojo2));border:none;border-radius:9px;padding:10px;color:#fff;font-size:.88rem;font-weight:600;cursor:pointer}
+.btn-ok:disabled{opacity:.5}
+.msg{font-size:.78rem;text-align:center;margin-top:8px;min-height:1.1em}
+.msg.ok{color:#86efac}
+.msg.err{color:#fca5a5}
 
-/* ── LOADING ── */
-.spin{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+/* MISC */
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-.empty{text-align:center;color:var(--txt2);padding:20px;font-size:.9rem}
+.empty{text-align:center;color:var(--txt2);padding:24px 12px;font-size:.88rem}
+.toast-box{position:fixed;bottom:calc(80px + var(--sab));left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid var(--bord);color:var(--txt3);padding:10px 18px;border-radius:20px;font-size:.82rem;z-index:500;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap}
+.toast-box.vis{opacity:1}
 </style>
 </head>
 <body>
@@ -139,10 +171,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="login-logo">
     <img src="./escudo.png" alt="Escudo">
     <h1>Madryn Norte</h1>
-    <p>Portal del alumno</p>
+    <p>Portal de acceso</p>
   </div>
   <div class="login-card">
-    <h2>🔐 Ingresá a tu perfil</h2>
+    <h2>🔐 Ingresá</h2>
     <div class="err-box" id="login-err"></div>
     <div class="fgroup">
       <label class="fl">DNI</label>
@@ -152,19 +184,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <label class="fl">Contraseña</label>
       <input class="fc" id="inp-pwd" type="password" placeholder="••••••••" autocomplete="current-password">
     </div>
-    <button class="btn-prim" id="btn-login" onclick="doLogin()">Ingresar</button>
-    <p class="login-hint">Si no tenés contraseña o la olvidaste,<br>contactá al club por WhatsApp.</p>
+    <button class="btn-p" id="btn-login" onclick="doLogin()">Ingresar</button>
+    <p class="login-hint">¿Olvidaste tu contraseña? Contactá al club.</p>
   </div>
 </div>
 
-<!-- APP -->
-<div id="app-view">
+<!-- VISTA ALUMNO -->
+<div id="alumno-view">
   <div class="topbar">
-    <span class="tb-title">👤 Mi Perfil</span>
-    <button class="tb-logout" onclick="logout()">Salir</button>
+    <span class="tb-title" id="al-topbar-title">👤 Mi Perfil</span>
+    <button class="tb-btn" onclick="logout()">Salir</button>
   </div>
-  <div class="content" id="app-content">
-    <div class="empty"><span class="spin"></span> Cargando tu perfil…</div>
+  <div class="content" id="al-content">
+    <div class="empty"><span class="spin"></span> Cargando…</div>
+  </div>
+</div>
+
+<!-- VISTA PROFE -->
+<div id="profe-view">
+  <div class="topbar">
+    <span class="tb-title" id="pr-topbar-title">Madryn Norte</span>
+    <button class="tb-btn" onclick="logout()">Salir</button>
+  </div>
+  <div class="content has-nav" id="pr-content">
+    <div class="empty"><span class="spin"></span> Cargando…</div>
+  </div>
+  <div class="bottom-nav">
+    <button class="bn-btn act" id="bn-asi"  onclick="prTab('asistencia')"><span class="bn-ico">✅</span>Asistencia</button>
+    <button class="bn-btn"     id="bn-acts" onclick="prTab('actividades')"><span class="bn-ico">🏃</span>Actividades</button>
+    <button class="bn-btn"     id="bn-prof" onclick="prTab('miPerfil')"><span class="bn-ico">👤</span>Mi perfil</button>
   </div>
 </div>
 
@@ -172,16 +220,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div id="edit-panel">
   <div class="edit-card">
     <h3>✏️ Editar perfil</h3>
-    <div id="edit-foto-prev-wrap">
-      <img id="edit-foto-prev" class="foto-preview" src="" alt="Preview">
-    </div>
     <div class="fgroup">
-      <label class="fl">Foto (subir imagen)</label>
+      <label class="fl">Subir foto</label>
+      <img id="edit-foto-prev" class="foto-prev" src="" alt="">
       <input type="file" accept="image/*" id="edit-foto-file" class="fc" style="padding:6px" onchange="prevFoto(this)">
-      <p class="foto-hint">También podés pegar una URL de foto:</p>
+      <p class="foto-hint">O pegá una URL:</p>
       <input class="fc" id="edit-foto-url" type="url" placeholder="https://…" style="margin-top:5px" oninput="prevFotoUrl(this)">
     </div>
-    <div class="edit-frow">
+    <div class="edit-row">
       <div class="fgroup">
         <label class="fl">Teléfono</label>
         <input class="fc" id="edit-tel" type="tel">
@@ -191,407 +237,507 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <input class="fc" id="edit-email" type="email">
       </div>
     </div>
-    <div class="fgroup">
-      <label class="fl">Contacto de emergencia</label>
-      <input class="fc" id="edit-emerg" type="text" placeholder="Nombre y teléfono">
+    <div id="edit-extra-al">
+      <div class="fgroup">
+        <label class="fl">Contacto emergencia</label>
+        <input class="fc" id="edit-emerg">
+      </div>
+      <div class="fgroup" style="margin-bottom:0">
+        <label class="fl">Condición de salud</label>
+        <input class="fc" id="edit-salud" placeholder="Alergias, lesiones…">
+      </div>
     </div>
-    <div class="fgroup">
-      <label class="fl">Condición de salud (si aplica)</label>
-      <input class="fc" id="edit-salud" type="text" placeholder="Alergias, lesiones, etc.">
-    </div>
-    <div class="pwd-section">
+    <div class="pwd-sec">
       <h4>🔑 Cambiar contraseña</h4>
-      <div class="edit-frow">
-        <div class="fgroup">
-          <label class="fl">Contraseña actual</label>
-          <input class="fc" id="edit-pwd-act" type="password">
-        </div>
-        <div class="fgroup">
-          <label class="fl">Nueva contraseña</label>
-          <input class="fc" id="edit-pwd-new" type="password" placeholder="Mín. 6 caracteres">
-        </div>
+      <div class="edit-row">
+        <div class="fgroup"><label class="fl">Actual</label><input class="fc" id="edit-pwd-act" type="password"></div>
+        <div class="fgroup"><label class="fl">Nueva (mín. 6)</label><input class="fc" id="edit-pwd-new" type="password"></div>
       </div>
     </div>
     <div class="edit-btns">
       <button class="btn-sec" onclick="cerrarEdit()">Cancelar</button>
       <button class="btn-ok" id="btn-save" onclick="guardarPerfil()">Guardar</button>
     </div>
-    <p class="save-msg" id="save-msg"></p>
+    <p class="msg" id="save-msg"></p>
   </div>
 </div>
 
+<div class="toast-box" id="toast-box"></div>
+
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────
-// URL del Apps Script — mismo que usa la app principal
-// Se lee desde el localStorage de la app, o se puede poner directamente.
+// ─────────────────────────────────────────────────────────────────────
 var SCRIPT_URL = '';
 var SESSION_KEY = 'mn_perfil_session';
+var sesion = null;  // { dni, pwdHash, tipo, alumno? / usuario? }
+var dataPerfil = null;
+var prTabActual = 'asistencia';
+var asiEstados = {}; // { alumno_id: estado } para tab asistencia
+var asiActId = '';
+var asiFecha = '';
 
-// ── ESTADO ───────────────────────────────────────────────────────────
-var sesion = null; // { dni, pwdHash, alumno }
-var dataPerfil = null; // { alumno, inscripciones, actividades, cuotas }
-
-// ── UTILIDADES ───────────────────────────────────────────────────────
-async function sha256(str) {
-  const enc = new TextEncoder().encode(str);
-  const buf = await crypto.subtle.digest('SHA-256', enc);
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+// ─── UTILS ───────────────────────────────────────────────────────────
+async function sha256(s){
+  const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
 }
-
-function post(body) {
-  return fetch(SCRIPT_URL, {
-    method:'POST', redirect:'follow',
-    headers:{'Content-Type':'text/plain'},
-    body: JSON.stringify(body)
-  }).then(r=>r.json());
+function post(body){
+  return fetch(SCRIPT_URL,{method:'POST',redirect:'follow',
+    headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)}).then(r=>r.json());
 }
+function fmtF(s){if(!s)return'—';const p=s.split('-');return p.length<3?s:p[2]+'/'+p[1]+'/'+p[0]}
+function fmtM(s){if(!s)return'—';const ms=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];const p=s.split('-');return p.length<2?s:ms[parseInt(p[1])-1]+' '+p[0]}
+function hoy(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function toast(msg){var b=document.getElementById('toast-box');b.textContent=msg;b.classList.add('vis');setTimeout(()=>b.classList.remove('vis'),2200)}
 
-function fmtFecha(str) {
-  if (!str) return '—';
-  const p = str.split('-');
-  if (p.length < 3) return str;
-  return p[2]+'/'+p[1]+'/'+p[0];
-}
-
-function fmtMes(str) {
-  if (!str) return '—';
-  const ms = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const p = str.split('-');
-  if (p.length < 2) return str;
-  return ms[parseInt(p[1])-1]+' '+p[0];
-}
-
-// ── INIT ─────────────────────────────────────────────────────────────
-window.addEventListener('load', function() {
-  // Intentar leer script URL de la config guardada por la app
-  try {
-    var cfg = JSON.parse(localStorage.getItem('mn_config') || '{}');
-    if (cfg.scriptUrl) SCRIPT_URL = cfg.scriptUrl;
-  } catch(e){}
-  // Fallback: intentar leer de mn_session (la app guarda la URL en la config)
-  if (!SCRIPT_URL) {
-    try {
-      var db = JSON.parse(localStorage.getItem('mn_db_cache') || '{}');
-      if (db.config && db.config.scriptUrl) SCRIPT_URL = db.config.scriptUrl;
-    } catch(e){}
-  }
-
+// ─── INIT ─────────────────────────────────────────────────────────────
+window.addEventListener('load',function(){
+  // Obtener URL del script desde caché de la app principal
+  try{var cfg=JSON.parse(localStorage.getItem('mn_config')||'{}');if(cfg.scriptUrl)SCRIPT_URL=cfg.scriptUrl}catch(e){}
+  if(!SCRIPT_URL){try{var db=JSON.parse(localStorage.getItem('mn_db_cache')||'{}');if(db.config&&db.config.scriptUrl)SCRIPT_URL=db.config.scriptUrl}catch(e){}}
   // Restaurar sesión
-  try {
-    var sv = localStorage.getItem(SESSION_KEY);
-    if (sv) {
-      sesion = JSON.parse(sv);
-      hideSplash();
-      mostrarApp();
-      cargarPerfil();
-      return;
-    }
-  } catch(e) { localStorage.removeItem(SESSION_KEY); }
-
-  hideSplash();
-  mostrarLogin();
+  try{
+    var sv=localStorage.getItem(SESSION_KEY);
+    if(sv){sesion=JSON.parse(sv);hideSpl();routeApp();cargarPerfil();return}
+  }catch(e){localStorage.removeItem(SESSION_KEY)}
+  hideSpl();mostrarLogin();
 });
-
-function hideSplash() {
-  var s = document.getElementById('splash');
-  if (s) { s.classList.add('oculto'); setTimeout(function(){s.style.display='none'},400); }
-}
-
-function mostrarLogin() {
-  document.getElementById('login-view').style.display = 'flex';
-  document.getElementById('app-view').style.display = 'none';
-}
-
-function mostrarApp() {
-  document.getElementById('login-view').style.display = 'none';
-  document.getElementById('app-view').style.display = 'flex';
-}
-
-// ── LOGIN ─────────────────────────────────────────────────────────────
-async function doLogin() {
-  var errBox = document.getElementById('login-err');
-  var btn = document.getElementById('btn-login');
-  errBox.classList.remove('vis');
-
-  var dni = document.getElementById('inp-dni').value.trim();
-  var pwd = document.getElementById('inp-pwd').value;
-
-  if (!dni) { showErr(errBox, 'Ingresá tu DNI'); return; }
-  if (!pwd) { showErr(errBox, 'Ingresá tu contraseña'); return; }
-  if (!SCRIPT_URL) { showErr(errBox, 'La app no está configurada. Abrí la app principal primero.'); return; }
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin"></span> Ingresando…';
-
-  try {
-    var pwdHash = await sha256(pwd);
-    var res = await post({ accion:'login_alumno', dni:dni, pwd:pwdHash });
-    if (!res.ok) { showErr(errBox, res.error || 'Error al ingresar'); return; }
-    sesion = { dni:dni, pwdHash:pwdHash, alumno: res.data.alumno };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(sesion));
-    mostrarApp();
-    cargarPerfil();
-  } catch(e) {
-    showErr(errBox, 'Error de conexión. Verificá tu internet.');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = 'Ingresar';
+function hideSpl(){var s=document.getElementById('splash');s.classList.add('out');setTimeout(()=>s.style.display='none',450)}
+function mostrarLogin(){document.getElementById('login-view').style.display='flex'}
+function routeApp(){
+  document.getElementById('login-view').style.display='none';
+  if(sesion.tipo==='usuario'){
+    document.getElementById('profe-view').style.display='flex';
+    const u=sesion.usuario||{};
+    document.getElementById('pr-topbar-title').textContent=(u.nombre||'')+(u.apellido?' '+u.apellido:'');
+  }else{
+    document.getElementById('alumno-view').style.display='flex';
+    const al=sesion.alumno||{};
+    document.getElementById('al-topbar-title').textContent=(al.nombre||'')+(al.apellido?' '+al.apellido:'');
   }
 }
 
-function showErr(box, msg) {
-  box.textContent = msg;
-  box.classList.add('vis');
+// ─── LOGIN ────────────────────────────────────────────────────────────
+async function doLogin(){
+  var errB=document.getElementById('login-err'),btn=document.getElementById('btn-login');
+  errB.classList.remove('vis');
+  var dni=document.getElementById('inp-dni').value.trim();
+  var pwd=document.getElementById('inp-pwd').value;
+  if(!dni){showErr(errB,'Ingresá tu DNI');return}
+  if(!pwd){showErr(errB,'Ingresá tu contraseña');return}
+  if(!SCRIPT_URL){showErr(errB,'App no configurada. Abrí la app de gestión una vez primero.');return}
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Ingresando…';
+  try{
+    var h=await sha256(pwd);
+    var r=await post({accion:'login_portal',dni,pwd:h});
+    if(!r.ok){showErr(errB,r.error||'Error al ingresar');return}
+    sesion={dni,pwdHash:h,tipo:r.data.tipo};
+    if(r.data.tipo==='usuario')sesion.usuario=r.data.usuario;
+    else sesion.alumno=r.data.alumno;
+    localStorage.setItem(SESSION_KEY,JSON.stringify(sesion));
+    routeApp();cargarPerfil();
+  }catch(e){showErr(errB,'Error de conexión. Verificá tu internet.')}
+  finally{btn.disabled=false;btn.innerHTML='Ingresar'}
 }
+function showErr(b,m){b.textContent=m;b.classList.add('vis')}
+document.getElementById('inp-pwd').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+document.getElementById('inp-dni').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('inp-pwd').focus()});
 
-// Enter key en inputs de login
-document.getElementById('inp-pwd').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') doLogin();
-});
-document.getElementById('inp-dni').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') document.getElementById('inp-pwd').focus();
-});
-
-// ── CARGAR PERFIL ─────────────────────────────────────────────────────
-async function cargarPerfil() {
-  var cont = document.getElementById('app-content');
-  cont.innerHTML = '<div class="empty"><span class="spin"></span> Cargando tu perfil…</div>';
-
-  // Mostrar datos cacheados mientras carga
-  if (sesion && sesion.alumno) {
-    renderPerfil({ alumno: sesion.alumno, inscripciones:[], actividades:[], cuotas:[] });
-  }
-
-  if (!SCRIPT_URL) {
-    cont.innerHTML = '<div class="empty">⚠️ No se encontró la URL del servidor.<br>Abrí la app de gestión primero para configurarla.</div>';
+// ─── CARGAR PERFIL ────────────────────────────────────────────────────
+async function cargarPerfil(){
+  if(!SCRIPT_URL){
+    const msg='⚠️ URL no configurada. Abrí la app de gestión primero.';
+    if(sesion.tipo==='usuario')document.getElementById('pr-content').innerHTML=`<div class="empty">${msg}</div>`;
+    else document.getElementById('al-content').innerHTML=`<div class="empty">${msg}</div>`;
     return;
   }
+  if(sesion.tipo==='usuario') await cargarPerfilProf();
+  else await cargarPerfilAl();
+}
 
-  try {
-    var res = await post({ accion:'get_perfil', dni:sesion.dni, pwd:sesion.pwdHash });
-    if (!res.ok) {
-      if (res.error && res.error.includes('autorizado')) { logout(); return; }
-      cont.innerHTML = '<div class="empty">⚠️ '+( res.error||'Error al cargar')+'</div>';
-      return;
+// ═══════════════════════════════════════════════════════════════════════
+//  ALUMNO
+// ═══════════════════════════════════════════════════════════════════════
+async function cargarPerfilAl(){
+  var cont=document.getElementById('al-content');
+  if(sesion.alumno)renderPerfilAl({alumno:sesion.alumno,inscripciones:[],actividades:[],cuotas:[]});
+  try{
+    var r=await post({accion:'get_perfil',dni:sesion.dni,pwd:sesion.pwdHash});
+    if(!r.ok){if(r.error&&r.error.includes('autorizado')){logout();return}
+      cont.innerHTML=`<div class="empty">⚠️ ${r.error||'Error al cargar'}</div>`;return}
+    dataPerfil=r.data;sesion.alumno=dataPerfil.alumno;
+    localStorage.setItem(SESSION_KEY,JSON.stringify(sesion));
+    renderPerfilAl(dataPerfil);
+  }catch(e){if(!dataPerfil)cont.innerHTML='<div class="empty">⚠️ Sin conexión.</div>'}
+}
+
+function renderPerfilAl(data){
+  var al=data.alumno||{},insc=data.inscripciones||[],acts=data.actividades||[],cuotas=data.cuotas||[];
+  document.getElementById('al-topbar-title').textContent=(al.nombre||'')+(al.apellido?' '+al.apellido:'');
+  var rolCls=al.estado==='activo'?'rol-alumno-activo':'rol-alumno-prov';
+  var rolTxt=al.estado==='activo'?'Activo':'Provisional';
+  var fotoEl=al.foto?`<img class="prof-foto" src="${al.foto}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`+
+    `<div class="prof-foto-ph" style="display:none">👤</div>`:`<div class="prof-foto-ph">👤</div>`;
+
+  var inscrHTML=insc.filter(i=>i.estado!=='baja').length?
+    insc.filter(i=>i.estado!=='baja').map(i=>{
+      var a=acts.find(x=>String(x.id)===String(i.actividad_id))||{};
+      return`<div class="act-card" style="cursor:default">
+        <div class="act-nombre">${a.nombre||'Actividad'}</div>
+        <div class="act-meta">${a.deporte?`<span>${a.deporte}</span>`:''}${a.dias_horarios?`<span>${a.dias_horarios}</span>`:''}</div>
+      </div>`;
+    }).join(''):
+    '<div class="empty">Sin actividades inscriptas</div>';
+
+  var cuotasOrden=cuotas.slice().sort((a,b)=>(b.mes_anio||'').localeCompare(a.mes_anio||'')).slice(0,12);
+  var cuotasHTML=cuotasOrden.length?cuotasOrden.map(c=>{
+    var a=acts.find(x=>String(x.id)===String(c.actividad_id))||{};
+    var bc=c.estado==='pagado'?'cb-p':c.estado==='bonificado'?'cb-b':c.estado==='parcial'?'cb-pa':'cb-pe';
+    var bt=c.estado==='pagado'?'Pagado':c.estado==='bonificado'?'Bonificado':c.estado==='parcial'?'Parcial':'Pendiente';
+    return`<div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--card);border:1px solid var(--bord);border-radius:10px;margin-bottom:6px">
+      <div style="flex:1"><div style="font-size:.85rem">${fmtM(c.mes_anio)}</div><div style="font-size:.72rem;color:var(--txt2)">${a.nombre||''}</div></div>
+      <div style="font-size:.88rem;font-weight:600">${c.monto?'$'+Number(c.monto).toLocaleString('es-AR'):''}</div>
+      <span class="cbadge ${bc}">${bt}</span>
+    </div>`;
+  }).join(''):
+  '<div class="empty">Sin cuotas registradas</div>';
+
+  document.getElementById('al-content').innerHTML=`
+  <div class="card">
+    <div class="prof-header">
+      ${fotoEl}
+      <div style="flex:1;min-width:0">
+        <div class="prof-nombre">${al.nombre||''} ${al.apellido||''}</div>
+        <span class="prof-rol ${rolCls}">${rolTxt}</span>
+        <div class="prof-meta">DNI ${al.dni||'—'}</div>
+      </div>
+    </div>
+    <div class="dato-grid">
+      <div class="dato"><div class="dato-l">Teléfono</div><div class="dato-v">${al.telefono||'—'}</div></div>
+      <div class="dato"><div class="dato-l">Email</div><div class="dato-v">${al.email||'—'}</div></div>
+      <div class="dato"><div class="dato-l">Nacimiento</div><div class="dato-v">${fmtF(al.fecha_nacimiento)}</div></div>
+      <div class="dato"><div class="dato-l">N° ficha</div><div class="dato-v">${al.id||'—'}</div></div>
+      ${al.contacto_emergencia?`<div class="dato full"><div class="dato-l">Emergencia</div><div class="dato-v">${al.contacto_emergencia}</div></div>`:''}
+    </div>
+    <button class="btn-edit" onclick="abrirEditAl()">✏️ Editar perfil</button>
+  </div>
+  <div class="sec-tit">🏃 Mis actividades</div>${inscrHTML}
+  <div class="sec-tit" style="margin-top:4px">💰 Cuotas</div>${cuotasHTML}`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  PROFE
+// ═══════════════════════════════════════════════════════════════════════
+async function cargarPerfilProf(){
+  var cont=document.getElementById('pr-content');
+  try{
+    var r=await post({accion:'get_perfil_prof',dni:sesion.dni,pwd:sesion.pwdHash});
+    if(!r.ok){if(r.error&&r.error.includes('autorizado')){logout();return}
+      cont.innerHTML=`<div class="empty">⚠️ ${r.error||'Error al cargar'}</div>`;return}
+    dataPerfil=r.data;sesion.usuario=dataPerfil.usuario;
+    localStorage.setItem(SESSION_KEY,JSON.stringify(sesion));
+    document.getElementById('pr-topbar-title').textContent=(dataPerfil.usuario.nombre||'')+(dataPerfil.usuario.apellido?' '+dataPerfil.usuario.apellido:'');
+    prTab(prTabActual);
+  }catch(e){
+    if(!dataPerfil){cont.innerHTML='<div class="empty">⚠️ Sin conexión.</div>';return}
+    prTab(prTabActual);
+  }
+}
+
+function prTab(tab){
+  prTabActual=tab;
+  ['asi','acts','prof'].forEach(k=>document.getElementById('bn-'+k).classList.remove('act'));
+  if(tab==='asistencia'){document.getElementById('bn-asi').classList.add('act');renderAsi()}
+  else if(tab==='actividades'){document.getElementById('bn-acts').classList.add('act');renderActsProfe()}
+  else{document.getElementById('bn-prof').classList.add('act');renderMiPerfilProfe()}
+}
+
+// ── Tab Asistencia ────────────────────────────────────────────────────
+function renderAsi(){
+  if(!dataPerfil){document.getElementById('pr-content').innerHTML='<div class="empty"><span class="spin"></span> Cargando…</div>';return}
+  const acts=dataPerfil.actividades||[];
+  const insc=dataPerfil.inscripciones||[];
+  const alumnos=dataPerfil.alumnos||[];
+  const asist=dataPerfil.asistencia||[];
+  const cont=document.getElementById('pr-content');
+
+  if(!acts.length){cont.innerHTML='<div class="empty">No tenés actividades asignadas.</div>';return}
+
+  // Selectores
+  if(!asiActId||!acts.find(a=>String(a.id)===asiActId))asiActId=String(acts[0].id);
+  if(!asiFecha)asiFecha=hoy();
+
+  const actOpts=acts.map(a=>`<option value="${a.id}"${String(a.id)===asiActId?' selected':''}>${a.nombre}${a.deporte?' — '+a.deporte:''}</option>`).join('');
+
+  // Alumnos de la actividad seleccionada
+  const alumsActIds=insc.filter(i=>String(i.actividad_id)===asiActId).map(i=>String(i.alumno_id));
+  const alumsAct=alumnos.filter(a=>alumsActIds.includes(String(a.id)));
+
+  // Pre-cargar estados existentes para esta fecha+actividad
+  if(!asiEstados._loaded||asiEstados._actId!==asiActId||asiEstados._fecha!==asiFecha){
+    asiEstados={_loaded:true,_actId:asiActId,_fecha:asiFecha};
+    asist.filter(r=>String(r.actividad_id)===asiActId&&String(r.fecha)===asiFecha)
+      .forEach(r=>{asiEstados[String(r.alumno_id)]=r.estado});
+  }
+
+  const count={presente:0,ausente:0,justificado:0};
+  alumsAct.forEach(a=>{const e=asiEstados[String(a.id)];if(e)count[e]=(count[e]||0)+1});
+  const totalMarcados=count.presente+count.ausente+count.justificado;
+
+  const filas=alumsAct.map(al=>{
+    const est=asiEstados[String(al.id)]||'';
+    const fp=est==='presente'?'sel-p':'';
+    const fa=est==='ausente'?'sel-a':'';
+    const fj=est==='justificado'?'sel-j':'';
+    const rowCls=est?'asi-row '+est:'asi-row';
+    const foto=al.foto?`<img class="asi-foto" src="${al.foto}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`+
+      `<div class="asi-foto" style="display:none">👤</div>`:`<div class="asi-foto">👤</div>`;
+    return`<div class="${rowCls}" id="arow-${al.id}">
+      ${foto}
+      <span class="asi-nom">${al.nombre} ${al.apellido||''}</span>
+      <div class="asi-btns">
+        <button class="asi-btn ${fp}" onclick="setAsi('${al.id}','presente')" title="Presente">✅</button>
+        <button class="asi-btn ${fa}" onclick="setAsi('${al.id}','ausente')"  title="Ausente">❌</button>
+        <button class="asi-btn ${fj}" onclick="setAsi('${al.id}','justificado')" title="Justificado">📋</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  cont.innerHTML=`
+  <div style="margin-bottom:12px">
+    <div class="asi-header">
+      <select class="fc" style="flex:1.5" onchange="asiCambiaAct(this.value)">${actOpts}</select>
+      <input class="fc" type="date" value="${asiFecha}" style="flex:1" onchange="asiCambiaFecha(this.value)">
+    </div>
+    ${totalMarcados>0?`<div class="asi-stats">
+      <div class="asi-stat">✅ Presentes: <span>${count.presente||0}</span></div>
+      <div class="asi-stat">❌ Ausentes: <span>${count.ausente||0}</span></div>
+      ${count.justificado?`<div class="asi-stat">📋 Just.: <span>${count.justificado}</span></div>`:''}
+      <div class="asi-stat">Total: <span>${alumsAct.length}</span></div>
+    </div>`:`<div style="font-size:.78rem;color:var(--txt2);margin-bottom:8px">Marcá la asistencia de ${alumsAct.length} alumno${alumsAct.length!==1?'s':''}</div>`}
+  </div>
+  ${alumsAct.length?`<div class="asi-list">${filas}</div>
+  <button class="asi-save" id="btn-asi-save" onclick="guardarAsi()">
+    ${totalMarcados===alumsAct.length&&alumsAct.length>0?'💾 Guardar asistencia':'💾 Guardar asistencia'}
+  </button>`:
+  '<div class="empty">No hay alumnos inscriptos en esta actividad.</div>'}`;
+}
+
+function setAsi(alId,estado){
+  const cur=asiEstados[alId];
+  // toggle: si ya estaba en ese estado, lo limpia
+  asiEstados[alId]=cur===estado?null:estado;
+  const row=document.getElementById('arow-'+alId);
+  if(!row)return;
+  row.className='asi-row'+(asiEstados[alId]?' '+asiEstados[alId]:'');
+  row.querySelectorAll('.asi-btn').forEach(b=>b.className='asi-btn');
+  if(asiEstados[alId]==='presente')row.querySelector('[title="Presente"]').classList.add('sel-p');
+  if(asiEstados[alId]==='ausente')row.querySelector('[title="Ausente"]').classList.add('sel-a');
+  if(asiEstados[alId]==='justificado')row.querySelector('[title="Justificado"]').classList.add('sel-j');
+  // actualizar stats en tiempo real
+  const cont=document.getElementById('pr-content');
+  const alumnos=dataPerfil.alumnos||[];
+  const insc=dataPerfil.inscripciones||[];
+  const alumsActIds=insc.filter(i=>String(i.actividad_id)===asiActId).map(i=>String(i.alumno_id));
+  const total=alumnos.filter(a=>alumsActIds.includes(String(a.id))).length;
+  const count={presente:0,ausente:0,justificado:0};
+  alumsActIds.forEach(id=>{const e=asiEstados[id];if(e&&count[e]!==undefined)count[e]++});
+  const statsEl=cont.querySelector('.asi-stats');
+  const totalMarcados=count.presente+count.ausente+count.justificado;
+  if(statsEl){
+    statsEl.innerHTML=`<div class="asi-stat">✅ Presentes: <span>${count.presente}</span></div>
+      <div class="asi-stat">❌ Ausentes: <span>${count.ausente}</span></div>
+      ${count.justificado?`<div class="asi-stat">📋 Just.: <span>${count.justificado}</span></div>`:''}
+      <div class="asi-stat">Total: <span>${total}</span></div>`;
+  }
+}
+
+function asiCambiaAct(id){
+  asiActId=id;asiEstados={};renderAsi();
+}
+function asiCambiaFecha(f){
+  asiFecha=f;asiEstados={_loaded:false};renderAsi();
+}
+
+async function guardarAsi(){
+  const btn=document.getElementById('btn-asi-save');
+  if(!btn)return;
+  const insc=dataPerfil.inscripciones||[];
+  const alumsActIds=insc.filter(i=>String(i.actividad_id)===asiActId).map(i=>String(i.alumno_id));
+  const registros=alumsActIds
+    .filter(id=>asiEstados[id])
+    .map(id=>({alumno_id:id,actividad_id:asiActId,fecha:asiFecha,estado:asiEstados[id],observacion:''}));
+  if(!registros.length){toast('Marcá al menos un alumno');return}
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Guardando…';
+  try{
+    var r=await post({accion:'guardar_asistencia_portal',dni:sesion.dni,pwd:sesion.pwdHash,registros});
+    if(!r.ok)throw new Error(r.error||'Error');
+    // Actualizar cache local
+    if(dataPerfil.asistencia){
+      registros.forEach(reg=>{
+        const ix=dataPerfil.asistencia.findIndex(r=>String(r.alumno_id)===String(reg.alumno_id)&&String(r.actividad_id)===reg.actividad_id&&String(r.fecha)===reg.fecha);
+        if(ix>=0)dataPerfil.asistencia[ix].estado=reg.estado;
+        else dataPerfil.asistencia.push({...reg,id:'pa_tmp_'+Date.now()});
+      });
     }
-    dataPerfil = res.data;
-    // Actualizar sesión con datos frescos
-    sesion.alumno = dataPerfil.alumno;
-    localStorage.setItem(SESSION_KEY, JSON.stringify(sesion));
-    renderPerfil(dataPerfil);
-  } catch(e) {
-    if (!dataPerfil) cont.innerHTML = '<div class="empty">⚠️ Sin conexión. Intentá más tarde.</div>';
-  }
+    toast('✅ Asistencia guardada ('+registros.length+' registros)');
+  }catch(e){toast('⚠️ '+e.message)}
+  finally{btn.disabled=false;btn.innerHTML='💾 Guardar asistencia'}
 }
 
-// ── RENDER PERFIL ─────────────────────────────────────────────────────
-function renderPerfil(data) {
-  var al   = data.alumno || {};
-  var insc = data.inscripciones || [];
-  var acts = data.actividades || [];
-  var cuotas = data.cuotas || [];
-
-  var estadoClass = al.estado==='activo'?'est-activo':al.estado==='provisional'?'est-provisional':'est-baja';
-  var estadoLabel = al.estado==='activo'?'Activo':al.estado==='provisional'?'Provisional':'Baja';
-
-  var fotoEl = al.foto
-    ? '<img class="prof-foto" src="'+al.foto+'" alt="Foto" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
-      +'<div class="prof-foto-ph" style="display:none">👤</div>'
-    : '<div class="prof-foto-ph">👤</div>';
-
-  // Inscripciones con nombre de actividad
-  var inscrHTML = '';
-  if (insc.length === 0) {
-    inscrHTML = '<div class="empty">No tenés actividades inscriptas</div>';
-  } else {
-    insc.forEach(function(i) {
-      if (i.estado === 'baja') return;
-      var act = acts.find(function(a){ return String(a.id)===String(i.actividad_id); }) || {};
-      inscrHTML += '<div class="act-chip">'
-        +'<div class="act-nombre">'+(act.nombre||'Actividad')+'</div>'
-        +'<div class="act-meta">'
-          +(act.deporte?'<span>🏃 '+act.deporte+'</span> · ':'')
-          +(act.dias_horarios?act.dias_horarios:'')
-        +'</div></div>';
-    });
-    if (!inscrHTML) inscrHTML = '<div class="empty">No tenés actividades activas</div>';
-  }
-
-  // Cuotas (últimas 6 o todas si son pocas)
-  var cuotasOrdenadas = cuotas.slice().sort(function(a,b){ return (b.mes_anio||'').localeCompare(a.mes_anio||''); });
-  var mostrar = cuotasOrdenadas.slice(0, 12);
-  var cuotasHTML = '';
-  if (mostrar.length === 0) {
-    cuotasHTML = '<div class="empty">Sin cuotas registradas</div>';
-  } else {
-    mostrar.forEach(function(c) {
-      var act = acts.find(function(a){ return String(a.id)===String(c.actividad_id); }) || {};
-      var badgeCls = c.estado==='pagado'?'cb-pagado':c.estado==='bonificado'?'cb-bonificado':c.estado==='parcial'?'cb-parcial':'cb-pendiente';
-      var badgeTxt = c.estado==='pagado'?'Pagado':c.estado==='bonificado'?'Bonificado':c.estado==='parcial'?'Parcial':'Pendiente';
-      cuotasHTML += '<div class="cuota-row">'
-        +'<div><div class="cuota-mes">'+fmtMes(c.mes_anio)+'</div>'
-          +'<div class="cuota-act">'+(act.nombre||'')+'</div></div>'
-        +'<div class="cuota-monto">'+(c.monto?'$'+Number(c.monto).toLocaleString('es-AR'):'')+'</div>'
-        +'<span class="cuota-badge '+badgeCls+'">'+badgeTxt+'</span>'
-        +'</div>';
-    });
-  }
-
-  var cont = document.getElementById('app-content');
-  cont.innerHTML = ''
-    // Tarjeta de perfil
-    +'<div class="prof-card">'
-      +'<div class="prof-header">'
-        +fotoEl
-        +'<div class="prof-info">'
-          +'<div class="prof-nombre">'+(al.nombre||'')+' '+(al.apellido||'')+'</div>'
-          +'<span class="prof-estado '+estadoClass+'">'+estadoLabel+'</span>'
-          +'<div class="prof-dni">DNI '+( al.dni||'—')+'</div>'
-        +'</div>'
-      +'</div>'
-      +'<div class="prof-datos">'
-        +'<div class="dato-item"><div class="dato-label">Teléfono</div><div class="dato-val">'+(al.telefono||'—')+'</div></div>'
-        +'<div class="dato-item"><div class="dato-label">Email</div><div class="dato-val">'+(al.email||'—')+'</div></div>'
-        +'<div class="dato-item"><div class="dato-label">Fecha de nacimiento</div><div class="dato-val">'+fmtFecha(al.fecha_nacimiento)+'</div></div>'
-        +'<div class="dato-item"><div class="dato-label">N° de ficha</div><div class="dato-val">'+(al.id||'—')+'</div></div>'
-        +(al.contacto_emergencia?'<div class="dato-item full"><div class="dato-label">Contacto emergencia</div><div class="dato-val">'+al.contacto_emergencia+'</div></div>':'')
-        +(al.salud?'<div class="dato-item full"><div class="dato-label">Salud</div><div class="dato-val">'+al.salud+'</div></div>':'')
-      +'</div>'
-      +'<button class="btn-edit" onclick="abrirEdit()">✏️ Editar perfil</button>'
-    +'</div>'
-    // Actividades
-    +'<div class="sec"><div class="sec-tit">🏃 Mis actividades</div>'
-      +inscrHTML
-    +'</div>'
-    // Cuotas
-    +'<div class="sec"><div class="sec-tit">💰 Estado de cuotas</div>'
-      +cuotasHTML
-    +'</div>';
+// ── Tab Actividades ───────────────────────────────────────────────────
+function renderActsProfe(){
+  if(!dataPerfil){document.getElementById('pr-content').innerHTML='<div class="empty"><span class="spin"></span></div>';return}
+  const acts=dataPerfil.actividades||[];
+  const insc=dataPerfil.inscripciones||[];
+  const alumnos=dataPerfil.alumnos||[];
+  const cont=document.getElementById('pr-content');
+  if(!acts.length){cont.innerHTML='<div class="empty">No tenés actividades asignadas.</div>';return}
+  const html=acts.map(a=>{
+    const alumsIds=insc.filter(i=>String(i.actividad_id)===String(a.id)).map(i=>String(i.alumno_id));
+    const alums=alumnos.filter(al=>alumsIds.includes(String(al.id)));
+    const alumsHtml=alums.length?alums.map(al=>{
+      var foto=al.foto?`<img src="${al.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg3)" onerror="this.outerHTML='<div style=width:36px;height:36px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center>👤</div>'">`:'<div style="width:36px;height:36px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center">👤</div>';
+      return`<div class="al-chip">${foto}<div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:500">${al.nombre} ${al.apellido||''}</div><div style="font-size:.72rem;color:var(--txt2)">DNI ${al.dni||'—'}</div></div></div>`;
+    }).join(''):'<div style="font-size:.8rem;color:var(--txt2);padding:8px 0">Sin alumnos inscriptos</div>';
+    return`<div class="card">
+      <div class="act-nombre">${a.nombre}</div>
+      <div class="act-meta">${a.deporte?`<span class="act-badge">🏃 ${a.deporte}</span>`:''}${a.categoria?`<span class="act-badge">${a.categoria}</span>`:''}${a.dias_horarios?`<span class="act-badge">🕐 ${a.dias_horarios}</span>`:''}</div>
+      <div class="act-alumnos-count" style="margin-top:8px;margin-bottom:4px;font-size:.75rem;font-weight:600;color:var(--txt2);text-transform:uppercase">👥 ${alums.length} alumno${alums.length!==1?'s':''}</div>
+      ${alumsHtml}
+    </div>`;
+  }).join('');
+  cont.innerHTML=html;
 }
 
-// ── EDIT ──────────────────────────────────────────────────────────────
-function abrirEdit() {
-  var al = (dataPerfil||{}).alumno || sesion.alumno || {};
-  document.getElementById('edit-tel').value   = al.telefono || '';
-  document.getElementById('edit-email').value = al.email || '';
-  document.getElementById('edit-emerg').value = al.contacto_emergencia || '';
-  document.getElementById('edit-salud').value = al.salud || '';
-  document.getElementById('edit-foto-url').value = '';
-  document.getElementById('edit-foto-file').value = '';
-  document.getElementById('edit-pwd-act').value = '';
-  document.getElementById('edit-pwd-new').value = '';
-  var prev = document.getElementById('edit-foto-prev');
-  if (al.foto) { prev.src = al.foto; prev.classList.add('vis'); }
-  else { prev.classList.remove('vis'); }
-  document.getElementById('save-msg').textContent = '';
+// ── Tab Mi Perfil ─────────────────────────────────────────────────────
+function renderMiPerfilProfe(){
+  if(!dataPerfil){document.getElementById('pr-content').innerHTML='<div class="empty"><span class="spin"></span></div>';return}
+  const u=dataPerfil.usuario||{};
+  const rolCls=u.rol==='admin'?'rol-admin':'rol-profesor';
+  const rolTxt=u.rol==='admin'?'Administrador':'Profesor';
+  const foto=u.foto?`<img class="prof-foto" src="${u.foto}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`+
+    `<div class="prof-foto-ph" style="display:none">👤</div>`:`<div class="prof-foto-ph">👤</div>`;
+  document.getElementById('pr-content').innerHTML=`
+  <div class="card">
+    <div class="prof-header">
+      ${foto}
+      <div style="flex:1;min-width:0">
+        <div class="prof-nombre">${u.nombre||''} ${u.apellido||''}</div>
+        <span class="prof-rol ${rolCls}">${rolTxt}</span>
+        ${u.dni?`<div class="prof-meta">DNI ${u.dni}</div>`:''}
+      </div>
+    </div>
+    <div class="dato-grid">
+      <div class="dato"><div class="dato-l">Teléfono</div><div class="dato-v">${u.telefono||'—'}</div></div>
+      <div class="dato"><div class="dato-l">Email</div><div class="dato-v">${u.email||'—'}</div></div>
+    </div>
+    <button class="btn-edit" onclick="abrirEditProf()">✏️ Editar mi perfil</button>
+  </div>
+  <div class="card" style="text-align:center;padding:18px">
+    <div style="font-size:.75rem;color:var(--txt2);margin-bottom:8px">Gestión completa de la app</div>
+    <a href="./index.html" style="display:inline-block;background:linear-gradient(135deg,var(--rojo),var(--rojo2));color:#fff;text-decoration:none;border-radius:10px;padding:11px 22px;font-size:.9rem;font-weight:600">📲 Abrir app de gestión</a>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  EDIT PANEL
+// ═══════════════════════════════════════════════════════════════════════
+var _editTipo = '';  // 'alumno' | 'profe'
+
+function abrirEditAl(){
+  _editTipo='alumno';
+  const al=(dataPerfil||{}).alumno||sesion.alumno||{};
+  document.getElementById('edit-tel').value=al.telefono||'';
+  document.getElementById('edit-email').value=al.email||'';
+  document.getElementById('edit-emerg').value=al.contacto_emergencia||'';
+  document.getElementById('edit-salud').value=al.salud||'';
+  document.getElementById('edit-extra-al').style.display='block';
+  _abrirEdit(al.foto);
+}
+function abrirEditProf(){
+  _editTipo='profe';
+  const u=(dataPerfil||{}).usuario||sesion.usuario||{};
+  document.getElementById('edit-tel').value=u.telefono||'';
+  document.getElementById('edit-email').value=u.email||'';
+  document.getElementById('edit-extra-al').style.display='none';
+  _abrirEdit(u.foto);
+}
+function _abrirEdit(fotoAct){
+  document.getElementById('edit-foto-file').value='';
+  document.getElementById('edit-foto-url').value='';
+  document.getElementById('edit-pwd-act').value='';
+  document.getElementById('edit-pwd-new').value='';
+  document.getElementById('save-msg').textContent='';
+  document.getElementById('save-msg').className='msg';
+  const prev=document.getElementById('edit-foto-prev');
+  if(fotoAct){prev.src=fotoAct;prev.classList.add('vis')}else prev.classList.remove('vis');
   document.getElementById('edit-panel').classList.add('vis');
 }
+function cerrarEdit(){document.getElementById('edit-panel').classList.remove('vis')}
 
-function cerrarEdit() {
-  document.getElementById('edit-panel').classList.remove('vis');
-}
-
-function prevFoto(input) {
-  var prev = document.getElementById('edit-foto-prev');
-  if (input.files && input.files[0]) {
-    var r = new FileReader();
-    r.onload = function(e){ prev.src = e.target.result; prev.classList.add('vis'); };
-    r.readAsDataURL(input.files[0]);
-    document.getElementById('edit-foto-url').value = '';
+function prevFoto(inp){
+  var prev=document.getElementById('edit-foto-prev');
+  if(inp.files&&inp.files[0]){
+    var r=new FileReader();
+    r.onload=e=>{prev.src=e.target.result;prev.classList.add('vis')};
+    r.readAsDataURL(inp.files[0]);
+    document.getElementById('edit-foto-url').value='';
   }
 }
-
-function prevFotoUrl(input) {
-  var prev = document.getElementById('edit-foto-prev');
-  var url = input.value.trim();
-  if (url) {
-    prev.src = url; prev.classList.add('vis');
-    document.getElementById('edit-foto-file').value = '';
-  } else {
-    prev.classList.remove('vis');
-  }
+function prevFotoUrl(inp){
+  var prev=document.getElementById('edit-foto-prev');
+  if(inp.value.trim()){prev.src=inp.value.trim();prev.classList.add('vis');document.getElementById('edit-foto-file').value=''}
+  else prev.classList.remove('vis');
 }
 
-async function guardarPerfil() {
-  var btn    = document.getElementById('btn-save');
-  var msgEl  = document.getElementById('save-msg');
-  msgEl.textContent = '';
-  msgEl.className = 'save-msg';
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin"></span> Guardando…';
-
-  try {
-    var datos = {};
-
-    // Foto: prioridad archivo > URL
-    var fotoFile = document.getElementById('edit-foto-file').files[0];
-    var fotoUrl  = document.getElementById('edit-foto-url').value.trim();
-    if (fotoFile) {
-      datos.foto = await new Promise(function(res,rej){
-        var r = new FileReader();
-        r.onload = function(e){ res(e.target.result); };
-        r.onerror = rej;
-        r.readAsDataURL(fotoFile);
-      });
-    } else if (fotoUrl) {
-      datos.foto = fotoUrl;
+async function guardarPerfil(){
+  const btn=document.getElementById('btn-save'),msgEl=document.getElementById('save-msg');
+  msgEl.textContent='';msgEl.className='msg';
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Guardando…';
+  try{
+    var datos={};
+    const fFile=document.getElementById('edit-foto-file').files[0];
+    const fUrl=document.getElementById('edit-foto-url').value.trim();
+    if(fFile){
+      datos.foto=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(fFile)});
+    }else if(fUrl)datos.foto=fUrl;
+    datos.telefono=document.getElementById('edit-tel').value.trim();
+    datos.email=document.getElementById('edit-email').value.trim();
+    if(_editTipo==='alumno'){
+      datos.contacto_emergencia=document.getElementById('edit-emerg').value.trim();
+      datos.salud=document.getElementById('edit-salud').value.trim();
     }
-
-    datos.telefono = document.getElementById('edit-tel').value.trim();
-    datos.email    = document.getElementById('edit-email').value.trim();
-    datos.contacto_emergencia = document.getElementById('edit-emerg').value.trim();
-    datos.salud    = document.getElementById('edit-salud').value.trim();
-
     // Cambio de contraseña
-    var pwdAct = document.getElementById('edit-pwd-act').value;
-    var pwdNew = document.getElementById('edit-pwd-new').value;
-    if (pwdNew) {
-      if (!pwdAct) { throw new Error('Ingresá tu contraseña actual para cambiarla'); }
-      var hashAct = await sha256(pwdAct);
-      if (hashAct !== sesion.pwdHash) throw new Error('La contraseña actual es incorrecta');
-      if (pwdNew.length < 6) throw new Error('La nueva contraseña debe tener al menos 6 caracteres');
-      datos.nueva_pwd = await sha256(pwdNew);
+    const pAct=document.getElementById('edit-pwd-act').value;
+    const pNew=document.getElementById('edit-pwd-new').value;
+    if(pNew){
+      if(!pAct)throw new Error('Ingresá tu contraseña actual');
+      if(await sha256(pAct)!==sesion.pwdHash)throw new Error('La contraseña actual es incorrecta');
+      if(pNew.length<6)throw new Error('La nueva contraseña debe tener al menos 6 caracteres');
+      datos.nueva_pwd=await sha256(pNew);
     }
-
-    var res = await post({ accion:'update_perfil', dni:sesion.dni, pwd:sesion.pwdHash, datos:datos });
-    if (!res.ok) throw new Error(res.error || 'Error al guardar');
-
-    // Si cambió la contraseña, actualizar sesión
-    if (datos.nueva_pwd) {
-      sesion.pwdHash = datos.nueva_pwd;
-      localStorage.setItem(SESSION_KEY, JSON.stringify(sesion));
-    }
-
-    msgEl.textContent = '✅ Perfil actualizado correctamente';
-    msgEl.className = 'save-msg save-ok';
-
-    // Recargar perfil
-    setTimeout(function(){ cerrarEdit(); cargarPerfil(); }, 1500);
-
-  } catch(e) {
-    msgEl.textContent = '⚠️ '+e.message;
-    msgEl.className = 'save-msg save-err';
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = 'Guardar';
-  }
+    const accion=_editTipo==='alumno'?'update_perfil':'update_perfil_usuario';
+    const r=await post({accion,dni:sesion.dni,pwd:sesion.pwdHash,datos});
+    if(!r.ok)throw new Error(r.error||'Error al guardar');
+    if(datos.nueva_pwd){sesion.pwdHash=datos.nueva_pwd;localStorage.setItem(SESSION_KEY,JSON.stringify(sesion))}
+    msgEl.textContent='✅ Perfil actualizado';msgEl.className='msg ok';
+    setTimeout(()=>{cerrarEdit();cargarPerfil()},1400);
+  }catch(e){msgEl.textContent='⚠️ '+e.message;msgEl.className='msg err'}
+  finally{btn.disabled=false;btn.innerHTML='Guardar'}
 }
 
-// ── LOGOUT ────────────────────────────────────────────────────────────
-function logout() {
+// ─── LOGOUT ───────────────────────────────────────────────────────────
+function logout(){
   localStorage.removeItem(SESSION_KEY);
-  sesion = null; dataPerfil = null;
-  document.getElementById('inp-dni').value = '';
-  document.getElementById('inp-pwd').value = '';
+  sesion=null;dataPerfil=null;asiEstados={};asiActId='';asiFecha='';
+  document.getElementById('alumno-view').style.display='none';
+  document.getElementById('profe-view').style.display='none';
+  document.getElementById('inp-dni').value='';
+  document.getElementById('inp-pwd').value='';
   document.getElementById('login-err').classList.remove('vis');
   mostrarLogin();
 }
-
-// Cerrar edit con Escape
-document.addEventListener('keydown', function(e){
-  if (e.key==='Escape') cerrarEdit();
-});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrarEdit()});
 </script>
 </body>
 </html>

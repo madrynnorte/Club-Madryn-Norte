@@ -362,20 +362,33 @@ function doPost(e) {
       return respOk({ message: 'Inscripción recibida' });
     }
 
-    // ── Login alumno (portal) ──
-    if (accion === 'login_alumno') {
-      const dniA   = String(body.dni  || '').trim();
-      const pwdA   = String(body.pwd  || '').trim();
-      if (!dniA || !pwdA) return respErr('DNI y contraseña requeridos');
+    // ── Login unificado portal (alumno o usuario/profe por DNI) ──
+    if (accion === 'login_portal' || accion === 'login_alumno') {
+      const dniIn = String(body.dni || '').trim();
+      const pwdIn = String(body.pwd || '').trim();
+      if (!dniIn || !pwdIn) return respErr('DNI y contraseña requeridos');
+      // Buscar en alumnos primero
       const alumnos = leerHoja('alumnos');
       const al = alumnos.find(function(a) {
-        return String(a.dni).trim() === dniA && a.estado !== 'baja';
+        return String(a.dni || '').trim() === dniIn && a.estado !== 'baja';
       });
-      if (!al) return respErr('DNI no encontrado o alumno dado de baja');
-      if (!al.password) return respErr('Contraseña no configurada. Contactá al club para obtenerla.');
-      if (String(al.password).trim() !== pwdA) return respErr('Contraseña incorrecta');
-      const safe = Object.assign({}, al); delete safe.password;
-      return respOk({ alumno: safe });
+      if (al && al.password && String(al.password).trim() === pwdIn) {
+        const safe = Object.assign({}, al); delete safe.password;
+        return respOk({ tipo: 'alumno', alumno: safe });
+      }
+      // Buscar en usuarios (profes / admin)
+      const usuarios = leerHoja('usuarios');
+      const u = usuarios.find(function(u) {
+        return String(u.dni || '').trim() === dniIn && u.activo !== false;
+      });
+      if (u && u.password && String(u.password).trim() === pwdIn) {
+        const safe = Object.assign({}, u); delete safe.password;
+        return respOk({ tipo: 'usuario', usuario: safe });
+      }
+      // Mensaje de error informativo
+      if (al && !al.password) return respErr('Contraseña no configurada. Contactá al club para obtenerla.');
+      if (u && !u.password) return respErr('Contraseña no configurada. Contactá al administrador.');
+      return respErr('DNI o contraseña incorrectos');
     }
 
     // ── Obtener perfil completo (portal alumno) ──
@@ -393,6 +406,88 @@ function doPost(e) {
       const acts  = leerHoja('actividades');
       const cuotas = leerHoja('cuotas').filter(function(c) { return String(c.alumno_id) === String(al.id); });
       return respOk({ alumno: safe, inscripciones: insc, actividades: acts, cuotas: cuotas });
+    }
+
+    // ── Obtener perfil profe completo (portal) ──
+    if (accion === 'get_perfil_prof') {
+      const dniU = String(body.dni || '').trim();
+      const pwdU = String(body.pwd || '').trim();
+      const usuarios = leerHoja('usuarios');
+      const u = usuarios.find(function(u) {
+        return String(u.dni || '').trim() === dniU && u.activo !== false;
+      });
+      if (!u || !u.password || String(u.password).trim() !== pwdU) return respErr('No autorizado');
+      const safe = Object.assign({}, u); delete safe.password;
+      const acts = leerHoja('actividades').filter(function(a) {
+        return String(a.profesor_id) === String(u.id) && a.estado === 'activa';
+      });
+      const actIds = acts.map(function(a) { return String(a.id); });
+      const insc = leerHoja('inscripciones').filter(function(i) {
+        return actIds.indexOf(String(i.actividad_id)) >= 0 && i.estado === 'activa';
+      });
+      const alumIds = insc.map(function(i) { return String(i.alumno_id); })
+        .filter(function(v,i,arr){ return arr.indexOf(v)===i; });
+      const alumnos = leerHoja('alumnos')
+        .filter(function(a) { return alumIds.indexOf(String(a.id)) >= 0; })
+        .map(function(a) { var c=Object.assign({},a); delete c.password; return c; });
+      // Asistencia de los últimos 30 días para sus actividades
+      const hace30 = Utilities.formatDate(new Date(new Date().getTime()-30*24*60*60*1000),'UTC','yyyy-MM-dd');
+      const asist = leerHoja('asistencia').filter(function(r) {
+        return actIds.indexOf(String(r.actividad_id)) >= 0 && String(r.fecha||'') >= hace30;
+      });
+      return respOk({ usuario: safe, actividades: acts, inscripciones: insc, alumnos: alumnos, asistencia: asist });
+    }
+
+    // ── Guardar asistencia desde el portal del profe ──
+    if (accion === 'guardar_asistencia_portal') {
+      const dniU = String(body.dni || '').trim();
+      const pwdU = String(body.pwd || '').trim();
+      const usuarios = leerHoja('usuarios');
+      const u = usuarios.find(function(u) {
+        return String(u.dni || '').trim() === dniU && u.activo !== false;
+      });
+      if (!u || !u.password || String(u.password).trim() !== pwdU) return respErr('No autorizado');
+      var registros = body.registros || [];
+      var asistencia = leerHoja('asistencia');
+      registros.forEach(function(reg) {
+        var existe = asistencia.find(function(r) {
+          return String(r.alumno_id)===String(reg.alumno_id) &&
+                 String(r.actividad_id)===String(reg.actividad_id) &&
+                 String(r.fecha)===String(reg.fecha);
+        });
+        if (existe) {
+          actualizarFila('asistencia', existe.id, { estado: reg.estado, observacion: reg.observacion||'', registrado_por: (u.nombre||'')+(u.apellido?' '+u.apellido:'')+' (portal)' });
+        } else {
+          insertarFila('asistencia', {
+            id: 'pa_'+new Date().getTime()+'_'+Math.random().toString(36).slice(2,5),
+            alumno_id: reg.alumno_id, actividad_id: reg.actividad_id,
+            fecha: reg.fecha, estado: reg.estado, observacion: reg.observacion||'',
+            registrado_por: (u.nombre||'')+(u.apellido?' '+u.apellido:'')+' (portal)'
+          });
+        }
+      });
+      return respOk({ message: 'Asistencia guardada: '+registros.length+' registros' });
+    }
+
+    // ── Actualizar perfil usuario/profe (portal) ──
+    if (accion === 'update_perfil_usuario') {
+      const dniU = String(body.dni || '').trim();
+      const pwdU = String(body.pwd || '').trim();
+      const usuarios = leerHoja('usuarios');
+      const u = usuarios.find(function(u) {
+        return String(u.dni || '').trim() === dniU && u.activo !== false;
+      });
+      if (!u || !u.password || String(u.password).trim() !== pwdU) return respErr('No autorizado');
+      const newData = {};
+      if (datos.foto && datos.foto.length > 100 && datos.foto.startsWith('data:')) {
+        const nom = (u.nombre||'usuario')+'_'+(u.dni||Date.now());
+        const url = guardarFotoEnDrive(datos.foto, nom);
+        if (url) newData.foto = url;
+      } else if (datos.foto) { newData.foto = datos.foto; }
+      ['telefono','email'].forEach(function(k) { if (datos[k]!==undefined) newData[k]=datos[k]; });
+      if (datos.nueva_pwd) newData.password = datos.nueva_pwd;
+      actualizarFila('usuarios', u.id, newData);
+      return respOk({ message: 'Perfil actualizado' });
     }
 
     // ── Actualizar perfil (portal alumno) ──

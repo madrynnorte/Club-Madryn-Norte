@@ -1,4 +1,4 @@
-const CACHE = 'madryn-norte-v3';
+const CACHE = 'madryn-norte-v4';
 const OFFLINE_HTML = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sin conexión — Madryn Norte</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui,sans-serif;background:linear-gradient(135deg,#7f1d1d,#166534);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}.card{background:#fff;border-radius:16px;padding:36px 28px;max-width:340px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)}.ico{font-size:52px;margin-bottom:16px}.t{font-size:20px;font-weight:700;color:#0f2318;margin-bottom:10px}.s{font-size:14px;color:#4d6557;line-height:1.6}</style></head><body><div class="card"><div class="ico">📵</div><div class="t">Sin conexión</div><div class="s">Abrí Madryn Norte cuando tengas internet.</div></div></body></html>`;
 
 self.addEventListener('install', e => {

@@ -351,7 +351,13 @@ tbody tr:hover td{background:var(--cr)}
           <button class="btn btn-o btn-sm" onclick="editarValSocio()">Editar</button>
         </div>
       </div>
-      <div class="ag" id="grid-acts"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+        <input class="fc" id="fil-dep-act" placeholder="🔍 Deporte…" style="width:140px" oninput="renderActs()">
+        <input class="fc" id="fil-cat-act" placeholder="Categoría…" style="width:130px" oninput="renderActs()">
+        <select class="fc" id="fil-prof-act" style="width:160px" onchange="renderActs()"><option value="">— Todos los profes —</option></select>
+        <select class="fc" id="fil-est-act" style="width:130px" onchange="renderActs()"><option value="activa">Solo activas</option><option value="">Todas</option><option value="inactiva">Solo inactivas</option></select>
+      </div>
+      <div id="grid-acts"></div>
     </div>
 
     <div class="page" id="page-cuotas">
@@ -472,9 +478,9 @@ tbody tr:hover td{background:var(--cr)}
   <div class="mh"><span class="mt" id="m-act-t">Nueva actividad</span><button class="bx" onclick="cerrar('m-act')">×</button></div>
   <div class="mb">
     <input type="hidden" id="act-id">
-    <div class="fg"><label class="fl">Nombre *</label><input class="fc" id="act-nom"></div>
-    <div class="frow"><div class="fg"><label class="fl">Instructor/a</label><select class="fc" id="act-prof"><option value="">Sin asignar</option></select></div><div class="fg"><label class="fl">Estado</label><select class="fc" id="act-est"><option value="activa">Activa</option><option value="inactiva">Inactiva</option></select></div></div>
-    <div class="fg"><label class="fl">Días y horarios</label><input class="fc" id="act-hor" placeholder="Lunes y Miércoles 16:00-17:30"></div>
+    <div class="frow"><div class="fg"><label class="fl">Nombre *</label><input class="fc" id="act-nom"></div><div class="fg"><label class="fl">Deporte / Disciplina</label><input class="fc" id="act-dep" placeholder="Ej: Fútbol, Hockey, Natación"></div></div>
+    <div class="frow"><div class="fg"><label class="fl">Categoría</label><input class="fc" id="act-cat" placeholder="Ej: Infantil, Juvenil, Adultos"></div><div class="fg"><label class="fl">Estado</label><select class="fc" id="act-est"><option value="activa">Activa</option><option value="inactiva">Inactiva</option></select></div></div>
+    <div class="frow"><div class="fg"><label class="fl">Instructor/a</label><select class="fc" id="act-prof"><option value="">Sin asignar</option></select></div><div class="fg"><label class="fl">Días y horarios</label><input class="fc" id="act-hor" placeholder="Lunes y Miércoles 16:00-17:30"></div></div>
     <div class="frow"><div class="fg"><label class="fl">Valor mensual ($)</label><input class="fc" type="number" id="act-val"></div><div class="fg"><label class="fl">Cupo máximo</label><input class="fc" type="number" id="act-cupo"></div></div>
   </div>
   <div class="mf"><button class="btn btn-o" onclick="cerrar('m-act')">Cancelar</button><button class="btn btn-p" id="btn-act" onclick="guardarAct()">Guardar</button></div>
@@ -813,7 +819,7 @@ function _nextIdCompartido(){
 function nuevoIdPersona(){
   const next=_nextIdCompartido();
   if(db.contadores)db.contadores.personas=next;
-  return String(next);
+  return 'A'+String(next);
 }
 function nuevoIdUsuario(){
   const next=_nextIdCompartido();
@@ -1143,7 +1149,7 @@ function abrirMAl(){
   toggleMenorAl(false);toggleDescPct();document.querySelectorAll('.al-act-cb').forEach(cb=>cb.checked=false);abrir('m-al');
 }
 function editAl(id){
-  const al=db.alumnos.find(a=>a.id===id);if(!al)return;
+  const al=db.alumnos.find(a=>String(a.id)===String(id));if(!al)return;
   document.getElementById('al-id').value=al.id;
   document.getElementById('al-nom').value=al.nombre||'';document.getElementById('al-ape').value=al.apellido||'';
   document.getElementById('al-dni').value=al.dni||'';document.getElementById('al-fnac').value=al.fecha_nacimiento||'';
@@ -1196,10 +1202,33 @@ async function delAl(id){
 
 function renderActs(){
   const valSocio=parseFloat(db.config?.valor_cuota_socio||0);
-  const el=document.getElementById('val-socio-txt');
-  if(el)el.textContent=fpeso(valSocio);
-  const isA=CU.rol==='admin';const acts=isA?db.actividades:db.actividades.filter(a=>String(a.profesor_id)===String(CU.id||''));
-  document.getElementById('grid-acts').innerHTML=acts.map(a=>{const prof=db.usuarios.find(u=>u.id===a.profesor_id),cnt=db.inscripciones.filter(i=>i.actividad_id===a.id&&i.estado==='activa').length,pct=a.cupo_maximo?Math.round(cnt/Number(a.cupo_maximo)*100):0;return`<div class="ac"><div class="ac-h"><div class="acn">${a.nombre}</div><div class="acp">${prof?'👨‍🏫 '+prof.nombre:'Sin asignar'}</div></div><div class="acb"><div class="acm">🕐 ${a.dias_horarios||'Sin horario'}</div><div class="acm">💰 ${fpeso(a.valor_mensual)}/mes</div><div class="abl"><span>Inscriptos</span><span>${cnt}/${a.cupo_maximo||'∞'}</span></div><div class="ab"><div class="abf" style="width:${pct}%"></div></div></div>${isA?`<div class="acf"><button class="btn btn-o btn-sm" style="flex:1" onclick="editAct('${a.id}')">Editar</button><button class="btn btn-g btn-sm" onclick="delAct('${a.id}')">🗑️</button></div>`:''}</div>`}).join('')||'<div class="empty"><div class="eico">🏃</div><p>Sin actividades</p></div>';
+  const el=document.getElementById('val-socio-txt');if(el)el.textContent=fpeso(valSocio);
+  const isA=CU.rol==='admin';
+  let acts=isA?db.actividades:db.actividades.filter(a=>String(a.profesor_id)===String(CU.id||''));
+  // filtros de agrupación
+  const fDep=(document.getElementById('fil-dep-act')?.value||'').toLowerCase();
+  const fCat=(document.getElementById('fil-cat-act')?.value||'').toLowerCase();
+  const fProf=document.getElementById('fil-prof-act')?.value||'';
+  const fEst=document.getElementById('fil-est-act')?.value||'activa';
+  if(fEst)acts=acts.filter(a=>a.estado===fEst);
+  if(fDep)acts=acts.filter(a=>(a.deporte||'').toLowerCase().includes(fDep));
+  if(fCat)acts=acts.filter(a=>(a.categoria||'').toLowerCase().includes(fCat));
+  if(fProf)acts=acts.filter(a=>String(a.profesor_id||'')===fProf);
+  // agrupar por deporte
+  const grupos={};acts.forEach(a=>{const k=a.deporte||'Sin deporte';if(!grupos[k])grupos[k]=[];grupos[k].push(a)});
+  const html=Object.entries(grupos).map(([dep,lista])=>`
+    <div style="margin-bottom:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--gt);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--gb)">${dep}</div>
+      <div class="ag">${lista.map(a=>{
+        const prof=db.usuarios.find(u=>String(u.id)===String(a.profesor_id));
+        const cnt=db.inscripciones.filter(i=>String(i.actividad_id)===String(a.id)&&i.estado==='activa').length;
+        const pct=a.cupo_maximo?Math.round(cnt/Number(a.cupo_maximo)*100):0;
+        const catBadge=a.categoria?`<span style="background:var(--vc);color:var(--vd);font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600">${a.categoria}</span>`:'';
+        const inact=a.estado==='inactiva'?'<span style="background:#fef3c7;color:#92400e;font-size:10px;padding:2px 8px;border-radius:99px;margin-left:4px">Inactiva</span>':'';
+        return`<div class="ac"><div class="ac-h"><div class="acn">${a.nombre} ${inact}</div><div class="acp" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">${catBadge}${prof?`<span style="color:rgba(255,255,255,.7);font-size:11px">👨‍🏫 ${prof.nombre}</span>`:''}</div></div><div class="acb"><div class="acm">🕐 ${a.dias_horarios||'Sin horario'}</div><div class="acm">💰 ${fpeso(a.valor_mensual)}/mes</div><div class="abl"><span>Inscriptos</span><span>${cnt}/${a.cupo_maximo||'∞'}</span></div><div class="ab"><div class="abf" style="width:${pct}%"></div></div></div>${isA?`<div class="acf"><button class="btn btn-o btn-sm" style="flex:1" onclick="editAct('${a.id}')">Editar</button><button class="btn btn-g btn-sm" onclick="delAct('${a.id}')">🗑️</button></div>`:''}</div>`
+      }).join('')}</div>
+    </div>`).join('')||'<div class="empty"><div class="eico">🏃</div><p>Sin actividades</p></div>';
+  document.getElementById('grid-acts').innerHTML=html;
 }
 function editarValSocio(){
   const actual=parseFloat(db.config?.valor_cuota_socio||0);
@@ -1211,9 +1240,9 @@ function editarValSocio(){
     renderActs();toast('Cuota de membresía → '+fpeso(val));
   }).catch(e=>toast('Error: '+e.message,'err'));
 }
-function abrirMAct(){document.getElementById('act-id').value='';document.getElementById('m-act-t').textContent='Nueva actividad';['act-nom','act-hor','act-val','act-cupo'].forEach(id=>document.getElementById(id).value='');document.getElementById('act-prof').value='';document.getElementById('act-est').value='activa';abrir('m-act')}
-function editAct(id){const a=db.actividades.find(x=>x.id===id);if(!a)return;document.getElementById('act-id').value=a.id;document.getElementById('act-nom').value=a.nombre||'';document.getElementById('act-prof').value=a.profesor_id||'';document.getElementById('act-est').value=a.estado||'activa';document.getElementById('act-hor').value=a.dias_horarios||'';document.getElementById('act-val').value=a.valor_mensual||'';document.getElementById('act-cupo').value=a.cupo_maximo||'';document.getElementById('m-act-t').textContent='Editar actividad';abrir('m-act')}
-async function guardarAct(){const id=document.getElementById('act-id').value,nom=document.getElementById('act-nom').value.trim();if(!nom){toast('Nombre obligatorio','err');return}btnOff('btn-act');const d={nombre:nom,profesor_id:document.getElementById('act-prof').value||null,estado:document.getElementById('act-est').value,dias_horarios:document.getElementById('act-hor').value.trim(),valor_mensual:parseFloat(document.getElementById('act-val').value)||0,cupo_maximo:parseInt(document.getElementById('act-cupo').value)||null};try{if(id){const ix=db.actividades.findIndex(a=>a.id===id);db.actividades[ix]={...db.actividades[ix],...d};await guardar('actualizar','actividades',id,d);toast('Actividad actualizada')}else{const slug=actSlug(nom);const nid=db.actividades.find(a=>a.id===slug)?slug+'-'+Date.now().toString(36):slug;const n={id:nid,...d};db.actividades.push(n);await guardar('insertar','actividades',null,n);toast('Actividad creada')}cerrar('m-act');renderActs();initSels()}catch(e){toast('Error: '+e.message,'err')}btnOn('btn-act')}
+function abrirMAct(){document.getElementById('act-id').value='';document.getElementById('m-act-t').textContent='Nueva actividad';['act-nom','act-dep','act-cat','act-hor','act-val','act-cupo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});document.getElementById('act-prof').value='';document.getElementById('act-est').value='activa';abrir('m-act')}
+function editAct(id){const a=db.actividades.find(x=>x.id===id);if(!a)return;document.getElementById('act-id').value=a.id;document.getElementById('act-nom').value=a.nombre||'';const depEl=document.getElementById('act-dep');if(depEl)depEl.value=a.deporte||'';const catEl=document.getElementById('act-cat');if(catEl)catEl.value=a.categoria||'';document.getElementById('act-prof').value=a.profesor_id||'';document.getElementById('act-est').value=a.estado||'activa';document.getElementById('act-hor').value=a.dias_horarios||'';document.getElementById('act-val').value=a.valor_mensual||'';document.getElementById('act-cupo').value=a.cupo_maximo||'';document.getElementById('m-act-t').textContent='Editar actividad';abrir('m-act')}
+async function guardarAct(){const id=document.getElementById('act-id').value,nom=document.getElementById('act-nom').value.trim();if(!nom){toast('Nombre obligatorio','err');return}btnOff('btn-act');const d={nombre:nom,deporte:(document.getElementById('act-dep')?.value||'').trim(),categoria:(document.getElementById('act-cat')?.value||'').trim(),profesor_id:document.getElementById('act-prof').value||null,estado:document.getElementById('act-est').value,dias_horarios:document.getElementById('act-hor').value.trim(),valor_mensual:parseFloat(document.getElementById('act-val').value)||0,cupo_maximo:parseInt(document.getElementById('act-cupo').value)||null};try{if(id){const ix=db.actividades.findIndex(a=>a.id===id);db.actividades[ix]={...db.actividades[ix],...d};await guardar('actualizar','actividades',id,d);toast('Actividad actualizada')}else{const slug=actSlug(nom);const nid=db.actividades.find(a=>a.id===slug)?slug+'-'+Date.now().toString(36):slug;const n={id:nid,...d};db.actividades.push(n);await guardar('insertar','actividades',null,n);toast('Actividad creada')}cerrar('m-act');renderActs();initSels()}catch(e){toast('Error: '+e.message,'err')}btnOn('btn-act')}
 async function delAct(id){if(!confirm('¿Eliminar?'))return;try{db.actividades=db.actividades.filter(a=>a.id!==id);await guardar('eliminar','actividades',id,null);renderActs();initSels();toast('Eliminada')}catch(e){toast('Error','err')}}
 
 function initFilMes(){const sel=document.getElementById('fil-mes'),m=[];for(let i=-3;i<=1;i++){const d=new Date(HOY.getFullYear(),HOY.getMonth()+i,1);m.push(d.toISOString().slice(0,7))}sel.innerHTML=m.map(x=>`<option value="${x}" ${x===MES?'selected':''}>${fmes(x)}</option>`).join('')}
@@ -1416,7 +1445,7 @@ function recalcMonto(){
 let DET_AL_ID=null;
 function verDetalleAl(alId){
   DET_AL_ID=alId;
-  const al=db.alumnos.find(a=>a.id===alId);
+  const al=db.alumnos.find(a=>String(a.id)===String(alId));
   if(!al)return;
   document.getElementById('m-al-det-t').textContent=al.nombre+' '+al.apellido;
   renderDetBody(alId);
@@ -1734,7 +1763,7 @@ function generarQRProf(){const link=document.getElementById('link-pub-prof').tex
 function generarQR(){const link=document.getElementById('link-pub').textContent;const qr=document.getElementById('qr-box');qr.style.display='block';qr.innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(link)}&color=1a6636&bgcolor=f8faf9" style="border-radius:8px;border:1px solid var(--gb)" alt="QR"><div style="font-size:12px;color:var(--gt);margin-top:8px">Escaneá para inscribirse</div>`}
 function copiarLink(){navigator.clipboard.writeText(document.getElementById('link-pub').textContent).then(()=>toast('Link copiado ✓')).catch(()=>toast('Copiá el link manualmente'))}
 function verCarnet(id){
-  const al=db.alumnos.find(a=>a.id===id);if(!al)return;
+  const al=db.alumnos.find(a=>String(a.id)===String(id));if(!al)return;
   const acts=getAlActs(id);
   const alCuotas=db.cuotas.filter(c=>String(c.alumno_id)===String(id));
   const mesesConCuota=[...new Set(alCuotas.map(c=>String(c.mes_anio).slice(0,7)))].sort((a,b)=>b.localeCompare(a));
@@ -1759,7 +1788,6 @@ function _carnetHTML(al,acts,cuotaColor,cuotaTxt,fotoUrl,edadNum,estVis){
     <div style="background:linear-gradient(135deg,#7f1d1d 0%,#991b1b 55%,#166534 100%);padding:16px 16px 28px;text-align:center;position:relative">
       <div style="font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.75);text-transform:uppercase;margin-bottom:2px">Complejo Deportivo</div>
       <div style="font-size:17px;font-weight:700;color:#fff;letter-spacing:.06em">MADRYN NORTE</div>
-      <div style="position:absolute;top:10px;right:12px;background:rgba(255,255,255,.15);border-radius:6px;padding:2px 8px;font-size:10px;color:rgba(255,255,255,.9);font-weight:600">Ficha N° ${al.id}</div>
     </div>
     <div style="background:#fff;padding:0 16px 16px;position:relative">
       <div style="display:flex;gap:14px;margin-top:-24px;align-items:flex-end;margin-bottom:12px">
@@ -1854,7 +1882,9 @@ function exportCSV(){const rows=[['Nombre','Apellido','DNI','Edad','Actividades'
 
 function initSels(){
   document.getElementById('al-acts-list').innerHTML=db.actividades.filter(a=>a.estado==='activa').map(a=>`<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:2px 0"><input type="checkbox" class="al-act-cb" value="${a.id}" style="width:15px;height:15px;accent-color:var(--vd);cursor:pointer"> ${a.nombre}</label>`).join('')||'<span style="font-size:13px;color:var(--g2)">Sin actividades activas</span>';
-  document.getElementById('act-prof').innerHTML='<option value="">Sin asignar</option>'+db.usuarios.filter(u=>u.rol==='profesor').map(u=>`<option value="${u.id}">${u.nombre}</option>`).join('');
+  const profsOpts=db.usuarios.filter(u=>u.rol==='profesor').map(u=>`<option value="${u.id}">${u.nombre}</option>`).join('');
+  document.getElementById('act-prof').innerHTML='<option value="">Sin asignar</option>'+profsOpts;
+  const fpActEl=document.getElementById('fil-prof-act');if(fpActEl)fpActEl.innerHTML='<option value="">— Todos los profes —</option>'+profsOpts;
   const isA=CU?.rol==='admin';
   const cuId=String(CU?.id||'');
   const actsPro=isA?null:db.actividades.filter(a=>String(a.profesor_id)===cuId).map(a=>String(a.id));

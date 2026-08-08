@@ -730,7 +730,17 @@ async function loginUser(){
 }
 
 function volverLogin(){document.getElementById('no-access').style.display='none';mostrarLogin()}
-function resetCfg(){localStorage.removeItem(CFG_KEY);location.reload()}
+function resetCfg(){
+  const url=prompt('URL del servidor (Apps Script):\n\nPegá la URL nueva o dejá la actual:',cfg.scriptUrl||'');
+  if(url===null)return; // canceló
+  const u=url.trim();
+  if(!u){toast('URL vacía — no se cambió nada','err');return}
+  if(!u.includes('script.google.com')){toast('URL inválida — debe ser de Apps Script','err');return}
+  cfg.scriptUrl=u;
+  localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
+  localStorage.removeItem('mn_db_cache');
+  toast('URL actualizada ✓');
+}
 function cerrarSesion(){CU=null;localStorage.removeItem('mn_session');document.getElementById('app').style.display='none';mostrarLogin()}
 async function actualizarDatos(){const b=document.getElementById('btn-refresh');b.textContent='↻…';b.disabled=true;await cargarTodo();renderPag();b.textContent='↻';b.disabled=false;toast('Datos actualizados ✓')}
 

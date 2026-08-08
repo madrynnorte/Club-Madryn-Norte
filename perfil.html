@@ -166,6 +166,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <p>Cargando…</p>
 </div>
 
+<!-- ACTIVACIÓN (primer ingreso via link) -->
+<div id="act-view" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:24px;padding-top:calc(24px + var(--saf))">
+  <div class="login-logo">
+    <img src="./escudo.png" alt="Escudo">
+    <h1>Madryn Norte</h1>
+    <p id="act-subtit">Completá tu acceso al portal</p>
+  </div>
+  <div class="login-card">
+    <h2>🔐 Primer ingreso</h2>
+    <p style="font-size:.8rem;color:var(--txt2);margin-bottom:16px;line-height:1.5">Ingresá tu DNI y elegí una contraseña para acceder al portal desde ahora.</p>
+    <div class="err-box" id="act-err"></div>
+    <div class="fgroup">
+      <label class="fl">Tu DNI</label>
+      <input class="fc" id="act-dni" type="text" inputmode="numeric" placeholder="Número de documento">
+    </div>
+    <div class="fgroup">
+      <label class="fl">Elegí una contraseña</label>
+      <input class="fc" id="act-pwd" type="password" placeholder="Mínimo 6 caracteres">
+    </div>
+    <div class="fgroup" style="margin-bottom:18px">
+      <label class="fl">Repetí la contraseña</label>
+      <input class="fc" id="act-pwd2" type="password" placeholder="Igual que la anterior">
+    </div>
+    <button class="btn-p" id="btn-act" onclick="doActivar()">Activar mi acceso</button>
+  </div>
+</div>
+
 <!-- LOGIN -->
 <div id="login-view">
   <div class="login-logo">
@@ -294,6 +321,15 @@ window.addEventListener('load',function(){
   // Obtener URL del script desde caché de la app principal
   try{var cfg=JSON.parse(localStorage.getItem('mn_config')||'{}');if(cfg.scriptUrl)SCRIPT_URL=cfg.scriptUrl}catch(e){}
   if(!SCRIPT_URL){try{var db=JSON.parse(localStorage.getItem('mn_db_cache')||'{}');if(db.config&&db.config.scriptUrl)SCRIPT_URL=db.config.scriptUrl}catch(e){}}
+
+  // ¿Viene de un link de invitación?
+  var invToken=new URLSearchParams(window.location.search).get('inv');
+  if(invToken){
+    hideSpl();
+    document.getElementById('act-view').style.display='flex';
+    return;
+  }
+
   // Restaurar sesión
   try{
     var sv=localStorage.getItem(SESSION_KEY);
@@ -301,6 +337,34 @@ window.addEventListener('load',function(){
   }catch(e){localStorage.removeItem(SESSION_KEY)}
   hideSpl();mostrarLogin();
 });
+
+// ─── ACTIVACIÓN ───────────────────────────────────────────────────────
+async function doActivar(){
+  var errB=document.getElementById('act-err'),btn=document.getElementById('btn-act');
+  errB.classList.remove('vis');
+  var invToken=new URLSearchParams(window.location.search).get('inv');
+  var dni=document.getElementById('act-dni').value.trim();
+  var pwd=document.getElementById('act-pwd').value;
+  var pwd2=document.getElementById('act-pwd2').value;
+  if(!dni){showErr(errB,'Ingresá tu DNI');return}
+  if(!pwd||pwd.length<6){showErr(errB,'La contraseña debe tener al menos 6 caracteres');return}
+  if(pwd!==pwd2){showErr(errB,'Las contraseñas no coinciden');return}
+  if(!SCRIPT_URL){showErr(errB,'No hay conexión con el servidor. Pedile el link al administrador.');return}
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Activando…';
+  try{
+    var h=await sha256(pwd);
+    var r=await post({accion:'activar_portal',token:invToken,dni,pwd:h});
+    if(!r.ok){showErr(errB,r.error||'Error al activar');return}
+    // Login automático
+    sesion={dni,pwdHash:h,tipo:r.data.tipo,usuario:r.data.usuario};
+    localStorage.setItem(SESSION_KEY,JSON.stringify(sesion));
+    // Quitar ?inv= de la URL sin recargar
+    window.history.replaceState({},'',window.location.pathname);
+    document.getElementById('act-view').style.display='none';
+    routeApp();cargarPerfil();
+  }catch(e){showErr(errB,'Error de conexión. Verificá tu internet.')}
+  finally{btn.disabled=false;btn.innerHTML='Activar mi acceso'}
+}
 function hideSpl(){var s=document.getElementById('splash');s.classList.add('out');setTimeout(()=>s.style.display='none',450)}
 function mostrarLogin(){document.getElementById('login-view').style.display='flex'}
 function routeApp(){

@@ -548,6 +548,29 @@ function doPost(e) {
       return respOk({ message: 'Configuración guardada' });
     }
 
+    // ── Activar portal (primer ingreso profe via link de invitación) ──
+    if (accion === 'activar_portal') {
+      const token  = String(body.token || '').trim();
+      const dniNew = String(body.dni   || '').trim();
+      const pwdH   = String(body.pwd   || '').trim();
+      if (!token || !dniNew || !pwdH) return respErr('Faltan datos');
+      // Decodificar token → userId
+      var userId;
+      try {
+        var bytes = Utilities.base64DecodeWebSafe(token);
+        userId = String.fromCharCode.apply(null, bytes);
+      } catch(e) { return respErr('Token inválido'); }
+      const usuarios = leerHoja('usuarios');
+      const u = usuarios.find(function(u) { return String(u.id) === String(userId) && u.activo !== false; });
+      if (!u) return respErr('Link inválido o usuario inactivo');
+      // Verificar que el DNI no esté en uso por otro usuario
+      const dniOcupado = usuarios.find(function(x) { return String(x.id) !== String(userId) && String(x.dni||'').trim() === dniNew; });
+      if (dniOcupado) return respErr('Ese DNI ya está registrado con otro usuario');
+      actualizarFila('usuarios', userId, { dni: dniNew, password: pwdH });
+      const safe = Object.assign({}, u, { dni: dniNew }); delete safe.password;
+      return respOk({ tipo: 'usuario', usuario: safe });
+    }
+
     return respErr('Acción no reconocida: ' + accion);
   } catch (ex) {
     return respErr(ex.message);
@@ -696,6 +719,58 @@ function arreglarIds() {
 
   Logger.log('IDs corregidos. Alumnos: ' + Object.keys(alIdMap).length +
              '. Actividades: ' + Object.keys(actIdMap).length);
+}
+
+// ── Corregir IDs numéricos de alumnos ─────────────────────────────
+// Busca alumnos con ID solo numérico (ej: 1014) y los renombra a A1014.
+// Actualiza las referencias en inscripciones, cuotas y asistencia.
+// Ejecutar UNA sola vez desde el editor de Apps Script.
+function fixAlumnoIds() {
+  const ss = getSS();
+  const shAl = ss.getSheetByName('alumnos');
+  if (!shAl || shAl.getLastRow() < 2) { Logger.log('Sin datos en alumnos'); return; }
+
+  const alVals = shAl.getDataRange().getValues();
+  const alH = alVals[0].map(String);
+  const alIdIdx = alH.indexOf('id');
+  if (alIdIdx < 0) { Logger.log('No se encontró columna id'); return; }
+
+  // Detectar IDs puramente numéricos
+  const toFix = [];
+  for (var i = 1; i < alVals.length; i++) {
+    var id = String(alVals[i][alIdIdx]).trim();
+    if (/^\d+$/.test(id)) {
+      toFix.push({ row: i + 1, oldId: id, newId: 'A' + id });
+    }
+  }
+
+  if (!toFix.length) { Logger.log('No hay IDs numéricos para corregir. Todo bien.'); return; }
+
+  // 1. Corregir en la hoja alumnos
+  toFix.forEach(function(f) {
+    shAl.getRange(f.row, alIdIdx + 1).setValue(f.newId);
+    Logger.log('alumnos: ' + f.oldId + ' → ' + f.newId);
+  });
+
+  // 2. Corregir alumno_id en inscripciones, cuotas, asistencia
+  ['inscripciones', 'cuotas', 'asistencia'].forEach(function(nombre) {
+    var sh = ss.getSheetByName(nombre);
+    if (!sh || sh.getLastRow() < 2) return;
+    var vals = sh.getDataRange().getValues();
+    var h = vals[0].map(String);
+    var col = h.indexOf('alumno_id');
+    if (col < 0) return;
+    for (var r = 1; r < vals.length; r++) {
+      var aid = String(vals[r][col]).trim();
+      var fix = toFix.find(function(f) { return f.oldId === aid; });
+      if (fix) {
+        sh.getRange(r + 1, col + 1).setValue(fix.newId);
+        Logger.log(nombre + ' fila ' + (r+1) + ': ' + aid + ' → ' + fix.newId);
+      }
+    }
+  });
+
+  Logger.log('✅ Listo. IDs corregidos: ' + toFix.map(function(f){return f.oldId+'→'+f.newId}).join(', '));
 }
 
 // Agrega 10 alumnos ficticios (observaciones="PRUEBA") a cada actividad sin inscriptos

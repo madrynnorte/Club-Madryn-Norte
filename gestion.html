@@ -764,24 +764,23 @@ async function guardarUrl(){
   const u=document.getElementById('url-inp').value.trim();
   if(!u){toast('Ingresá la URL','err');return}
   if(!u.includes('script.google.com')){toast('URL inválida','err');return}
-  cfg.scriptUrl=u;
-  localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
-  cerrar('m-url');
-  toast('Conectando con nuevo servidor…');
-  // Intentar conectar con la nueva URL SIN borrar sesión ni caché hasta confirmar
+  const btn=document.querySelector('#m-url .btn-p');
+  if(btn){btn.disabled=true;btn.textContent='Verificando…'}
   try{
-    const r=await apig({accion:'todo'});
-    if(r.ok&&r.data){
-      db=r.data;
-      ['usuarios','actividades','alumnos','inscripciones','cuotas','asistencia','nuevos'].forEach(k=>{if(!db[k])db[k]=[]});
-      if(!db.config)db.config={};
-      if(!db.contadores)db.contadores={personas:1000,usuarios:1};
-      localStorage.setItem('mn_db_cache',JSON.stringify(db));
-      renderPag();
-      toast('✓ URL actualizada y datos sincronizados');
-    }else throw new Error(r.error||'Sin respuesta');
+    // 1. Probar la URL NUEVA sin tocar nada del estado actual
+    const r=await fetch(u+'?'+new URLSearchParams({accion:'todo'}).toString(),{redirect:'follow'});
+    const data=JSON.parse(await r.text());
+    if(!data.ok)throw new Error(data.error||'Sin respuesta del servidor');
+    // 2. URL válida: guardar y recargar limpio (la sesión sobrevive, el caché viejo no)
+    cfg.scriptUrl=u;
+    localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
+    localStorage.removeItem('mn_db_cache');
+    cerrar('m-url');
+    toast('✓ URL guardada. Recargando…');
+    setTimeout(()=>location.reload(),1200);
   }catch(e){
-    toast('⚠️ URL guardada pero no se pudo conectar. Intentá recargar.','err');
+    toast('No se pudo conectar con esa URL: '+(e.message||'Error desconocido'),'err');
+    if(btn){btn.disabled=false;btn.textContent='Guardar'}
   }
 }
 function cerrarSesion(){CU=null;localStorage.removeItem('mn_session');document.getElementById('app').style.display='none';mostrarLogin()}

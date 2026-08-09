@@ -268,7 +268,7 @@ tbody tr:hover td{background:var(--cr)}
 <div class="mbg" id="m-url"><div class="modal" style="max-width:420px">
   <div class="mh"><span class="mt">⚙️ URL del servidor</span><button class="bx" onclick="cerrar('m-url')">×</button></div>
   <div class="mb">
-    <p style="font-size:13px;color:var(--gs);margin-bottom:12px">Pegá la URL del Apps Script (empieza con <code>https://script.google.com</code>)</p>
+    <p style="font-size:13px;color:var(--gs);margin-bottom:12px">Pegá la URL nueva y guardá. Vas a tener que volver a ingresar con tu usuario.</p>
     <div class="fg"><label class="fl">URL actual / nueva</label><input class="fc" id="url-inp" type="url" placeholder="https://script.google.com/macros/s/…/exec"></div>
   </div>
   <div class="mf">
@@ -757,31 +757,23 @@ async function loginUser(){
 
 function volverLogin(){document.getElementById('no-access').style.display='none';mostrarLogin()}
 function resetCfg(){
+  // Cierra sesión primero para evitar conflictos de estado
+  CU=null;
+  localStorage.removeItem('mn_session');
+  localStorage.removeItem('mn_db_cache');
+  document.getElementById('app').style.display='none';
+  mostrarLogin();
   document.getElementById('url-inp').value=cfg.scriptUrl||'';
-  abrir('m-url');
+  setTimeout(()=>abrir('m-url'),150);
 }
-async function guardarUrl(){
+function guardarUrl(){
   const u=document.getElementById('url-inp').value.trim();
   if(!u){toast('Ingresá la URL','err');return}
   if(!u.includes('script.google.com')){toast('URL inválida','err');return}
-  const btn=document.querySelector('#m-url .btn-p');
-  if(btn){btn.disabled=true;btn.textContent='Verificando…'}
-  try{
-    // 1. Probar la URL NUEVA sin tocar nada del estado actual
-    const r=await fetch(u+'?'+new URLSearchParams({accion:'todo'}).toString(),{redirect:'follow'});
-    const data=JSON.parse(await r.text());
-    if(!data.ok)throw new Error(data.error||'Sin respuesta del servidor');
-    // 2. URL válida: guardar y recargar limpio (la sesión sobrevive, el caché viejo no)
-    cfg.scriptUrl=u;
-    localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
-    localStorage.removeItem('mn_db_cache');
-    cerrar('m-url');
-    toast('✓ URL guardada. Recargando…');
-    setTimeout(()=>location.reload(),1200);
-  }catch(e){
-    toast('No se pudo conectar con esa URL: '+(e.message||'Error desconocido'),'err');
-    if(btn){btn.disabled=false;btn.textContent='Guardar'}
-  }
+  cfg.scriptUrl=u;
+  localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
+  cerrar('m-url');
+  toast('✓ URL guardada. Ingresá con tu usuario y contraseña.');
 }
 function cerrarSesion(){CU=null;localStorage.removeItem('mn_session');document.getElementById('app').style.display='none';mostrarLogin()}
 async function actualizarDatos(){const b=document.getElementById('btn-refresh');b.textContent='↻…';b.disabled=true;await cargarTodo();renderPag();b.textContent='↻';b.disabled=false;toast('Datos actualizados ✓')}

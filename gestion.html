@@ -608,16 +608,20 @@ window.addEventListener('load',()=>{
     const sv=localStorage.getItem('mn_session');
     const dc=localStorage.getItem('mn_db_cache');
     if(sv&&dc){
+      let okS=false,okC=false;
+      try{CU=JSON.parse(sv);okS=true}catch(e){localStorage.removeItem('mn_session')}
       try{
-        CU=JSON.parse(sv);
         db=JSON.parse(dc);
         ['usuarios','actividades','alumnos','inscripciones','cuotas','asistencia','nuevos'].forEach(k=>{if(!db[k])db[k]=[]});
         if(!db.config)db.config={};
         if(!db.contadores)db.contadores={personas:1000,usuarios:1};
+        okC=true;
+      }catch(e){localStorage.removeItem('mn_db_cache')}
+      if(okS&&okC){
         hideSpl();iniciarSesion();
         cargarTodo().then(()=>renderPag()).catch(()=>{});
         return;
-      }catch(e){localStorage.removeItem('mn_session');localStorage.removeItem('mn_db_cache')}
+      }
     }
   }
   setSpl('Iniciando…');

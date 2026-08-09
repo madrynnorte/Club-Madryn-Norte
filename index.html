@@ -629,7 +629,7 @@ window.addEventListener('load',()=>{
       hideSpl();mostrarLogin();
     }else if(cfg.scriptUrl){
       const sv=localStorage.getItem('mn_session');
-      if(sv){try{CU=JSON.parse(sv);setSpl('Restaurando sesión…');await cargarTodo();hideSpl();iniciarSesion();return}catch(e){localStorage.removeItem('mn_session')}}
+      if(sv){try{CU=JSON.parse(sv);setSpl('Restaurando sesión…');await cargarTodo();hideSpl();iniciarSesion();return}catch(e){}}
       hideSpl();mostrarLogin();
     }else{hideSpl();document.getElementById('setup').style.display='flex'}
   },900);
@@ -756,15 +756,29 @@ function resetCfg(){
   document.getElementById('url-inp').value=cfg.scriptUrl||'';
   abrir('m-url');
 }
-function guardarUrl(){
+async function guardarUrl(){
   const u=document.getElementById('url-inp').value.trim();
   if(!u){toast('Ingresá la URL','err');return}
   if(!u.includes('script.google.com')){toast('URL inválida','err');return}
   cfg.scriptUrl=u;
   localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
-  localStorage.removeItem('mn_db_cache');
   cerrar('m-url');
-  toast('URL actualizada ✓');
+  toast('Conectando con nuevo servidor…');
+  // Intentar conectar con la nueva URL SIN borrar sesión ni caché hasta confirmar
+  try{
+    const r=await apig({accion:'todo'});
+    if(r.ok&&r.data){
+      db=r.data;
+      ['usuarios','actividades','alumnos','inscripciones','cuotas','asistencia','nuevos'].forEach(k=>{if(!db[k])db[k]=[]});
+      if(!db.config)db.config={};
+      if(!db.contadores)db.contadores={personas:1000,usuarios:1};
+      localStorage.setItem('mn_db_cache',JSON.stringify(db));
+      renderPag();
+      toast('✓ URL actualizada y datos sincronizados');
+    }else throw new Error(r.error||'Sin respuesta');
+  }catch(e){
+    toast('⚠️ URL guardada pero no se pudo conectar. Intentá recargar.','err');
+  }
 }
 function cerrarSesion(){CU=null;localStorage.removeItem('mn_session');document.getElementById('app').style.display='none';mostrarLogin()}
 async function actualizarDatos(){const b=document.getElementById('btn-refresh');b.textContent='↻…';b.disabled=true;await cargarTodo();renderPag();b.textContent='↻';b.disabled=false;toast('Datos actualizados ✓')}
@@ -828,7 +842,7 @@ function salirVistaPro(){
   buildNav();navA('dashboard');toast('Volviste al modo admin');
 }
 function updBadge(){const nb=document.getElementById('nav-inscripcion');if(!nb)return;const cnt=(db.nuevos||[]).filter(i=>i.estado==='pendiente').length;const ex=nb.querySelector('.nb-badge');if(ex)ex.remove();if(cnt>0)nb.innerHTML+=`<span class="nb-badge">${cnt}</span>`}
-function navA(page){
+function navA(page, pushState=true){
   if(PAG==='asistencia'&&page!=='asistencia'&&asiModificado){guardarAsi().catch(()=>{})}
   PAG=page;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -838,8 +852,16 @@ function navA(page){
   document.getElementById('tb-title').textContent=PT[page]||page;
   closeSB();
   ({home:renderHome,dashboard:renderDash,alumnos:renderAlumnos,actividades:renderActs,cuotas:renderCuotas,asistencia:renderAsi,usuarios:renderUs,inscripcion:renderInsc,'mis-actividades':renderMis})[page]?.();
+  if(pushState) history.pushState({page}, '', '');
 }
-function renderPag(){navA(PAG)}
+function renderPag(){navA(PAG, false)}
+window.addEventListener('popstate', e=>{
+  // Si hay un modal abierto, cerrarlo en vez de salir
+  const abierto = document.querySelector('.mbg.open');
+  if(abierto){abierto.classList.remove('open');history.pushState({page:PAG},'','');return}
+  // Si hay sesión activa, navegar a home en lugar de salir de la app
+  if(CU){const dest=e.state?.page||'home';navA(dest,false);history.pushState({page:dest},'','');return}
+});
 
 function uid(){return 'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function actSlug(nombre){return nombre.toLowerCase().replace(/[áàä]/g,'a').replace(/[éèë]/g,'e').replace(/[íìï]/g,'i').replace(/[óòö]/g,'o').replace(/[úùü]/g,'u').replace(/ñ/g,'n').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}

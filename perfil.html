@@ -264,13 +264,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div id="edit-panel">
   <div class="edit-card">
     <h3>✏️ Editar perfil</h3>
+
+    <!-- Foto -->
     <div class="fgroup">
-      <label class="fl">Subir foto</label>
+      <label class="fl">Foto de perfil</label>
       <img id="edit-foto-prev" class="foto-prev" src="" alt="">
-      <input type="file" accept="image/*" id="edit-foto-file" class="fc" style="padding:6px" onchange="prevFoto(this)">
-      <p class="foto-hint">O pegá una URL:</p>
-      <input class="fc" id="edit-foto-url" type="url" placeholder="https://…" style="margin-top:5px" oninput="prevFotoUrl(this)">
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--bg2);border:1.5px solid var(--bord);border-radius:9px;padding:10px;cursor:pointer;font-size:.85rem;color:var(--txt3)">
+          📷 Cámara
+          <input type="file" accept="image/*" capture="environment" id="edit-foto-cam" style="display:none" onchange="prevFoto(this,'edit-foto-file')">
+        </label>
+        <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--bg2);border:1.5px solid var(--bord);border-radius:9px;padding:10px;cursor:pointer;font-size:.85rem;color:var(--txt3)">
+          🖼️ Galería
+          <input type="file" accept="image/*" id="edit-foto-file" style="display:none" onchange="prevFoto(this,'edit-foto-cam')">
+        </label>
+      </div>
     </div>
+
+    <!-- Contacto -->
     <div class="edit-row">
       <div class="fgroup">
         <label class="fl">Teléfono</label>
@@ -281,16 +292,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <input class="fc" id="edit-email" type="email">
       </div>
     </div>
+
+    <!-- Extra alumno -->
     <div id="edit-extra-al">
       <div class="fgroup">
-        <label class="fl">Contacto emergencia</label>
-        <input class="fc" id="edit-emerg">
+        <label class="fl">Contacto de emergencia</label>
+        <input class="fc" id="edit-emerg" placeholder="Nombre y teléfono">
       </div>
-      <div class="fgroup" style="margin-bottom:0">
+      <div class="fgroup">
         <label class="fl">Condición de salud</label>
-        <input class="fc" id="edit-salud" placeholder="Alergias, lesiones…">
+        <input class="fc" id="edit-salud" placeholder="Alergias, lesiones, medicación…">
+      </div>
+      <div class="fgroup">
+        <label class="fl">Observaciones</label>
+        <input class="fc" id="edit-obs" placeholder="Cualquier dato adicional">
+      </div>
+      <!-- Responsable (menores) -->
+      <div id="edit-resp-sec" style="display:none;border-top:1px solid var(--bord);margin-top:12px;padding-top:12px">
+        <div style="font-size:.78rem;font-weight:600;color:var(--txt2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px">👨‍👩‍👧 Responsable</div>
+        <div class="edit-row">
+          <div class="fgroup"><label class="fl">Nombre</label><input class="fc" id="edit-rnom"></div>
+          <div class="fgroup"><label class="fl">DNI</label><input class="fc" id="edit-rdni" type="text" inputmode="numeric"></div>
+        </div>
+        <div class="edit-row">
+          <div class="fgroup"><label class="fl">Vínculo</label><input class="fc" id="edit-rvin" placeholder="Mamá, Papá, Tutor…"></div>
+          <div class="fgroup"><label class="fl">Teléfono</label><input class="fc" id="edit-rtel" type="tel"></div>
+        </div>
       </div>
     </div>
+
     <div class="pwd-sec">
       <h4>🔑 Cambiar contraseña</h4>
       <div class="edit-row">
@@ -767,6 +797,17 @@ function abrirEditAl(){
   document.getElementById('edit-email').value=al.email||'';
   document.getElementById('edit-emerg').value=al.contacto_emergencia||'';
   document.getElementById('edit-salud').value=al.salud||'';
+  document.getElementById('edit-obs').value=al.observaciones||'';
+  // Responsable (menores)
+  const esM=al.es_menor==='Sí'||al.es_menor===true||al.es_menor==='true';
+  const respSec=document.getElementById('edit-resp-sec');
+  respSec.style.display=esM?'block':'none';
+  if(esM){
+    document.getElementById('edit-rnom').value=al.responsable_nombre||'';
+    document.getElementById('edit-rdni').value=al.responsable_dni||'';
+    document.getElementById('edit-rvin').value=al.responsable_vinculo||'';
+    document.getElementById('edit-rtel').value=al.responsable_telefono||'';
+  }
   document.getElementById('edit-extra-al').style.display='block';
   _abrirEdit(al.foto);
 }
@@ -791,19 +832,16 @@ function _abrirEdit(fotoAct){
 }
 function cerrarEdit(){document.getElementById('edit-panel').classList.remove('vis')}
 
-function prevFoto(inp){
+function prevFoto(inp, otroId){
   var prev=document.getElementById('edit-foto-prev');
   if(inp.files&&inp.files[0]){
     var r=new FileReader();
     r.onload=e=>{prev.src=e.target.result;prev.classList.add('vis')};
     r.readAsDataURL(inp.files[0]);
-    document.getElementById('edit-foto-url').value='';
+    // Limpiar el otro input de foto para que guardarPerfil use solo uno
+    var otro=document.getElementById(otroId);
+    if(otro)otro.value='';
   }
-}
-function prevFotoUrl(inp){
-  var prev=document.getElementById('edit-foto-prev');
-  if(inp.value.trim()){prev.src=inp.value.trim();prev.classList.add('vis');document.getElementById('edit-foto-file').value=''}
-  else prev.classList.remove('vis');
 }
 
 async function guardarPerfil(){
@@ -812,16 +850,26 @@ async function guardarPerfil(){
   btn.disabled=true;btn.innerHTML='<span class="spin"></span> Guardando…';
   try{
     var datos={};
+    // Foto: cámara o galería
+    const fCam=document.getElementById('edit-foto-cam').files[0];
     const fFile=document.getElementById('edit-foto-file').files[0];
-    const fUrl=document.getElementById('edit-foto-url').value.trim();
-    if(fFile){
-      datos.foto=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(fFile)});
-    }else if(fUrl)datos.foto=fUrl;
+    const fSrc=fCam||fFile;
+    if(fSrc){
+      datos.foto=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(fSrc)});
+    }
     datos.telefono=document.getElementById('edit-tel').value.trim();
     datos.email=document.getElementById('edit-email').value.trim();
     if(_editTipo==='alumno'){
       datos.contacto_emergencia=document.getElementById('edit-emerg').value.trim();
       datos.salud=document.getElementById('edit-salud').value.trim();
+      datos.observaciones=document.getElementById('edit-obs').value.trim();
+      const respSec=document.getElementById('edit-resp-sec');
+      if(respSec.style.display!=='none'){
+        datos.responsable_nombre=document.getElementById('edit-rnom').value.trim();
+        datos.responsable_dni=document.getElementById('edit-rdni').value.trim();
+        datos.responsable_vinculo=document.getElementById('edit-rvin').value.trim();
+        datos.responsable_telefono=document.getElementById('edit-rtel').value.trim();
+      }
     }
     // Cambio de contraseña
     const pAct=document.getElementById('edit-pwd-act').value;

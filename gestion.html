@@ -1332,7 +1332,16 @@ async function guardarAct(){const id=document.getElementById('act-id').value,nom
 async function delAct(id){if(!confirm('¿Eliminar?'))return;try{db.actividades=db.actividades.filter(a=>a.id!==id);await guardar('eliminar','actividades',id,null);renderActs();initSels();toast('Eliminada')}catch(e){toast('Error','err')}}
 
 function initFilMes(){const sel=document.getElementById('fil-mes'),m=[];for(let i=-3;i<=1;i++){const d=new Date(HOY.getFullYear(),HOY.getMonth()+i,1);m.push(d.toISOString().slice(0,7))}sel.innerHTML=m.map(x=>`<option value="${x}" ${x===MES?'selected':''}>${fmes(x)}</option>`).join('')}
-function initFilActCu(){const isA=CU?.rol==='admin';const cuId=String(CU?.id||'');const acts=isA?db.actividades:db.actividades.filter(a=>String(a.profesor_id)===cuId);document.getElementById('fil-act-cu').innerHTML='<option value="">— Todas las actividades —</option>'+(isA?'<option value="__socio__">🏅 Cuota de membresía</option>':'')+acts.map(a=>`<option value="${a.id}">${a.nombre}</option>`).join('')}
+function initFilActCu(){
+  const isA=CU?.rol==='admin';
+  const cuId=String(CU?.id||'');
+  // Solo actividades activas
+  const actsAll=db.actividades.filter(a=>a.estado==='activo'||a.estado==='activa');
+  const acts=isA?actsAll:actsAll.filter(a=>String(a.profesor_id)===cuId);
+  document.getElementById('fil-act-cu').innerHTML='<option value="">— Todas las actividades —</option>'+(isA?'<option value="__socio__">🏅 Cuota de membresía</option>':'')+acts.map(a=>`<option value="${a.id}">${a.nombre}</option>`).join('');
+  // Para el profe: auto-seleccionar su primera actividad para ver todos sus alumnos
+  if(!isA&&acts.length){document.getElementById('fil-act-cu').value=String(acts[0].id)}
+}
 function renderCuotas(){
   const mes=document.getElementById('fil-mes').value;
   const af=document.getElementById('fil-act-cu').value;
@@ -1882,7 +1891,7 @@ async function aprobar(){
 async function rechazar(){if(!vt)return;try{vt.estado='rechazado';await guardar('actualizar','nuevos',vt.id,{estado:'rechazado'});vt=null;cerrar('m-val');toast('Inscripción rechazada');renderInsc();renderDash();updBadge()}catch(e){toast('Error','err')}}
 
 function renderMis(){
-  const mis=db.actividades.filter(a=>String(a.profesor_id)===String(CU.id||''));
+  const mis=db.actividades.filter(a=>String(a.profesor_id)===String(CU.id||'')&&(a.estado==='activo'||a.estado==='activa'));
   document.getElementById('grid-mis').innerHTML=mis.map(a=>{
     const als=getActAls(a.id).filter(x=>x.estado==='activo'||x.estado==='provisional');
     return`<div class="ac"><div class="ac-h"><div class="acn">${a.nombre}</div><div class="acp">🕐 ${a.dias_horarios||'Sin horario'}</div></div><div class="acb"><div style="font-size:12px;font-weight:500;color:var(--gt);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Alumnos (${als.length})</div>${als.slice(0,8).map(al=>{const q=db.cuotas.find(c=>c.alumno_id===al.id&&c.actividad_id===a.id&&c.mes_anio===MES);const ico=q?.estado==='pagado'?'<span style="color:var(--vd)">✓</span>':q?.estado==='pendiente'?'<span style="color:var(--rg)">⚠</span>':'<span style="color:var(--g2)">○</span>';const prov=al.estado==='provisional'?'<span class="badge b-prov" style="font-size:10px;margin-left:4px">prov</span>':'';return`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:13px;border-bottom:1px solid var(--cr)"><span>${al.nombre} ${al.apellido}${prov}</span>${ico}</div>`}).join('')}${als.length>8?`<div style="font-size:12px;color:var(--g2);margin-top:6px">+${als.length-8} más</div>`:''}</div><div class="acf"><button class="btn btn-p btn-sm" style="flex:1" onclick="irAsi('${a.id}')">📋 Asistencia</button><button class="btn btn-o btn-sm" onclick="abrirProv('${a.id}')">+ Provisional</button></div></div>`;

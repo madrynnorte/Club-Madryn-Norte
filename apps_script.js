@@ -847,6 +847,152 @@ function onFormSubmit(e) {
 // ═══════════════════════════════════════════════════════════════════
 
 /**
+ * Limpia actividades viejas y deja solo las 4 correctas.
+ * Reasigna alumnos por keywords del nombre de actividad.
+ * Ejecutar UNA sola vez. Ver → Registros para confirmar.
+ */
+function migrarActividades() {
+  var ss = getSS();
+
+  // IDs de las 4 actividades destino (creadas por crearProfesYActividades)
+  var actividades = leerHoja('actividades');
+
+  function findAct(keywords) {
+    return actividades.find(function(a) {
+      var n = String(a.nombre||'').toLowerCase()
+        .replace(/[áä]/g,'a').replace(/[éë]/g,'e').replace(/[íï]/g,'i')
+        .replace(/[óö]/g,'o').replace(/[úü]/g,'u');
+      return keywords.some(function(k){ return n.indexOf(k) >= 0; });
+    });
+  }
+
+  var destinos = [
+    { keywords: ['futbol mayores','fútbol mayores','futsal mayores','entrenamiento de futbol mayor','entrenamiento futbol may'], target: 'Fútbol Mayores' },
+    { keywords: ['futbol juvenil','fútbol juvenil','futsal juvenil','futbol fem','femenino','entrenamiento de futbol juv'], target: 'Fútbol Juvenil' },
+    { keywords: ['arquero'],  target: 'Arqueros Mayores' },
+    { keywords: ['hockey'],   target: 'Hockey' },
+  ];
+
+  // Mapa: id_viejo → id_nuevo
+  var mapa = {};
+  var actDestIds = {};
+
+  destinos.forEach(function(d) {
+    var dest = actividades.find(function(a){ return String(a.nombre||'').trim() === d.target; });
+    if (!dest) { Logger.log('⚠️ No se encontró actividad destino: ' + d.target); return; }
+    actDestIds[d.target] = String(dest.id);
+    actividades.forEach(function(a) {
+      if (String(a.id) === String(dest.id)) return; // skip la propia
+      var n = String(a.nombre||'').toLowerCase()
+        .replace(/[áä]/g,'a').replace(/[éë]/g,'e').replace(/[íï]/g,'i')
+        .replace(/[óö]/g,'o').replace(/[úü]/g,'u');
+      var match = d.keywords.some(function(k){ return n.indexOf(k) >= 0; });
+      if (match && !mapa[String(a.id)]) {
+        mapa[String(a.id)] = String(dest.id);
+        Logger.log('Map: "' + a.nombre + '" → "' + d.target + '"');
+      }
+    });
+  });
+
+  // Las que no mapearon con ningún destino → inactivas directamente
+  actividades.forEach(function(a) {
+    var isDestino = Object.values(actDestIds).indexOf(String(a.id)) >= 0;
+    if (!isDestino && !mapa[String(a.id)]) {
+      Logger.log('Sin destino (se marcará inactiva): "' + a.nombre + '"');
+      mapa[String(a.id)] = '__borrar__';
+    }
+  });
+
+  // Reasignar inscripciones
+  var insc = leerHoja('inscripciones');
+  var inscMod = 0;
+  insc.forEach(function(i) {
+    var nuevo = mapa[String(i.actividad_id)];
+    if (!nuevo) return;
+    if (nuevo === '__borrar__') {
+      actualizarFila('inscripciones', i.id, { estado: 'baja' });
+      inscMod++;
+    } else {
+      // Verificar que no haya duplicado destino
+      var yaExiste = insc.find(function(x){ return String(x.alumno_id)===String(i.alumno_id) && String(x.actividad_id)===nuevo && x.estado==='activa'; });
+      if (!yaExiste) {
+        actualizarFila('inscripciones', i.id, { actividad_id: nuevo });
+      } else {
+        actualizarFila('inscripciones', i.id, { estado: 'baja' });
+      }
+      inscMod++;
+    }
+  });
+  Logger.log('Inscripciones modificadas: ' + inscMod);
+
+  // Reasignar cuotas
+  var cuotas = leerHoja('cuotas');
+  var cuMod = 0;
+  cuotas.forEach(function(c) {
+    var nuevo = mapa[String(c.actividad_id)];
+    if (!nuevo || nuevo === '__borrar__') return;
+    actualizarFila('cuotas', c.id, { actividad_id: nuevo });
+    cuMod++;
+  });
+  Logger.log('Cuotas reasignadas: ' + cuMod);
+
+  // Marcar actividades viejas como inactivas
+  Object.keys(mapa).forEach(function(oldId) {
+    actualizarFila('actividades', oldId, { estado: 'inactivo' });
+  });
+  Logger.log('Actividades viejas marcadas inactivas: ' + Object.keys(mapa).length);
+  Logger.log('✅ Migración completa. Revisá Ver → Registros.');
+}
+
+/**
+ * Genera cuotas PENDIENTES para todos los alumnos activos, para el mes indicado.
+ * Solo crea la cuota si NO existe ya una para ese alumno+actividad+mes.
+ * Por defecto genera septiembre 2026 (mes actual).
+ * Ejecutar UNA sola vez por mes.
+ */
+function generarCuotasMesActual() {
+  var MES_GENERAR = '2026-09'; // Cambiar si es otro mes
+  var alumnos = leerHoja('alumnos').filter(function(a){ return a.estado === 'activo' || a.estado === 'provisional'; });
+  var inscripciones = leerHoja('inscripciones').filter(function(i){ return i.estado === 'activa'; });
+  var actividades = leerHoja('actividades');
+  var cuotasExist = leerHoja('cuotas').filter(function(c){ return String(c.mes_anio||'').slice(0,7) === MES_GENERAR; });
+  var base = new Date().getTime();
+  var creadas = 0;
+  var saltadas = 0;
+
+  inscripciones.forEach(function(insc, idx) {
+    var al = alumnos.find(function(a){ return String(a.id) === String(insc.alumno_id); });
+    if (!al) return;
+    var act = actividades.find(function(a){ return String(a.id) === String(insc.actividad_id); });
+    if (!act || (act.estado !== 'activo' && act.estado !== 'activa')) return;
+    // ¿Ya existe cuota para este alumno+actividad+mes?
+    var existe = cuotasExist.find(function(c){
+      return String(c.alumno_id) === String(insc.alumno_id) &&
+             String(c.actividad_id) === String(insc.actividad_id);
+    });
+    if (existe) { saltadas++; return; }
+    var monto = Number(act.valor_mensual || 0);
+    var newId = 'cq_' + (base + idx);
+    insertarFila('cuotas', {
+      id: newId,
+      alumno_id: insc.alumno_id,
+      actividad_id: insc.actividad_id,
+      tipo: 'mensual',
+      mes_anio: MES_GENERAR,
+      monto: monto,
+      descuento: 0,
+      estado: 'pendiente',
+      medio_pago: '',
+      fecha_pago: '',
+      observaciones: ''
+    });
+    creadas++;
+  });
+
+  Logger.log('✅ Cuotas generadas para ' + MES_GENERAR + ': ' + creadas + ' nuevas, ' + saltadas + ' ya existían.');
+}
+
+/**
  * Crea los 4 profes y las 4 actividades de Madryn Norte.
  * CÓMO USARLA:
  *   1. Guardá el archivo en el editor de Apps Script

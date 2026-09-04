@@ -1000,6 +1000,53 @@ function generarCuotasMesActual() {
  *   3. Hacé clic en ▶ Ejecutar
  *   4. Revisá el log (Ver → Registros) para ver qué se creó
  */
+/**
+ * Reactiva las 4 actividades principales y las crea si no existen.
+ * Ejecutar si después de migrarActividades() no aparecen actividades.
+ */
+function repararActividades() {
+  var profes = [
+    { nombre: 'Marcos', apellido: 'Méndez',  actividad: 'Fútbol Mayores',   deporte: 'Fútbol',   categoria: 'Mayores' },
+    { nombre: 'Nuria',  apellido: 'Lamela',   actividad: 'Fútbol Juvenil',   deporte: 'Fútbol',   categoria: 'Juvenil' },
+    { nombre: 'Pablo',  apellido: 'Cárcamo',  actividad: 'Arqueros Mayores', deporte: 'Arqueros', categoria: 'Mayores' },
+    { nombre: 'Angie',  apellido: '',          actividad: 'Hockey',           deporte: 'Hockey',   categoria: 'General' }
+  ];
+  var usuarios = leerHoja('usuarios');
+  var actividades = leerHoja('actividades');
+  var base = new Date().getTime();
+
+  profes.forEach(function(p, idx) {
+    // Profe
+    var u = usuarios.find(function(x) {
+      return x.rol === 'profesor' &&
+             String(x.nombre||'').toLowerCase() === p.nombre.toLowerCase() &&
+             String(x.apellido||'').toLowerCase() === p.apellido.toLowerCase();
+    });
+    var profId;
+    if (u) {
+      profId = u.id;
+    } else {
+      profId = 'U' + (base + idx);
+      var usr = p.apellido
+        ? (p.nombre+'.'+p.apellido).toLowerCase().replace(/[áä]/g,'a').replace(/[éë]/g,'e').replace(/[íï]/g,'i').replace(/[óö]/g,'o').replace(/[úü]/g,'u').replace(/[^a-z.]/g,'')
+        : p.nombre.toLowerCase();
+      insertarFila('usuarios', { id: profId, nombre: p.nombre, apellido: p.apellido, username: usr, rol: 'profesor', activo: true, password: 'madryn2025' });
+      Logger.log('Profe creado: ' + p.nombre + ' ' + p.apellido);
+    }
+    // Actividad: buscar por nombre (independiente del estado)
+    var act = actividades.find(function(a) { return String(a.nombre||'').trim().toLowerCase() === p.actividad.toLowerCase(); });
+    if (act) {
+      actualizarFila('actividades', act.id, { estado: 'activo', profesor_id: profId });
+      Logger.log('Actividad reactivada: ' + p.actividad + ' (id: ' + act.id + ')');
+    } else {
+      var aId = 'AC' + (base + 100 + idx);
+      insertarFila('actividades', { id: aId, nombre: p.actividad, deporte: p.deporte, categoria: p.categoria, profesor_id: profId, estado: 'activo' });
+      Logger.log('Actividad creada: ' + p.actividad + ' (id: ' + aId + ')');
+    }
+  });
+  Logger.log('✅ Reparación completa. Verificá en Ver → Registros.');
+}
+
 function crearProfesYActividades() {
   var profes = [
     { nombre: 'Marcos', apellido: 'Méndez',  actividad: 'Fútbol Mayores',   deporte: 'Fútbol',   categoria: 'Mayores' },

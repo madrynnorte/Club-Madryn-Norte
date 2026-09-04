@@ -843,180 +843,26 @@ function onFormSubmit(e) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  SETUP INICIAL — Ejecutar desde el editor una sola vez
+//  SETUP — Ejecutar desde el editor (menú desplegable → ▶ Ejecutar)
 // ═══════════════════════════════════════════════════════════════════
 
 /**
- * Limpia actividades viejas y deja solo las 4 correctas.
- * Reasigna alumnos por keywords del nombre de actividad.
- * Ejecutar UNA sola vez. Ver → Registros para confirmar.
+ * PASO 1: Crea los 4 profes y las 4 actividades. Reactiva si ya existen.
+ * NO borra nada. Ejecutar primero.
  */
-function migrarActividades() {
-  var ss = getSS();
-
-  // IDs de las 4 actividades destino (creadas por crearProfesYActividades)
-  var actividades = leerHoja('actividades');
-
-  function findAct(keywords) {
-    return actividades.find(function(a) {
-      var n = String(a.nombre||'').toLowerCase()
-        .replace(/[áä]/g,'a').replace(/[éë]/g,'e').replace(/[íï]/g,'i')
-        .replace(/[óö]/g,'o').replace(/[úü]/g,'u');
-      return keywords.some(function(k){ return n.indexOf(k) >= 0; });
-    });
-  }
-
-  var destinos = [
-    { keywords: ['futbol mayores','fútbol mayores','futsal mayores','entrenamiento de futbol mayor','entrenamiento futbol may'], target: 'Fútbol Mayores' },
-    { keywords: ['futbol juvenil','fútbol juvenil','futsal juvenil','futbol fem','femenino','entrenamiento de futbol juv'], target: 'Fútbol Juvenil' },
-    { keywords: ['arquero'],  target: 'Arqueros Mayores' },
-    { keywords: ['hockey'],   target: 'Hockey' },
-  ];
-
-  // Mapa: id_viejo → id_nuevo
-  var mapa = {};
-  var actDestIds = {};
-
-  destinos.forEach(function(d) {
-    var dest = actividades.find(function(a){ return String(a.nombre||'').trim() === d.target; });
-    if (!dest) { Logger.log('⚠️ No se encontró actividad destino: ' + d.target); return; }
-    actDestIds[d.target] = String(dest.id);
-    actividades.forEach(function(a) {
-      if (String(a.id) === String(dest.id)) return; // skip la propia
-      var n = String(a.nombre||'').toLowerCase()
-        .replace(/[áä]/g,'a').replace(/[éë]/g,'e').replace(/[íï]/g,'i')
-        .replace(/[óö]/g,'o').replace(/[úü]/g,'u');
-      var match = d.keywords.some(function(k){ return n.indexOf(k) >= 0; });
-      if (match && !mapa[String(a.id)]) {
-        mapa[String(a.id)] = String(dest.id);
-        Logger.log('Map: "' + a.nombre + '" → "' + d.target + '"');
-      }
-    });
-  });
-
-  // Las que no mapearon con ningún destino → inactivas directamente
-  actividades.forEach(function(a) {
-    var isDestino = Object.values(actDestIds).indexOf(String(a.id)) >= 0;
-    if (!isDestino && !mapa[String(a.id)]) {
-      Logger.log('Sin destino (se marcará inactiva): "' + a.nombre + '"');
-      mapa[String(a.id)] = '__borrar__';
-    }
-  });
-
-  // Reasignar inscripciones
-  var insc = leerHoja('inscripciones');
-  var inscMod = 0;
-  insc.forEach(function(i) {
-    var nuevo = mapa[String(i.actividad_id)];
-    if (!nuevo) return;
-    if (nuevo === '__borrar__') {
-      actualizarFila('inscripciones', i.id, { estado: 'baja' });
-      inscMod++;
-    } else {
-      // Verificar que no haya duplicado destino
-      var yaExiste = insc.find(function(x){ return String(x.alumno_id)===String(i.alumno_id) && String(x.actividad_id)===nuevo && x.estado==='activa'; });
-      if (!yaExiste) {
-        actualizarFila('inscripciones', i.id, { actividad_id: nuevo });
-      } else {
-        actualizarFila('inscripciones', i.id, { estado: 'baja' });
-      }
-      inscMod++;
-    }
-  });
-  Logger.log('Inscripciones modificadas: ' + inscMod);
-
-  // Reasignar cuotas
-  var cuotas = leerHoja('cuotas');
-  var cuMod = 0;
-  cuotas.forEach(function(c) {
-    var nuevo = mapa[String(c.actividad_id)];
-    if (!nuevo || nuevo === '__borrar__') return;
-    actualizarFila('cuotas', c.id, { actividad_id: nuevo });
-    cuMod++;
-  });
-  Logger.log('Cuotas reasignadas: ' + cuMod);
-
-  // Marcar actividades viejas como inactivas
-  Object.keys(mapa).forEach(function(oldId) {
-    actualizarFila('actividades', oldId, { estado: 'inactivo' });
-  });
-  Logger.log('Actividades viejas marcadas inactivas: ' + Object.keys(mapa).length);
-  Logger.log('✅ Migración completa. Revisá Ver → Registros.');
-}
-
-/**
- * Genera cuotas PENDIENTES para todos los alumnos activos, para el mes indicado.
- * Solo crea la cuota si NO existe ya una para ese alumno+actividad+mes.
- * Por defecto genera septiembre 2026 (mes actual).
- * Ejecutar UNA sola vez por mes.
- */
-function generarCuotasMesActual() {
-  var MES_GENERAR = '2026-09'; // Cambiar si es otro mes
-  var alumnos = leerHoja('alumnos').filter(function(a){ return a.estado === 'activo' || a.estado === 'provisional'; });
-  var inscripciones = leerHoja('inscripciones').filter(function(i){ return i.estado === 'activa'; });
-  var actividades = leerHoja('actividades');
-  var cuotasExist = leerHoja('cuotas').filter(function(c){ return String(c.mes_anio||'').slice(0,7) === MES_GENERAR; });
-  var base = new Date().getTime();
-  var creadas = 0;
-  var saltadas = 0;
-
-  inscripciones.forEach(function(insc, idx) {
-    var al = alumnos.find(function(a){ return String(a.id) === String(insc.alumno_id); });
-    if (!al) return;
-    var act = actividades.find(function(a){ return String(a.id) === String(insc.actividad_id); });
-    if (!act || (act.estado !== 'activo' && act.estado !== 'activa')) return;
-    // ¿Ya existe cuota para este alumno+actividad+mes?
-    var existe = cuotasExist.find(function(c){
-      return String(c.alumno_id) === String(insc.alumno_id) &&
-             String(c.actividad_id) === String(insc.actividad_id);
-    });
-    if (existe) { saltadas++; return; }
-    var monto = Number(act.valor_mensual || 0);
-    var newId = 'cq_' + (base + idx);
-    insertarFila('cuotas', {
-      id: newId,
-      alumno_id: insc.alumno_id,
-      actividad_id: insc.actividad_id,
-      tipo: 'mensual',
-      mes_anio: MES_GENERAR,
-      monto: monto,
-      descuento: 0,
-      estado: 'pendiente',
-      medio_pago: '',
-      fecha_pago: '',
-      observaciones: ''
-    });
-    creadas++;
-  });
-
-  Logger.log('✅ Cuotas generadas para ' + MES_GENERAR + ': ' + creadas + ' nuevas, ' + saltadas + ' ya existían.');
-}
-
-/**
- * Crea los 4 profes y las 4 actividades de Madryn Norte.
- * CÓMO USARLA:
- *   1. Guardá el archivo en el editor de Apps Script
- *   2. En el menú desplegable de funciones (arriba), elegí "crearProfesYActividades"
- *   3. Hacé clic en ▶ Ejecutar
- *   4. Revisá el log (Ver → Registros) para ver qué se creó
- */
-/**
- * Reactiva las 4 actividades principales y las crea si no existen.
- * Ejecutar si después de migrarActividades() no aparecen actividades.
- */
-function repararActividades() {
-  var profes = [
+function setup_madryn() {
+  var CONFIG = [
     { nombre: 'Marcos', apellido: 'Méndez',  actividad: 'Fútbol Mayores',   deporte: 'Fútbol',   categoria: 'Mayores' },
     { nombre: 'Nuria',  apellido: 'Lamela',   actividad: 'Fútbol Juvenil',   deporte: 'Fútbol',   categoria: 'Juvenil' },
     { nombre: 'Pablo',  apellido: 'Cárcamo',  actividad: 'Arqueros Mayores', deporte: 'Arqueros', categoria: 'Mayores' },
     { nombre: 'Angie',  apellido: '',          actividad: 'Hockey',           deporte: 'Hockey',   categoria: 'General' }
   ];
-  var usuarios = leerHoja('usuarios');
+  var usuarios    = leerHoja('usuarios');
   var actividades = leerHoja('actividades');
   var base = new Date().getTime();
 
-  profes.forEach(function(p, idx) {
-    // Profe
+  CONFIG.forEach(function(p, idx) {
+    // ── Profe ──
     var u = usuarios.find(function(x) {
       return x.rol === 'profesor' &&
              String(x.nombre||'').toLowerCase() === p.nombre.toLowerCase() &&
@@ -1025,85 +871,55 @@ function repararActividades() {
     var profId;
     if (u) {
       profId = u.id;
+      Logger.log('Profe OK: ' + p.nombre + ' ' + p.apellido + ' (id:' + profId + ')');
     } else {
       profId = 'U' + (base + idx);
-      var usr = p.apellido
-        ? (p.nombre+'.'+p.apellido).toLowerCase().replace(/[áä]/g,'a').replace(/[éë]/g,'e').replace(/[íï]/g,'i').replace(/[óö]/g,'o').replace(/[úü]/g,'u').replace(/[^a-z.]/g,'')
-        : p.nombre.toLowerCase();
+      var usr = (p.apellido ? p.nombre+'.'+p.apellido : p.nombre).toLowerCase()
+        .replace(/[áäàâ]/g,'a').replace(/[éëèê]/g,'e').replace(/[íïìî]/g,'i')
+        .replace(/[óöòô]/g,'o').replace(/[úüùû]/g,'u').replace(/[ñ]/g,'n').replace(/[^a-z.]/g,'');
       insertarFila('usuarios', { id: profId, nombre: p.nombre, apellido: p.apellido, username: usr, rol: 'profesor', activo: true, password: 'madryn2025' });
-      Logger.log('Profe creado: ' + p.nombre + ' ' + p.apellido);
+      Logger.log('Profe CREADO: ' + p.nombre + ' ' + p.apellido + ' pwd:madryn2025');
     }
-    // Actividad: buscar por nombre (independiente del estado)
-    var act = actividades.find(function(a) { return String(a.nombre||'').trim().toLowerCase() === p.actividad.toLowerCase(); });
+    // ── Actividad ── busca por nombre sin importar estado ni mayúsculas
+    var act = actividades.find(function(a) {
+      return String(a.nombre||'').trim().toLowerCase() === p.actividad.toLowerCase();
+    });
     if (act) {
       actualizarFila('actividades', act.id, { estado: 'activo', profesor_id: profId });
-      Logger.log('Actividad reactivada: ' + p.actividad + ' (id: ' + act.id + ')');
+      Logger.log('Actividad REACTIVADA: ' + p.actividad + ' (id:' + act.id + ')');
     } else {
       var aId = 'AC' + (base + 100 + idx);
       insertarFila('actividades', { id: aId, nombre: p.actividad, deporte: p.deporte, categoria: p.categoria, profesor_id: profId, estado: 'activo' });
-      Logger.log('Actividad creada: ' + p.actividad + ' (id: ' + aId + ')');
+      Logger.log('Actividad CREADA: ' + p.actividad + ' (id:' + aId + ')');
     }
   });
-  Logger.log('✅ Reparación completa. Verificá en Ver → Registros.');
+  Logger.log('✅ setup_madryn listo. Ver → Registros para confirmar.');
 }
 
-function crearProfesYActividades() {
-  var profes = [
-    { nombre: 'Marcos', apellido: 'Méndez',  actividad: 'Fútbol Mayores',   deporte: 'Fútbol',   categoria: 'Mayores' },
-    { nombre: 'Nuria',  apellido: 'Lamela',   actividad: 'Fútbol Juvenil',   deporte: 'Fútbol',   categoria: 'Juvenil' },
-    { nombre: 'Pablo',  apellido: 'Cárcamo',  actividad: 'Arqueros Mayores', deporte: 'Arqueros', categoria: 'Mayores' },
-    { nombre: 'Angie',  apellido: '',          actividad: 'Hockey',           deporte: 'Hockey',   categoria: 'General' }
-  ];
-
-  var usuarios   = leerHoja('usuarios');
-  var actividades = leerHoja('actividades');
+/**
+ * PASO 2: Genera cuotas pendientes de septiembre 2026 para todos los alumnos activos.
+ * Solo crea cuotas que NO existen todavía.
+ */
+function generarCuotasMesActual() {
+  var MES = '2026-09';
+  var alumnos      = leerHoja('alumnos').filter(function(a){ return a.estado==='activo'||a.estado==='provisional'; });
+  var inscripciones= leerHoja('inscripciones').filter(function(i){ return i.estado==='activa'; });
+  var actividades  = leerHoja('actividades');
+  var cuotasExist  = leerHoja('cuotas').filter(function(c){ return String(c.mes_anio||'').slice(0,7)===MES; });
   var base = new Date().getTime();
+  var creadas=0, saltadas=0;
 
-  profes.forEach(function(p, idx) {
-    // ── Crear/encontrar profe ──
-    var uExiste = usuarios.find(function(u) {
-      return u.rol === 'profesor' &&
-             String(u.nombre||'').toLowerCase() === p.nombre.toLowerCase() &&
-             String(u.apellido||'').toLowerCase() === p.apellido.toLowerCase();
-    });
-    var profId;
-    if (uExiste) {
-      profId = uExiste.id;
-      Logger.log('Profe ya existe: ' + p.nombre + ' ' + p.apellido + ' (id: ' + profId + ')');
-    } else {
-      profId = 'U' + (base + idx);
-      var usr = p.apellido
-        ? (p.nombre + '.' + p.apellido).toLowerCase()
-            .replace(/[áäàâ]/g,'a').replace(/[éëèê]/g,'e').replace(/[íïìî]/g,'i')
-            .replace(/[óöòô]/g,'o').replace(/[úüùû]/g,'u').replace(/[^a-z.]/g,'')
-        : p.nombre.toLowerCase();
-      insertarFila('usuarios', {
-        id: profId, nombre: p.nombre, apellido: p.apellido,
-        username: usr, rol: 'profesor', activo: true, password: 'madryn2025'
-      });
-      Logger.log('Profe creado: ' + p.nombre + ' ' + p.apellido + ' — id: ' + profId + ' — pwd: madryn2025');
-    }
-
-    // ── Crear/encontrar actividad ──
-    var aExiste = actividades.find(function(a) {
-      return String(a.nombre||'').toLowerCase() === p.actividad.toLowerCase();
-    });
-    if (aExiste) {
-      if (!aExiste.profesor_id || String(aExiste.profesor_id).trim() === '') {
-        actualizarFila('actividades', aExiste.id, { profesor_id: profId });
-      }
-      Logger.log('Actividad ya existe: ' + p.actividad + ' (id: ' + aExiste.id + ')');
-    } else {
-      var aId = 'AC' + (base + 100 + idx);
-      insertarFila('actividades', {
-        id: aId, nombre: p.actividad, deporte: p.deporte,
-        categoria: p.categoria, profesor_id: profId, estado: 'activo'
-      });
-      Logger.log('Actividad creada: ' + p.actividad + ' — id: ' + aId);
-    }
+  inscripciones.forEach(function(insc, idx) {
+    var al  = alumnos.find(function(a){ return String(a.id)===String(insc.alumno_id); });
+    if (!al) return;
+    var act = actividades.find(function(a){ return String(a.id)===String(insc.actividad_id)&&(a.estado==='activo'||a.estado==='activa'); });
+    if (!act) return;
+    var existe = cuotasExist.find(function(c){ return String(c.alumno_id)===String(insc.alumno_id)&&String(c.actividad_id)===String(insc.actividad_id); });
+    if (existe) { saltadas++; return; }
+    insertarFila('cuotas', { id:'cq_'+(base+idx), alumno_id:insc.alumno_id, actividad_id:insc.actividad_id, tipo:'mensual', mes_anio:MES, monto:Number(act.valor_mensual||0), descuento:0, estado:'pendiente', medio_pago:'', fecha_pago:'', observaciones:'' });
+    creadas++;
   });
-
-  Logger.log('✅ Listo. Abrí Ver → Registros para ver el detalle.');
+  Logger.log('✅ Cuotas '+ MES +': '+ creadas +' creadas, '+ saltadas +' ya existían.');
 }
 
 // ═══════════════════════════════════════════════════════════════════

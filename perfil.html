@@ -952,7 +952,7 @@ function renderActsProfe(){
         if(est==='pagado'||est==='pagada')cuotaHTML=`<span class="cbadge cb-p" style="margin-left:6px">✅ Pago</span>`;
         else if(est==='bonificado'||est==='bonificada')cuotaHTML=`<span class="cbadge cb-b" style="margin-left:6px">🎁 Bon.</span>`;
         else if(est==='parcial')cuotaHTML=`<span class="cbadge cb-pa" style="margin-left:6px">⚠️ Parcial</span>`;
-        else cuotaHTML=`<button onclick='abrirPago(${JSON.stringify({alumno_id:al.id,actividad_id:a.id,mes:cuMesActual,nombre:al.nombre,cuota:null})})' style="margin-left:6px;border:none;border-radius:6px;padding:2px 7px;font-size:.65rem;font-weight:600;background:var(--rojo);color:#fff;cursor:pointer">💰 Pagar</button>`;
+        else cuotaHTML=`<span class="cbadge cb-pe" style="margin-left:6px">⏳ Sin pago</span>`;
         return`<div class="al-chip">${foto}<div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:500">${al.nombre} ${al.apellido||''} ${cuotaHTML}</div><div style="font-size:.72rem;color:var(--txt2)">DNI ${al.dni||'—'}${waTel}</div></div></div>`;
       }).join(''):'<div style="font-size:.8rem;color:var(--txt2);padding:6px 0">Sin alumnos inscriptos</div>';
       return`<div class="disc-act-blk">

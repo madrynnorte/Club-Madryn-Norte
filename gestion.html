@@ -797,8 +797,8 @@ function iniciarSesion(){
   if(!DEMO)setInterval(async()=>{try{await cargarTodo();renderPag()}catch(e){}},120000);
 }
 
-const NVA=[{id:'home',l:'Inicio',i:'🏠'},{id:'dashboard',l:'Panel general',i:'📊'},{id:'alumnos',l:'Alumnos y Colaboradores',i:'👥'},{id:'actividades',l:'Actividades',i:'🏃'},{id:'cuotas',l:'Cuotas',i:'💰'},{id:'asistencia',l:'Asistencia',i:'✅'},{id:'inscripcion',l:'Formulario público',i:'📬'},{id:'usuarios',l:'Usuarios',i:'👤'}];
-const NVP=[{id:'home',l:'Inicio',i:'🏠'},{id:'mis-actividades',l:'Mis actividades',i:'🏃'},{id:'cuotas',l:'Cuotas',i:'💰'},{id:'asistencia',l:'Asistencia',i:'✅'}];
+const NVA=[{id:'home',l:'Inicio',i:'🏠'},{id:'cuotas',l:'Cuotas',i:'💰'},{id:'alumnos',l:'Alumnos',i:'👥'},{id:'actividades',l:'Actividades',i:'🏃'},{id:'inscripcion',l:'Formulario público',i:'📬'},{id:'dashboard',l:'Panel general',i:'📊'},{id:'asistencia',l:'Asistencia',i:'✅'},{id:'usuarios',l:'Usuarios',i:'👤'}];
+const NVP=[{id:'home',l:'Inicio',i:'🏠'},{id:'cuotas',l:'Cuotas',i:'💰'},{id:'mis-actividades',l:'Mis alumnos',i:'👥'},{id:'asistencia',l:'Asistencia',i:'✅'}];
 const PT={home:'Inicio',dashboard:'Panel general',alumnos:'Alumnos y Colaboradores',actividades:'Actividades',cuotas:'Cuotas',asistencia:'Asistencia',usuarios:'Usuarios',inscripcion:'Formulario público','mis-actividades':'Mis actividades'};
 
 function buildNav(){
@@ -984,30 +984,51 @@ function renderHome(){
   const h=new Date().getHours();
   const saludo=h<13?'Buenos días':h<20?'Buenas tardes':'Buenas noches';
   const isA=CU?.rol==='admin';
+  // Cuotas por actividad para el mes actual
+  const actsSumm=isA?db.actividades.filter(a=>a.estado==='activo'||a.estado==='activa'):
+    db.actividades.filter(a=>String(a.profesor_id)===String(CU?.id));
+  const actSummHTML=actsSumm.slice(0,4).map(a=>{
+    const alumIds=db.inscripciones.filter(i=>String(i.actividad_id)===String(a.id)&&i.estado==='activa').map(i=>String(i.alumno_id));
+    const cuotasAct=db.cuotas.filter(c=>String(c.actividad_id)===String(a.id)&&c.mes_anio&&c.mes_anio.slice(0,7)===MES);
+    const pagadoN=cuotasAct.filter(c=>c.estado==='pagado'||c.estado==='pagada').length;
+    const totalN=alumIds.length;
+    const pct=totalN>0?Math.round(pagadoN/totalN*100):0;
+    const color=pct>=80?'#14532d':pct>=50?'#713f12':'#7f1d1d';
+    return`<div onclick="navA('cuotas')" style="background:var(--bl);border:1px solid var(--gb);border-radius:12px;padding:12px 14px;cursor:pointer" title="Ver cuotas">
+      <div style="font-size:.85rem;font-weight:600;margin-bottom:6px">${a.nombre}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:1;height:6px;background:var(--gb);border-radius:3px"><div style="width:${pct}%;height:100%;background:${color};border-radius:3px"></div></div>
+        <span style="font-size:.78rem;font-weight:600;color:${color};white-space:nowrap">${pagadoN}/${totalN}</span>
+      </div>
+    </div>`;
+  }).join('');
   const secs=isA?[
-    {id:'alumnos',l:'Alumnos',i:'👥',bg:'#166534',val:activos+' activos'},
     {id:'cuotas',l:'Cuotas',i:'💰',bg:'#7f1d1d',val:pend+' pendientes'},
-    {id:'asistencia',l:'Asistencia',i:'✅',bg:'#0c4a6e',val:''},
+    {id:'alumnos',l:'Alumnos',i:'👥',bg:'#166534',val:activos+' activos'},
     {id:'actividades',l:'Actividades',i:'🏃',bg:'#78350f',val:''},
+    {id:'inscripcion',l:'Formulario público',i:'📬',bg:'#0c4a6e',val:''},
     {id:'dashboard',l:'Panel general',i:'📊',bg:'#1e293b',val:''},
     {id:'usuarios',l:'Usuarios',i:'👤',bg:'#4a1d96',val:''},
   ]:[
-    {id:'mis-actividades',l:'Mis actividades',i:'🏃',bg:'#166534',val:''},
     {id:'cuotas',l:'Cuotas',i:'💰',bg:'#7f1d1d',val:pend+' pendientes'},
+    {id:'mis-actividades',l:'Mis alumnos',i:'👥',bg:'#166534',val:''},
     {id:'asistencia',l:'Asistencia',i:'✅',bg:'#0c4a6e',val:''},
   ];
   document.getElementById('home-body').innerHTML=`
-    <div style="background:linear-gradient(150deg,#7f1d1d 0%,#991b1b 40%,#166534 100%);padding:32px 20px 40px;margin:-0px;border-radius:0 0 28px 28px;text-align:center;margin-bottom:20px">
-      <img src="escudo.png" style="width:72px;height:72px;object-fit:contain;border-radius:50%;background:#fff;padding:6px;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.25)">
+    <div style="background:linear-gradient(150deg,#7f1d1d 0%,#991b1b 40%,#166534 100%);padding:28px 20px 36px;border-radius:0 0 28px 28px;text-align:center;margin-bottom:16px">
+      <img src="escudo.png" style="width:64px;height:64px;object-fit:contain;border-radius:50%;background:#fff;padding:6px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.25)">
       <div style="color:rgba(255,255,255,.8);font-size:13px;margin-bottom:4px">${saludo}, <strong>${CU.nombre}</strong> 👋</div>
-      <div style="color:#fff;font-size:22px;font-weight:700;letter-spacing:.02em">Madryn Norte</div>
-      <div style="color:rgba(255,255,255,.55);font-size:11px;letter-spacing:.15em;text-transform:uppercase;margin-top:2px">Complejo Deportivo</div>
+      <div style="color:#fff;font-size:20px;font-weight:700">Madryn Norte</div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 4px 24px">
-      ${secs.map(s=>`<button onclick="navA('${s.id}')" style="background:${s.bg};border:none;border-radius:18px;padding:22px 12px 18px;text-align:center;cursor:pointer;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.18);transition:transform .12s,opacity .12s" onmousedown="this.style.transform='scale(.96)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.96)'" ontouchend="this.style.transform=''">
-        <div style="font-size:30px;margin-bottom:8px">${s.i}</div>
-        <div style="font-size:13px;font-weight:600;line-height:1.3">${s.l}</div>
-        ${s.val?`<div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:5px">${s.val}</div>`:''}
+    ${actsSumm.length?`<div style="padding:0 4px;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:600;color:var(--gt);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">💰 Cuotas ${(()=>{const[y,m]=MES.split('-');const mo=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];return mo[Number(m)-1]+' '+y})()}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${actSummHTML}</div>
+    </div>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 4px 24px">
+      ${secs.map(s=>`<button onclick="navA('${s.id}')" style="background:${s.bg};border:none;border-radius:16px;padding:18px 12px 16px;text-align:center;cursor:pointer;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.18);transition:transform .12s" onmousedown="this.style.transform='scale(.96)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.96)'" ontouchend="this.style.transform=''">
+        <div style="font-size:26px;margin-bottom:6px">${s.i}</div>
+        <div style="font-size:13px;font-weight:600">${s.l}</div>
+        ${s.val?`<div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:4px">${s.val}</div>`:''}
       </button>`).join('')}
     </div>`;
 }

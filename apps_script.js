@@ -464,7 +464,57 @@ function doPost(e) {
       const asist = leerHoja('asistencia').filter(function(r) {
         return actIds.indexOf(String(r.actividad_id)) >= 0 && String(r.fecha||'') >= hace30;
       });
-      return respOk({ usuario: safe, actividades: acts, inscripciones: insc, alumnos: alumnos, asistencia: asist });
+      // Cuotas de sus alumnos (últimos 3 meses + mes actual)
+      const hoyP = new Date();
+      const hace3m = Utilities.formatDate(new Date(hoyP.getFullYear(), hoyP.getMonth()-2, 1), 'UTC', 'yyyy-MM');
+      const cuotasP = leerHoja('cuotas').filter(function(c) {
+        return actIds.indexOf(String(c.actividad_id)) >= 0 &&
+               String(c.mes_anio||'').slice(0,7) >= hace3m;
+      });
+      return respOk({ usuario: safe, actividades: acts, inscripciones: insc, alumnos: alumnos, asistencia: asist, cuotas: cuotasP });
+    }
+
+    // ── Registrar pago de cuota desde portal del profe ──
+    if (accion === 'guardar_cuota_portal') {
+      const dniU = String(body.dni || '').trim();
+      const pwdU = String(body.pwd || '').trim();
+      const usuarios = leerHoja('usuarios');
+      const u = usuarios.find(function(u) {
+        return String(u.dni || '').trim() === dniU && u.activo !== false;
+      });
+      if (!u || !pwdMatch(u.password, pwdU)) return respErr('No autorizado');
+      const alumnoId = String(body.alumno_id || '').trim();
+      const actividadId = String(body.actividad_id || '').trim();
+      const mesAnio = String(body.mes_anio || '').trim();
+      const monto = Number(body.monto || 0);
+      const estado = String(body.estado || 'pagado').trim();
+      const medioPago = String(body.medio_pago || '').trim();
+      const obs = String(body.observaciones || '').trim();
+      if (!alumnoId || !actividadId || !mesAnio) return respErr('Faltan datos: alumno, actividad o mes');
+      // Verificar que la actividad pertenece al profe
+      const actsP = leerHoja('actividades');
+      const actP = actsP.find(function(a) { return String(a.id) === actividadId && String(a.profesor_id) === String(u.id); });
+      if (!actP) return respErr('No tenés permiso sobre esa actividad');
+      const cuotasAll = leerHoja('cuotas');
+      const existe = cuotasAll.find(function(c) {
+        return String(c.alumno_id) === alumnoId &&
+               String(c.actividad_id) === actividadId &&
+               String(c.mes_anio || '').slice(0,7) === mesAnio.slice(0,7);
+      });
+      const fechaPago = Utilities.formatDate(new Date(), 'UTC', 'yyyy-MM-dd');
+      const registradoPor = (u.nombre||'') + (u.apellido?' '+u.apellido:'') + ' (portal)';
+      if (existe) {
+        actualizarFila('cuotas', existe.id, { estado: estado, monto: monto, medio_pago: medioPago, fecha_pago: fechaPago, observaciones: obs });
+        return respOk({ message: 'Cuota actualizada', id: existe.id });
+      } else {
+        const newId = 'cp_' + new Date().getTime() + '_' + Math.random().toString(36).slice(2,5);
+        insertarFila('cuotas', {
+          id: newId, alumno_id: alumnoId, actividad_id: actividadId,
+          tipo: 'mensual', mes_anio: mesAnio, monto: monto, descuento: 0,
+          estado: estado, medio_pago: medioPago, fecha_pago: fechaPago, observaciones: obs
+        });
+        return respOk({ message: 'Cuota registrada', id: newId });
+      }
     }
 
     // ── Guardar asistencia desde el portal del profe ──
@@ -652,6 +702,63 @@ function doPost(e) {
         }
       }
       return respOk({ alumno: { dni: DNI_ALUMNO, password: 'alumno123' }, profe: { dni: DNI_PROFE, password: 'profe123', nombre: (uDemo.nombre||'') + ' ' + (uDemo.apellido||'') } });
+    }
+
+    // ── Setup profes reales + actividades ──
+    if (accion === 'setup_profes') {
+      var spUsuarios = leerHoja('usuarios');
+      var spActividades = leerHoja('actividades');
+      var spLog = [];
+      var spProfes = [
+        { nombre: 'Marcos', apellido: 'Méndez',  key: 'marcos' },
+        { nombre: 'Nuria',  apellido: 'Lamela',   key: 'nuria'  },
+        { nombre: 'Pablo',  apellido: 'Cárcamo',  key: 'pablo'  },
+        { nombre: 'Angie',  apellido: '',          key: 'angie'  }
+      ];
+      var spIds = {};
+      var spBase = Date.now();
+      spProfes.forEach(function(p, idx) {
+        var existe = spUsuarios.find(function(u) {
+          return u.rol === 'profesor' &&
+                 String(u.nombre||'').toLowerCase().trim() === p.nombre.toLowerCase() &&
+                 String(u.apellido||'').toLowerCase().trim() === p.apellido.toLowerCase();
+        });
+        if (existe) {
+          spIds[p.key] = existe.id;
+          spLog.push('Profe ya existe: ' + p.nombre + ' ' + p.apellido + ' (id:' + existe.id + ')');
+        } else {
+          var nId = 'U' + (spBase + idx);
+          var usr = p.apellido
+            ? (p.nombre + '.' + p.apellido).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z.]/g,'')
+            : p.nombre.toLowerCase();
+          insertarFila('usuarios', { id: nId, nombre: p.nombre, apellido: p.apellido, username: usr, rol: 'profesor', activo: true, password: 'madryn2025' });
+          spIds[p.key] = nId;
+          spLog.push('Profe creado: ' + p.nombre + ' ' + p.apellido + ' (id:' + nId + ', pwd:madryn2025)');
+        }
+      });
+      var spActsDef = [
+        { nombre: 'Fútbol Mayores',   deporte: 'Fútbol',    categoria: 'Mayores', key: 'marcos' },
+        { nombre: 'Fútbol Juvenil',   deporte: 'Fútbol',    categoria: 'Juvenil', key: 'nuria'  },
+        { nombre: 'Hockey',           deporte: 'Hockey',    categoria: 'General', key: 'angie'  },
+        { nombre: 'Arqueros Mayores', deporte: 'Arqueros',  categoria: 'Mayores', key: 'pablo'  }
+      ];
+      var spABase = spBase + 200;
+      spActsDef.forEach(function(a, idx) {
+        var existe = spActividades.find(function(x) {
+          return String(x.nombre||'').trim().toLowerCase() === a.nombre.toLowerCase();
+        });
+        if (existe) {
+          if (!existe.profesor_id || String(existe.profesor_id).trim() === '') {
+            actualizarFila('actividades', existe.id, { profesor_id: spIds[a.key] });
+          }
+          spLog.push('Actividad ya existe: ' + a.nombre + ' (id:' + existe.id + ')');
+        } else {
+          var aId = 'AC' + (spABase + idx);
+          insertarFila('actividades', { id: aId, nombre: a.nombre, deporte: a.deporte, categoria: a.categoria, profesor_id: spIds[a.key], estado: 'activo' });
+          spLog.push('Actividad creada: ' + a.nombre + ' (id:' + aId + ')');
+        }
+      });
+      return respOk({ log: spLog });
     }
 
     // ── Acciones autenticadas ──

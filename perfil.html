@@ -129,6 +129,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .cb-b{background:#2e1065;color:#c4b5fd}
 .cb-pa{background:#1e3a5f;color:#93c5fd}
 
+/* CUOTAS TAB (profe) */
+.cu-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bord)}
+.cu-row:last-child{border-bottom:none}
+.cu-av{width:36px;height:36px;border-radius:50%;background:var(--bg3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.95rem;font-weight:600;color:var(--txt3)}
+.cu-nom{flex:1;min-width:0;font-size:.88rem;font-weight:500}
+.cu-estado{font-size:.72rem;color:var(--txt2)}
+.cu-btn{border:none;border-radius:8px;padding:6px 12px;font-size:.78rem;font-weight:600;cursor:pointer;background:var(--rojo);color:#fff;white-space:nowrap;flex-shrink:0}
+.cu-btn.pag{background:#14532d;color:#86efac}
+/* MODAL pago */
+#m-pago{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;align-items:flex-end;justify-content:center}
+#m-pago.vis{display:flex}
+.m-pago-card{background:var(--card);border-radius:20px 20px 0 0;padding:22px 20px calc(22px + var(--sab));width:100%;max-width:480px}
+.m-pago-card h3{font-size:.95rem;font-weight:600;margin-bottom:16px}
+.m-pago-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+@media(max-width:360px){.m-pago-grid{grid-template-columns:1fr}}
+.m-pago-btns{display:flex;gap:8px;margin-top:16px}
+.cu-sel-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.cu-sel-bar select,.cu-sel-bar input{flex:1;min-width:100px}
+
 /* EDIT PANEL */
 #edit-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;overflow-y:auto;padding:16px;padding-top:calc(var(--saf)+16px);padding-bottom:calc(var(--sab)+16px);align-items:flex-start;justify-content:center}
 #edit-panel.vis{display:flex}
@@ -268,9 +287,53 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="empty"><span class="spin"></span> Cargando…</div>
   </div>
   <div class="bottom-nav">
-    <button class="bn-btn act" id="bn-asi"  onclick="prTab('asistencia')"><span class="bn-ico">✅</span>Asistencia</button>
-    <button class="bn-btn"     id="bn-acts" onclick="prTab('actividades')"><span class="bn-ico">🏃</span>Actividades</button>
+    <button class="bn-btn act" id="bn-cu"   onclick="prTab('cuotas')"><span class="bn-ico">💰</span>Cuotas</button>
+    <button class="bn-btn"     id="bn-asi"  onclick="prTab('asistencia')"><span class="bn-ico">✅</span>Asistencia</button>
+    <button class="bn-btn"     id="bn-acts" onclick="prTab('actividades')"><span class="bn-ico">🏃</span>Alumnos</button>
     <button class="bn-btn"     id="bn-prof" onclick="prTab('miPerfil')"><span class="bn-ico">👤</span>Mi perfil</button>
+  </div>
+</div>
+
+<!-- MODAL REGISTRAR PAGO -->
+<div id="m-pago">
+  <div class="m-pago-card">
+    <h3>💰 Registrar pago</h3>
+    <div style="font-size:.8rem;color:var(--txt2);margin-bottom:14px" id="m-pago-subtit">—</div>
+    <div class="m-pago-grid">
+      <div class="fgroup">
+        <label class="fl">Monto $</label>
+        <input class="fc" id="m-pago-monto" type="number" min="0" step="100" placeholder="0">
+      </div>
+      <div class="fgroup">
+        <label class="fl">Medio de pago</label>
+        <select class="fc" id="m-pago-medio">
+          <option value="">— Seleccionar —</option>
+          <option value="efectivo">Efectivo</option>
+          <option value="transferencia">Transferencia</option>
+          <option value="tarjeta">Tarjeta</option>
+          <option value="mercadopago">MercadoPago</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+    </div>
+    <div class="fgroup">
+      <label class="fl">Estado</label>
+      <select class="fc" id="m-pago-estado">
+        <option value="pagado">✅ Pagado completo</option>
+        <option value="parcial">⚠️ Parcial</option>
+        <option value="bonificado">🎁 Bonificado / Sin cargo</option>
+        <option value="pendiente">⏳ Pendiente</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label class="fl">Observaciones</label>
+      <input class="fc" id="m-pago-obs" placeholder="Opcional…">
+    </div>
+    <p class="msg err" id="m-pago-err" style="display:none"></p>
+    <div class="m-pago-btns">
+      <button class="btn-sec" onclick="cerrarPago()">Cancelar</button>
+      <button class="btn-ok" id="btn-guardar-pago" onclick="guardarPago()">Guardar pago</button>
+    </div>
   </div>
 </div>
 
@@ -358,7 +421,7 @@ var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOIbATY-QiY5yKu4at475
 var SESSION_KEY = 'mn_perfil_session';
 var sesion = null;  // { dni, pwdHash, tipo, alumno? / usuario? }
 var dataPerfil = null;
-var prTabActual = 'asistencia';
+var prTabActual = 'cuotas';
 var asiEstados = {}; // { alumno_id: estado } para tab asistencia
 var asiActId = '';
 var asiFecha = '';
@@ -597,10 +660,112 @@ async function cargarPerfilProf(){
 
 function prTab(tab){
   prTabActual=tab;
-  ['asi','acts','prof'].forEach(k=>document.getElementById('bn-'+k).classList.remove('act'));
-  if(tab==='asistencia'){document.getElementById('bn-asi').classList.add('act');renderAsi()}
+  ['cu','asi','acts','prof'].forEach(k=>{const el=document.getElementById('bn-'+k);if(el)el.classList.remove('act')});
+  if(tab==='cuotas'){document.getElementById('bn-cu').classList.add('act');renderCuotasProfe()}
+  else if(tab==='asistencia'){document.getElementById('bn-asi').classList.add('act');renderAsi()}
   else if(tab==='actividades'){document.getElementById('bn-acts').classList.add('act');renderActsProfe()}
   else{document.getElementById('bn-prof').classList.add('act');renderMiPerfilProfe()}
+}
+
+// ── Tab Cuotas (profe) ───────────────────────────────────────────────
+var cuActId='';
+var cuMesActual=(()=>{const d=new Date();return d.getFullYear()+'-'+(String(d.getMonth()+1).padStart(2,'0'))})();
+var cuMes=cuMesActual;
+var pagoCtx={}; // contexto del pago en edición
+
+function renderCuotasProfe(){
+  const cont=document.getElementById('pr-content');
+  if(!dataPerfil){cont.innerHTML='<div class="empty"><span class="spin"></span> Cargando…</div>';return}
+  const acts=dataPerfil.actividades||[];
+  const insc=dataPerfil.inscripciones||[];
+  const alumnos=dataPerfil.alumnos||[];
+  const cuotas=dataPerfil.cuotas||[];
+  if(!acts.length){cont.innerHTML='<div class="empty">No tenés actividades asignadas.</div>';return}
+  if(!cuActId||!acts.find(a=>String(a.id)===cuActId))cuActId=String(acts[0].id);
+
+  const actOpts=acts.map(a=>`<option value="${a.id}"${String(a.id)===cuActId?' selected':''}>${a.nombre}</option>`).join('');
+
+  // Alumnes de la actividad
+  const alumsIds=insc.filter(i=>String(i.actividad_id)===cuActId).map(i=>String(i.alumno_id));
+  const alumsAct=alumnos.filter(a=>alumsIds.includes(String(a.id)));
+
+  // Cuotas del mes seleccionado para esta actividad
+  const cuotasMes=cuotas.filter(c=>String(c.actividad_id)===cuActId&&String(c.mes_anio||'').slice(0,7)===cuMes.slice(0,7));
+  const cuotaMap={};cuotasMes.forEach(c=>{cuotaMap[String(c.alumno_id)]=c});
+
+  const pagados=cuotasMes.filter(c=>['pagado','pagada'].includes(c.estado)).length;
+  const total=alumsAct.length;
+
+  const filas=alumsAct.map(al=>{
+    const c=cuotaMap[String(al.id)];
+    const est=c?c.estado:'sin cuota';
+    let estLabel,estCls,btnLabel;
+    if(est==='pagado'||est==='pagada'){estLabel='✅ Pagado';estCls='cb-p';btnLabel='Editar'}
+    else if(est==='bonificado'||est==='bonificada'){estLabel='🎁 Bonificado';estCls='cb-b';btnLabel='Editar'}
+    else if(est==='parcial'){estLabel='⚠️ Parcial';estCls='cb-pa';btnLabel='Completar'}
+    else if(est==='pendiente'){estLabel='⏳ Pendiente';estCls='cb-pe';btnLabel='Registrar pago'}
+    else{estLabel='Sin cuota';estCls='';btnLabel='Registrar pago'}
+    const ini=(al.nombre||' ')[0].toUpperCase();
+    const montoStr=c&&c.monto?'$'+Number(c.monto).toLocaleString('es-AR'):'';
+    const medioStr=c&&c.medio_pago?` · ${c.medio_pago}`:'';
+    return`<div class="cu-row">
+      <div class="cu-av">${ini}</div>
+      <div style="flex:1;min-width:0">
+        <div class="cu-nom">${al.nombre} ${al.apellido||''}</div>
+        <div class="cu-estado">${estLabel}${montoStr?' · '+montoStr:''}${medioStr}</div>
+      </div>
+      <button class="cu-btn${(est==='pagado'||est==='pagada')?' pag':''}" onclick='abrirPago(${JSON.stringify({alumno_id:al.id,actividad_id:cuActId,mes:cuMes,nombre:al.nombre,cuota:c||null})})'>${btnLabel}</button>
+    </div>`;
+  }).join('');
+
+  cont.innerHTML=`
+  <div class="cu-sel-bar">
+    <select class="fc" onchange="cuCambiaAct(this.value)">${actOpts}</select>
+    <input class="fc" type="month" value="${cuMes}" onchange="cuCambiaMes(this.value)">
+  </div>
+  <div style="font-size:.78rem;color:var(--txt2);margin-bottom:10px">${pagados} de ${total} pagaron este mes</div>
+  ${total?`<div>${filas}</div>`:'<div class="empty">Sin alumnos en esta actividad.</div>'}`;
+}
+
+function cuCambiaAct(id){cuActId=id;renderCuotasProfe()}
+function cuCambiaMes(m){cuMes=m;renderCuotasProfe()}
+
+function abrirPago(ctx){
+  pagoCtx=ctx;
+  const c=ctx.cuota||{};
+  document.getElementById('m-pago-subtit').textContent=ctx.nombre+' — '+fmtM(ctx.mes);
+  document.getElementById('m-pago-monto').value=c.monto||'';
+  document.getElementById('m-pago-medio').value=c.medio_pago||'';
+  document.getElementById('m-pago-estado').value=c.estado&&['pagado','pagada','parcial','bonificado','bonificada','pendiente'].includes(c.estado)?c.estado.replace('pagada','pagado').replace('bonificada','bonificado'):'pagado';
+  document.getElementById('m-pago-obs').value=c.observaciones||'';
+  const errEl=document.getElementById('m-pago-err');errEl.style.display='none';
+  document.getElementById('m-pago').classList.add('vis');
+}
+function cerrarPago(){document.getElementById('m-pago').classList.remove('vis')}
+
+async function guardarPago(){
+  const btn=document.getElementById('btn-guardar-pago');
+  const monto=Number(document.getElementById('m-pago-monto').value)||0;
+  const medio=document.getElementById('m-pago-medio').value;
+  const estado=document.getElementById('m-pago-estado').value;
+  const obs=document.getElementById('m-pago-obs').value.trim();
+  const errEl=document.getElementById('m-pago-err');
+  if(!medio){errEl.textContent='Seleccioná el medio de pago';errEl.style.display='block';return}
+  btn.disabled=true;btn.textContent='Guardando…';errEl.style.display='none';
+  try{
+    var r=await post({accion:'guardar_cuota_portal',dni:sesion.dni,pwd:sesion.pwdHash,
+      alumno_id:pagoCtx.alumno_id,actividad_id:pagoCtx.actividad_id,
+      mes_anio:pagoCtx.mes,monto,estado,medio_pago:medio,observaciones:obs});
+    if(!r.ok)throw new Error(r.error||'Error');
+    // Actualizar cache local
+    if(!dataPerfil.cuotas)dataPerfil.cuotas=[];
+    const mes7=pagoCtx.mes.slice(0,7);
+    const ix=dataPerfil.cuotas.findIndex(c=>String(c.alumno_id)===String(pagoCtx.alumno_id)&&String(c.actividad_id)===String(pagoCtx.actividad_id)&&String(c.mes_anio||'').slice(0,7)===mes7);
+    const newC={alumno_id:pagoCtx.alumno_id,actividad_id:pagoCtx.actividad_id,mes_anio:pagoCtx.mes,monto,estado,medio_pago:medio,observaciones:obs,id:r.data.id||('tmp_'+Date.now())};
+    if(ix>=0)dataPerfil.cuotas[ix]=newC;else dataPerfil.cuotas.push(newC);
+    cerrarPago();renderCuotasProfe();toast('✅ Pago guardado');
+  }catch(e){errEl.textContent=e.message;errEl.style.display='block'}
+  finally{btn.disabled=false;btn.textContent='Guardar pago'}
 }
 
 // ── Tab Asistencia ────────────────────────────────────────────────────
@@ -773,13 +938,22 @@ function renderActsProfe(){
     const actsHtml=depActs.map(a=>{
       const alumsIds=insc.filter(i=>String(i.actividad_id)===String(a.id)).map(i=>String(i.alumno_id));
       const alums=alumnos.filter(al=>alumsIds.includes(String(al.id)));
+      const cuotasMes=(dataPerfil.cuotas||[]).filter(c=>String(c.actividad_id)===String(a.id)&&String(c.mes_anio||'').slice(0,7)===cuMesActual);
+      const cuotaMap={};cuotasMes.forEach(c=>{cuotaMap[String(c.alumno_id)]=c});
       const alumsHtml=alums.length?alums.map(al=>{
         const foto=al.foto
           ?`<img src="${al.foto}" class="al-chip-foto" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`+
            `<div class="al-chip-foto-ph" style="display:none">👤</div>`
           :`<div class="al-chip-foto-ph">👤</div>`;
         const waTel=al.telefono?`<span style="margin-left:6px">${waBtnHtml(al.telefono)}</span>`:'';
-        return`<div class="al-chip">${foto}<div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:500">${al.nombre} ${al.apellido||''}</div><div style="font-size:.72rem;color:var(--txt2)">DNI ${al.dni||'—'}${waTel}</div></div></div>`;
+        const c=cuotaMap[String(al.id)];
+        const est=c?c.estado:'';
+        let cuotaHTML='';
+        if(est==='pagado'||est==='pagada')cuotaHTML=`<span class="cbadge cb-p" style="margin-left:6px">✅ Pago</span>`;
+        else if(est==='bonificado'||est==='bonificada')cuotaHTML=`<span class="cbadge cb-b" style="margin-left:6px">🎁 Bon.</span>`;
+        else if(est==='parcial')cuotaHTML=`<span class="cbadge cb-pa" style="margin-left:6px">⚠️ Parcial</span>`;
+        else cuotaHTML=`<button onclick='abrirPago(${JSON.stringify({alumno_id:al.id,actividad_id:a.id,mes:cuMesActual,nombre:al.nombre,cuota:null})})' style="margin-left:6px;border:none;border-radius:6px;padding:2px 7px;font-size:.65rem;font-weight:600;background:var(--rojo);color:#fff;cursor:pointer">💰 Pagar</button>`;
+        return`<div class="al-chip">${foto}<div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:500">${al.nombre} ${al.apellido||''} ${cuotaHTML}</div><div style="font-size:.72rem;color:var(--txt2)">DNI ${al.dni||'—'}${waTel}</div></div></div>`;
       }).join(''):'<div style="font-size:.8rem;color:var(--txt2);padding:6px 0">Sin alumnos inscriptos</div>';
       return`<div class="disc-act-blk">
         <div class="disc-act-nom">${a.nombre}</div>

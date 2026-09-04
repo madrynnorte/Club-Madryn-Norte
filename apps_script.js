@@ -843,6 +843,77 @@ function onFormSubmit(e) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+//  SETUP INICIAL — Ejecutar desde el editor una sola vez
+// ═══════════════════════════════════════════════════════════════════
+
+/**
+ * Crea los 4 profes y las 4 actividades de Madryn Norte.
+ * CÓMO USARLA:
+ *   1. Guardá el archivo en el editor de Apps Script
+ *   2. En el menú desplegable de funciones (arriba), elegí "crearProfesYActividades"
+ *   3. Hacé clic en ▶ Ejecutar
+ *   4. Revisá el log (Ver → Registros) para ver qué se creó
+ */
+function crearProfesYActividades() {
+  var profes = [
+    { nombre: 'Marcos', apellido: 'Méndez',  actividad: 'Fútbol Mayores',   deporte: 'Fútbol',   categoria: 'Mayores' },
+    { nombre: 'Nuria',  apellido: 'Lamela',   actividad: 'Fútbol Juvenil',   deporte: 'Fútbol',   categoria: 'Juvenil' },
+    { nombre: 'Pablo',  apellido: 'Cárcamo',  actividad: 'Arqueros Mayores', deporte: 'Arqueros', categoria: 'Mayores' },
+    { nombre: 'Angie',  apellido: '',          actividad: 'Hockey',           deporte: 'Hockey',   categoria: 'General' }
+  ];
+
+  var usuarios   = leerHoja('usuarios');
+  var actividades = leerHoja('actividades');
+  var base = new Date().getTime();
+
+  profes.forEach(function(p, idx) {
+    // ── Crear/encontrar profe ──
+    var uExiste = usuarios.find(function(u) {
+      return u.rol === 'profesor' &&
+             String(u.nombre||'').toLowerCase() === p.nombre.toLowerCase() &&
+             String(u.apellido||'').toLowerCase() === p.apellido.toLowerCase();
+    });
+    var profId;
+    if (uExiste) {
+      profId = uExiste.id;
+      Logger.log('Profe ya existe: ' + p.nombre + ' ' + p.apellido + ' (id: ' + profId + ')');
+    } else {
+      profId = 'U' + (base + idx);
+      var usr = p.apellido
+        ? (p.nombre + '.' + p.apellido).toLowerCase()
+            .replace(/[áäàâ]/g,'a').replace(/[éëèê]/g,'e').replace(/[íïìî]/g,'i')
+            .replace(/[óöòô]/g,'o').replace(/[úüùû]/g,'u').replace(/[^a-z.]/g,'')
+        : p.nombre.toLowerCase();
+      insertarFila('usuarios', {
+        id: profId, nombre: p.nombre, apellido: p.apellido,
+        username: usr, rol: 'profesor', activo: true, password: 'madryn2025'
+      });
+      Logger.log('Profe creado: ' + p.nombre + ' ' + p.apellido + ' — id: ' + profId + ' — pwd: madryn2025');
+    }
+
+    // ── Crear/encontrar actividad ──
+    var aExiste = actividades.find(function(a) {
+      return String(a.nombre||'').toLowerCase() === p.actividad.toLowerCase();
+    });
+    if (aExiste) {
+      if (!aExiste.profesor_id || String(aExiste.profesor_id).trim() === '') {
+        actualizarFila('actividades', aExiste.id, { profesor_id: profId });
+      }
+      Logger.log('Actividad ya existe: ' + p.actividad + ' (id: ' + aExiste.id + ')');
+    } else {
+      var aId = 'AC' + (base + 100 + idx);
+      insertarFila('actividades', {
+        id: aId, nombre: p.actividad, deporte: p.deporte,
+        categoria: p.categoria, profesor_id: profId, estado: 'activo'
+      });
+      Logger.log('Actividad creada: ' + p.actividad + ' — id: ' + aId);
+    }
+  });
+
+  Logger.log('✅ Listo. Abrí Ver → Registros para ver el detalle.');
+}
+
+// ═══════════════════════════════════════════════════════════════════
 //  UTILIDADES — Ejecutar desde el editor, una sola vez
 // ═══════════════════════════════════════════════════════════════════
 
